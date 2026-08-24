@@ -13,6 +13,7 @@ const ctx = canvas.getContext("2d");
 
 let game = null;
 let levelIndex = 0;
+let custom = null;            // a level from a #lvl= share code, or null
 let mode = "intro";           // intro | playing | paused | dead | won | complete
 let acc = 0;
 let lastFrame = 0;
@@ -74,6 +75,8 @@ const Sound = {
       boom: [[90, 0, .2, "sawtooth", .08]],
       die: [[440, 0, .12, "sawtooth"], [300, .12, .14, "sawtooth"], [160, .26, .3, "sawtooth"]],
       win: [[660, 0, .1], [880, .1, .1], [1100, .2, .1], [1320, .3, .25]],
+      reject: [[240, 0, .1, "sawtooth", .06], [150, .1, .18, "sawtooth", .06]],
+      rewind: [[700, 0, .05], [520, .05, .05], [380, .1, .08]],
       step: [[150, 0, .03, "triangle", .02]]
     }[name];
     if (!seq) return;
@@ -124,10 +127,12 @@ function drawTerrain(ch, sx, sy, gx, gy) {
 }
 
 function drawItem(ch, sx, sy, gx, gy) {
-  if (ch === "c") Sprites.hardware(ctx, sx, sy, TILE, partKind(gx, gy, true), animT);
-  else if (ch === "s") Sprites.software(ctx, sx, sy, TILE, partKind(gx, gy, false), animT);
-  else if ("rbyg".includes(ch)) Sprites.card(ctx, sx, sy, TILE, ch);
-  else Sprites.tool(ctx, sx, sy, TILE, ch);
+  const kind = game.kindAt.get(gx + "," + gy);
+  if (ch === "c" || ch === "x") Sprites.hardware(ctx, sx, sy, TILE, kind, animT);
+  else if (ch === "s" || ch === "z") Sprites.software(ctx, sx, sy, TILE, kind, animT);
+  else if ("rbyg".includes(ch)) return Sprites.card(ctx, sx, sy, TILE, ch);
+  else return Sprites.tool(ctx, sx, sy, TILE, ch);
+  if (ch === "x" || ch === "z") Sprites.incompatible(ctx, sx, sy, TILE);
 }
 
 function render(alpha) {
@@ -184,19 +189,39 @@ function chipCanvas(draw) {
 }
 
 function updateHUD() {
-  el("level-no").textContent = `Level ${levelIndex + 1} of ${LEVELS.length}`;
+  el("level-no").textContent = custom ? "Custom level" : `Level ${levelIndex + 1} of ${LEVELS.length}`;
   el("level-name").textContent = game.level.name;
   el("time-left").textContent = fmtTime(game.timeLeft);
   el("time-left").parentElement.classList.toggle("warn", game.timeLeft < 20000);
-  el("hw-count").textContent = `${game.collected.hw}/${game.required.hw}`;
-  el("sw-count").textContent = `${game.collected.sw}/${game.required.sw}`;
+  const got = game.collected.hw + game.collected.sw;
+  el("parts-count").textContent = `${got}/${game.required.hw + game.required.sw}`;
+  el("par-count").textContent = game.level.par ? `${game.moves}/${game.level.par}` : String(game.moves);
+
+  const list = el("spec-list");
+  list.innerHTML = "";
+  for (const entry of game.spec) {
+    const row = document.createElement("div");
+    row.className = "spec-row" + (entry.got >= entry.need ? " done" : "");
+    row.appendChild(chipCanvas((c, sz) => (entry.hardware
+      ? Sprites.hardware(c, 0, 0, sz, entry.kind, 0)
+      : Sprites.software(c, 0, 0, sz, entry.kind, 0))));
+    const n = document.createElement("span");
+    n.className = "n";
+    n.textContent = entry.name;
+    const q = document.createElement("span");
+    q.className = "q";
+    q.textContent = entry.got >= entry.need ? "\u2713" : `${entry.got}/${entry.need}`;
+    row.append(n, q);
+    list.appendChild(row);
+  }
+  el("btn-rewind").disabled = !game.canUndo();
 
   const ready = game.partsDone();
   const socket = el("socket-state");
   socket.classList.toggle("ready", ready);
   socket.textContent = ready
     ? "Socket open — get to the power button"
-    : "Socket locked — parts still missing";
+    : "Socket locked — the build is not complete";
 
   const inv = el("inventory");
   inv.innerHTML = "";
@@ -224,20 +249,27 @@ function updateHUD() {
   box.querySelector("h3").textContent = game.onHint ? "Help terminal" : "Objective";
   el("hint-text").textContent = game.onHint
     ? game.level.hint
-    : `Collect ${game.required.hw} hardware and ${game.required.sw} software parts, then reach the power button through the assembly socket.`;
+    : "Fetch exactly the parts on the build spec — anything tagged with a red cross does not fit this machine and costs you 10 seconds.";
 }
 
 let toastTimer = null;
-function toast(msg) {
+function toast(msg, bad) {
   const t = el("toast");
   t.textContent = msg;
+  t.classList.toggle("bad", !!bad);
   t.style.opacity = "1";
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { t.style.opacity = "0"; }, 1600);
 }
 
 /* ---------------------------------------------------------------- overlays */
+let bootTimer = null;
+function stopBoot() { clearTimeout(bootTimer); bootTimer = null; }
+
 function showOverlay(title, text, stats, primary, secondary) {
+  stopBoot();
+  el("ov-boot").classList.add("hidden");
+  el("ov-stars").textContent = "";
   el("ov-title").textContent = title;
   el("ov-text").textContent = text;
   el("ov-stats").innerHTML = stats || "";
@@ -248,14 +280,16 @@ function showOverlay(title, text, stats, primary, secondary) {
   else { s.style.display = "none"; }
   el("overlay").classList.remove("hidden");
 }
-function hideOverlay() { el("overlay").classList.add("hidden"); }
+function hideOverlay() { stopBoot(); el("overlay").classList.add("hidden"); }
 
 function introOverlay() {
   mode = "intro";
   showOverlay(
     `Level ${levelIndex + 1} — ${game.level.name}`,
     game.level.hint,
-    `<span>Hardware <b>${game.required.hw}</b></span><span>Software <b>${game.required.sw}</b></span><span>Clock <b>${fmtTime(game.timeLeft)}</b></span>`,
+    `<span>Parts <b>${game.required.hw + game.required.sw}</b></span>` +
+    `<span>Clock <b>${fmtTime(game.timeLeft)}</b></span>` +
+    (game.level.par ? `<span>Par <b>${game.level.par} moves</b></span>` : ""),
     { label: "Start", action: startPlaying },
     { label: "Levels", action: () => el("levels-dialog").showModal() }
   );
@@ -271,37 +305,121 @@ function startPlaying() {
 function deathOverlay() {
   mode = "dead";
   Sound.play("die");
-  showOverlay("Assembly failed", game.deathReason,
-    `<span>Hardware <b>${game.collected.hw}/${game.required.hw}</b></span><span>Software <b>${game.collected.sw}/${game.required.sw}</b></span>`,
-    { label: "Try again", action: () => loadLevel(levelIndex) },
-    { label: "Levels", action: () => el("levels-dialog").showModal() });
+  const parts = `<span>Parts <b>${game.collected.hw + game.collected.sw}/${game.required.hw + game.required.sw}</b></span>` +
+    `<span>Moves <b>${game.moves}</b></span>`;
+  if (game.canUndo()) {
+    showOverlay("Assembly failed", game.deathReason + " — you can step back and try something else.", parts,
+      { label: "Rewind one move", action: rewind },
+      { label: "Restart level", action: () => loadLevel(levelIndex) });
+  } else {
+    showOverlay("Assembly failed", game.deathReason, parts,
+      { label: "Try again", action: () => loadLevel(levelIndex) },
+      { label: "Levels", action: () => el("levels-dialog").showModal() });
+  }
 }
+
+function rewind() {
+  if (!game.undo()) return;
+  for (const ev of game.drainEvents()) handleEvent(ev);
+  hideOverlay();
+  mode = "playing";
+  acc = 0;
+  held.length = 0;
+  buffered = null;
+  updateHUD();
+}
+
+/* Three stars: finish, finish briskly, finish briskly with no rewinds and no
+   incompatible parts picked up. Par comes from the solver in tools/solve.js. */
+function starsFor(g) {
+  const par = g.level.par;
+  if (!par) return 3;
+  if (g.moves <= Math.round(par * 1.25) && g.rewinds === 0 && g.rejects === 0) return 3;
+  if (g.moves <= par * 2) return 2;
+  return 1;
+}
+function starString(n) { return "\u2605".repeat(n) + "\u2606".repeat(3 - n); }
 
 function winOverlay() {
   mode = "won";
   Sound.play("win");
   const name = game.level.name;
   const seconds = Math.round(elapsedMs / 1000);
-  const best = progress.best[name];
-  const record = !best || seconds < best.time;
-  if (record) progress.best[name] = { time: seconds, moves: game.moves };
+  const stars = starsFor(game);
+  const prev = progress.best[name];
+  const record = !prev || seconds < prev.time || stars > (prev.stars || 0);
+  progress.best[name] = {
+    time: Math.min(seconds, prev ? prev.time : seconds),
+    moves: Math.min(game.moves, prev ? prev.moves : game.moves),
+    stars: Math.max(stars, prev ? prev.stars || 0 : 0)
+  };
   progress.unlocked = Math.max(progress.unlocked, Math.min(levelIndex + 2, LEVELS.length));
   saveProgress(progress);
   buildLevelList();
 
   const last = levelIndex === LEVELS.length - 1;
-  showOverlay(
-    last ? "All systems assembled!" : "Machine booted!",
-    last
-      ? "Every rig is built and running. You can replay any level for a faster time."
-      : `${name} is complete — the next bench is unlocked.`,
-    `<span>Time <b>${seconds}s</b></span><span>Moves <b>${game.moves}</b></span>` +
-    `<span>Clock left <b>${fmtTime(game.timeLeft)}</b></span>` + (record ? "<span><b>New best</b></span>" : ""),
-    last
+  const primary = custom
+    ? { label: "Play again", action: () => loadLevel(levelIndex) }
+    : last
       ? { label: "Replay level", action: () => loadLevel(levelIndex) }
-      : { label: "Next level", action: () => loadLevel(levelIndex + 1) },
+      : { label: "Next level", action: () => loadLevel(levelIndex + 1) };
+
+  showOverlay(
+    last && !custom ? "All systems assembled!" : "Machine booted!",
+    last && !custom
+      ? "Every rig is built and running. Replay any level for a cleaner run."
+      : `${name} is complete.`,
+    `<span>Time <b>${seconds}s</b></span><span>Moves <b>${game.moves}</b></span>` +
+    (game.level.par ? `<span>Par <b>${game.level.par}</b></span>` : "") +
+    (game.rewinds ? `<span>Rewinds <b>${game.rewinds}</b></span>` : "") +
+    (record ? "<span><b>New best</b></span>" : ""),
+    primary,
     { label: "Levels", action: () => el("levels-dialog").showModal() }
   );
+  runBootSequence(seconds, stars);
+}
+
+/* The payoff: a POST screen listing exactly what you installed. */
+function runBootSequence(seconds, stars) {
+  const pre = el("ov-boot");
+  const text = el("ov-text"), stats = el("ov-stats"), starLine = el("ov-stars");
+  const buttons = document.querySelector(".overlay-buttons");
+  const lines = ["BIT BUILDER POST v1.0", ""];
+  const width = 26;
+  for (const e of game.spec) {
+    const label = e.name + (e.need > 1 ? ` \u00d7${e.need}` : "");
+    lines.push(label + " " + ".".repeat(Math.max(3, width - label.length)) + " OK");
+    if (e === game.spec.filter(x => x.hardware).slice(-1)[0]) lines.push("");
+  }
+  lines.push("", `Boot complete in ${seconds}s, ${game.moves} moves.`);
+
+  pre.textContent = "";
+  pre.classList.remove("hidden");
+  for (const n of [text, stats, buttons]) n.style.visibility = "hidden";
+  starLine.textContent = "";
+
+  let i = 0;
+  const tick = () => {
+    if (i < lines.length) {
+      pre.textContent += (i ? "\n" : "") + lines[i++];
+      if (lines[i - 1]) Sound.play("step");
+      bootTimer = setTimeout(tick, 70);
+      return;
+    }
+    starLine.textContent = starString(stars);
+    for (const n of [text, stats, buttons]) n.style.visibility = "";
+    bootTimer = null;
+  };
+  tick();
+}
+
+function skipBoot() {
+  if (!bootTimer) return false;
+  stopBoot();
+  const stars = starsFor(game);
+  el("ov-stars").textContent = starString(stars);
+  for (const n of [el("ov-text"), el("ov-stats"), document.querySelector(".overlay-buttons")]) n.style.visibility = "";
+  return true;
 }
 
 function togglePause() {
@@ -337,12 +455,13 @@ document.addEventListener("keydown", e => {
     if (mode === "intro") startPlaying();
     return;
   }
-  if (e.key === "r" || e.key === "R") { loadLevel(levelIndex); return; }
+  if (e.key === "r" || e.key === "R") { custom ? loadCustomLevel(custom) : loadLevel(levelIndex); return; }
+  if (e.key === "z" || e.key === "Z") { if (mode === "playing" || mode === "dead") rewind(); return; }
   if (e.key === "p" || e.key === "P") { togglePause(); return; }
   if (e.key === "Enter" || e.key === " ") {
     if (!el("overlay").classList.contains("hidden")) {
       e.preventDefault();
-      el("ov-primary").click();
+      if (!skipBoot()) el("ov-primary").click();
     }
   }
 });
@@ -387,6 +506,8 @@ function takeStep() {
 function handleEvent(ev) {
   Sound.play(ev.name);
   if (ev.name === "pickup" && game.lastPickup) toast(`Picked up: ${game.lastPickup}`);
+  if (ev.name === "reject") toast(`${ev.data} does not fit this build — 10s lost`, true);
+  if (ev.name === "rewind") toast("Rewound one move");
   if (ev.name === "door") toast("Access card used");
   if (ev.name === "scrub") toast("Scrubber wiped your tools!");
   if (ev.name === "ready") toast("All parts collected — socket unlocked");
@@ -415,8 +536,18 @@ function frame(now) {
 
 /* ------------------------------------------------------------------ levels */
 function loadLevel(i) {
+  custom = null;
   levelIndex = Math.max(0, Math.min(i, LEVELS.length - 1));
-  game = new Game(LEVELS[levelIndex]);
+  startGame(LEVELS[levelIndex]);
+}
+
+function loadCustomLevel(level) {
+  custom = level;
+  startGame(level);
+}
+
+function startGame(level) {
+  game = new Game(level);
   elapsedMs = 0;
   acc = 0;
   held.length = 0;
@@ -436,7 +567,8 @@ function buildLevelList() {
     b.disabled = i + 1 > progress.unlocked;
     const best = progress.best[lv.name];
     b.innerHTML = `<span class="n">Level ${i + 1}</span><span class="t">${b.disabled ? "Locked" : lv.name}</span>` +
-      (best ? `<span class="best">best ${best.time}s · ${best.moves} moves</span>` : "");
+      (best ? `<p class="stars">${starString(best.stars || 1)}</p>` +
+              `<span class="best">best ${best.time}s · ${best.moves} moves</span>` : "");
     b.onclick = () => loadLevel(i);
     list.appendChild(b);
   });
@@ -445,9 +577,11 @@ function buildLevelList() {
 /* ------------------------------------------------------------------ legend */
 function buildLegend() {
   const items = [
-    [(c, s) => Sprites.hardware(c, 0, 0, s, "cpu", 0), "Hardware part", "CPUs, RAM, drives, fans — collect them all"],
+    [(c, s) => Sprites.hardware(c, 0, 0, s, "cpu", 0), "Hardware part", "CPUs, RAM, drives, fans — only the ones on the build spec"],
     [(c, s) => Sprites.software(c, 0, 0, s, "os", 0), "Software part", "OS images, drivers, compilers, antivirus"],
-    [(c, s) => Sprites.socket(c, 0, 0, s, false, 0), "Assembly socket", "opens only when every part is on your belt"],
+    [(c, s) => { Sprites.hardware(c, 0, 0, s, "ram", 0); Sprites.incompatible(c, 0, 0, s); }, "Does not fit",
+      "a part this build has no slot for — grabbing it costs 10 seconds"],
+    [(c, s) => Sprites.socket(c, 0, 0, s, false, 0), "Assembly socket", "opens once the whole build spec is ticked off"],
     [(c, s) => Sprites.exit(c, 0, 0, s, 0), "Power button", "reach it to finish the level"],
     [(c, s) => Sprites.card(c, 0, 0, s, "b"), "Access card", "opens one matching port (green root access is reusable)"],
     [(c, s) => Sprites.door(c, 0, 0, s, "b"), "Locked port", "needs the matching card"],
@@ -481,7 +615,9 @@ function buildLegend() {
 }
 
 /* -------------------------------------------------------------------- boot */
-el("btn-restart").onclick = () => loadLevel(levelIndex);
+el("overlay").addEventListener("click", e => { if (e.target.tagName !== "BUTTON") skipBoot(); });
+el("btn-rewind").onclick = rewind;
+el("btn-restart").onclick = () => (custom ? loadCustomLevel(custom) : loadLevel(levelIndex));
 el("btn-pause").onclick = togglePause;
 el("btn-levels").onclick = () => el("levels-dialog").showModal();
 el("btn-help").onclick = () => el("help-dialog").showModal();
@@ -496,5 +632,20 @@ setupCanvas();
 window.addEventListener("resize", setupCanvas);
 buildLevelList();
 buildLegend();
-loadLevel(Math.min(progress.unlocked - 1, LEVELS.length - 1));
+startFromHash();
 requestAnimationFrame(frame);
+
+function startFromHash() {
+  const m = /[#&]lvl=([A-Za-z0-9\-_]+)/.exec(location.hash);
+  if (m) {
+    try {
+      loadCustomLevel(Codec.decode(m[1]));
+      return;
+    } catch (err) {
+      alert("That level code could not be read: " + err.message);
+    }
+  }
+  loadLevel(Math.min(progress.unlocked - 1, LEVELS.length - 1));
+}
+
+window.addEventListener("hashchange", startFromHash);

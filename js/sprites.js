@@ -606,6 +606,22 @@ const Sprites = {
     ctx.restore();
   },
 
+  /* Red tag on a part that does not fit the current build. */
+  incompatible(ctx, px, py, S) {
+    const cx = px + S * 0.78, cy = py + S * 0.24, r = S * 0.17;
+    ctx.fillStyle = "#7f1d1d";
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 7);
+    ctx.fill();
+    ctx.strokeStyle = "#fecaca";
+    ctx.lineWidth = Math.max(1, S * 0.035);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - r * 0.4, cy - r * 0.4); ctx.lineTo(cx + r * 0.4, cy + r * 0.4);
+    ctx.moveTo(cx + r * 0.4, cy - r * 0.4); ctx.lineTo(cx - r * 0.4, cy + r * 0.4);
+    ctx.stroke();
+  },
+
   crate(ctx, px, py, S) {
     ctx.fillStyle = "#3f3f46";
     rr(ctx, px + S * 0.06, py + S * 0.06, S * 0.88, S * 0.88, S * 0.08);

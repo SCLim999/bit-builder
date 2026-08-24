@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bit Builder — level editor</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">&#9998;</span>
+    <div>
+      <h1>Level editor</h1>
+      <p>Paint a map, name the parts, check it, then share the link. Levels travel in the URL &mdash; nothing is uploaded.</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="btn" href="index.html">Back to the game</a>
+  </div>
+</header>
+
+<main class="ed-shell">
+  <section class="stage">
+    <canvas id="ed-board" width="640" height="640"></canvas>
+    <p class="ed-hint">Click or drag to paint &middot; right-click to erase &middot; the board resizes to fit your map</p>
+  </section>
+
+  <aside class="panel ed-panel">
+    <div class="ed-fields">
+      <label>Name <input id="ed-name" type="text" maxlength="60" value="My level"></label>
+      <label>Seconds <input id="ed-time" type="number" min="10" max="3600" value="150"></label>
+      <label>Width <input id="ed-w" type="number" min="7" max="40" value="15"></label>
+      <label>Height <input id="ed-h" type="number" min="7" max="40" value="13"></label>
+      <label class="wide">Hint shown at the help terminal
+        <input id="ed-hintline" type="text" maxlength="240" value="">
+      </label>
+    </div>
+
+    <div class="belt">
+      <h3>Brush</h3>
+      <div id="ed-palette" class="ed-palette"></div>
+    </div>
+
+    <div class="belt">
+      <h3>Parts on the map</h3>
+      <div id="ed-kinds" class="ed-kinds"></div>
+    </div>
+
+    <div id="ed-report" class="ed-report">Draw a map, then press Check.</div>
+
+    <div class="ed-buttons">
+      <button id="ed-check" class="btn btn-primary">Check</button>
+      <button id="ed-play" class="btn">Test play</button>
+      <button id="ed-copy" class="btn">Copy share link</button>
+      <button id="ed-load" class="btn">Load code</button>
+      <button id="ed-start" class="btn">Start from a level</button>
+      <button id="ed-clear" class="btn">Clear</button>
+    </div>
+  </aside>
+</main>
+
+<footer class="foot">Every level is just text — a share link holds the whole map.</footer>
+
+<script src="js/levels.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/validate.js"></script>
+<script src="js/codec.js"></script>
+<script src="js/editor.js"></script>
+</body>
+</html>

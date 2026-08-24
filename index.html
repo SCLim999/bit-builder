@@ -18,6 +18,7 @@
   </div>
   <div class="topbar-actions">
     <button id="btn-levels" class="btn">Levels</button>
+    <a class="btn" href="editor.html">Editor</a>
     <button id="btn-sound" class="btn" aria-pressed="true">Sound: on</button>
     <button id="btn-help" class="btn">How to play</button>
   </div>
@@ -29,7 +30,9 @@
     <div id="overlay" class="overlay hidden">
       <div class="overlay-card">
         <h2 id="ov-title">Ready?</h2>
+        <pre id="ov-boot" class="boot hidden"></pre>
         <p id="ov-text"></p>
+        <p id="ov-stars" class="stars"></p>
         <div id="ov-stats" class="ov-stats"></div>
         <div class="overlay-buttons">
           <button id="ov-primary" class="btn btn-primary"></button>
@@ -60,13 +63,18 @@
         <strong id="time-left">0:00</strong>
       </div>
       <div class="gauge">
-        <span class="gauge-label">Hardware</span>
-        <strong id="hw-count">0/0</strong>
+        <span class="gauge-label">Parts</span>
+        <strong id="parts-count">0/0</strong>
       </div>
       <div class="gauge">
-        <span class="gauge-label">Software</span>
-        <strong id="sw-count">0/0</strong>
+        <span class="gauge-label">Par</span>
+        <strong id="par-count">&mdash;</strong>
       </div>
+    </div>
+
+    <div class="belt">
+      <h3>Build spec</h3>
+      <div id="spec-list" class="spec-list"></div>
     </div>
 
     <div id="socket-state" class="socket-state">Socket locked &mdash; parts still missing</div>
@@ -84,6 +92,7 @@
     <p id="toast" class="toast"></p>
 
     <div class="panel-buttons">
+      <button id="btn-rewind" class="btn">Rewind <kbd>Z</kbd></button>
       <button id="btn-restart" class="btn">Restart <kbd>R</kbd></button>
       <button id="btn-pause" class="btn">Pause <kbd>P</kbd></button>
     </div>
@@ -100,9 +109,15 @@
 <dialog id="help-dialog">
   <h2>How to play</h2>
   <p>Move with the <strong>arrow keys</strong> or <strong>WASD</strong> (swipe or use the pad on a phone).
-     Pick up every hardware part and every software part on the map, walk through the
-     <strong>assembly socket</strong> &mdash; it only opens once nothing is missing &mdash; and reach the
-     <strong>power button</strong> before the clock runs out. <kbd>R</kbd> restarts, <kbd>P</kbd> pauses.</p>
+     Every level is a <strong>build spec</strong>: fetch exactly the components it lists, walk through the
+     <strong>assembly socket</strong> &mdash; it only opens once the spec is complete &mdash; and reach the
+     <strong>power button</strong> before the clock runs out. Parts marked with a red cross belong to a
+     different machine: picking one up costs you ten seconds.</p>
+  <p>Made a mess of a crate push? <kbd>Z</kbd> <strong>rewinds</strong> one move, even the one that killed you
+     &mdash; the clock keeps running, and a clean run with no rewinds is worth the third star.
+     <kbd>R</kbd> restarts, <kbd>P</kbd> pauses. Every level has a <strong>par</strong> move count from the
+     solver; beat 125% of it with no rewinds and no wrong parts for three stars.
+     You can also <a href="editor.html">build your own levels</a> and share them as a link.</p>
   <div class="legend" id="legend"></div>
   <form method="dialog"><button class="btn">Close</button></form>
 </dialog>
@@ -112,6 +127,7 @@
 </footer>
 
 <script src="js/levels.js"></script>
+<script src="js/codec.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/main.js"></script>

@@ -32,7 +32,9 @@ const ICE_WALLS = { "1": ["up", "left"], "2": ["up", "right"], "3": ["down", "ri
 const DOOR_CARD = { R: "r", B: "b", Y: "y", G: "g" };
 const CARD_CHARS = "rbyg";
 const TOOL_CHARS = "FHKM";
-const ITEM_CHARS = "cs" + CARD_CHARS + TOOL_CHARS;
+const PART_CHARS = "cs";           // parts the build spec asks for
+const DECOY_CHARS = "xz";          // parts that do not fit this build
+const ITEM_CHARS = PART_CHARS + DECOY_CHARS + CARD_CHARS + TOOL_CHARS;
 const MONSTER_CHARS = "@%&$";
 const MONSTER_SPEED = { "@": 2, "%": 2, "&": 2, "$": 1 };
 
@@ -58,7 +60,12 @@ const SOFTWARE_NAMES = {
   antivirus: "Antivirus", database: "Database", browser: "Browser"
 };
 
-/* Stable per-tile flavour, so a part always looks the same on a given map. */
+const PART_NAMES = Object.assign({}, HARDWARE_NAMES, SOFTWARE_NAMES);
+const DECOY_PENALTY_MS = 10000;    // grabbing a part that does not fit costs time
+const HISTORY_LIMIT = 80;          // how many moves the rewind buffer holds
+
+/* Fallback flavour when a level does not name its parts: stable per tile, so a
+   part always looks the same on a given map. */
 function partKind(x, y, isHardware) {
   const list = isHardware ? HARDWARE_KINDS : SOFTWARE_KINDS;
   return list[(x * 7 + y * 13) % list.length];
@@ -94,11 +101,8 @@ class Game {
       }
     }
 
-    this.required = { hw: 0, sw: 0 };
-    for (const row of this.items) for (const it of row) {
-      if (it === "c") this.required.hw++;
-      if (it === "s") this.required.sw++;
-    }
+    this.assignKinds();
+    this.buildSpec();
     this.collected = { hw: 0, sw: 0 };
     this.keys = { r: 0, b: 0, y: 0, g: 0 };
     this.tools = { F: false, H: false, K: false, M: false };
@@ -109,17 +113,67 @@ class Game {
     this.slide = null;                   // direction the floor is dragging us
     this.tick = 0;
     this.moves = 0;
+    this.rejects = 0;
+    this.rewinds = 0;
+    this.history = [];
     this.onHint = false;
     this.lastPickup = null;
     this.events = [];
   }
+
+  /* Each part tile gets a component kind. A level names them in reading order
+     via `kinds`, e.g. { c: ["cpu", "ram", "ram"], x: ["ram"] }; anything not
+     named falls back to the positional hash. */
+  assignKinds() {
+    const named = this.level.kinds || {};
+    const cursor = {};
+    this.kindAt = new Map();
+    for (let y = 0; y < this.h; y++) {
+      for (let x = 0; x < this.w; x++) {
+        const ch = this.items[y][x];
+        if (!ch || !(PART_CHARS + DECOY_CHARS).includes(ch)) continue;
+        const list = named[ch] || [];
+        const i = cursor[ch] = (cursor[ch] || 0);
+        cursor[ch]++;
+        const hardware = ch === "c" || ch === "x";
+        this.kindAt.set(x + "," + y, list[i] || partKind(x, y, hardware));
+      }
+    }
+  }
+
+  /* The build spec is simply every part the level actually placed, grouped by
+     kind. Incompatible parts ('x'/'z') are deliberately left out of it. */
+  buildSpec() {
+    const order = [], byKind = new Map();
+    for (let y = 0; y < this.h; y++) {
+      for (let x = 0; x < this.w; x++) {
+        const ch = this.items[y][x];
+        if (!PART_CHARS.includes(ch)) continue;
+        const kind = this.kindAt.get(x + "," + y);
+        if (!byKind.has(kind)) {
+          const entry = { kind, name: PART_NAMES[kind] || kind, hardware: ch === "c", need: 0, got: 0 };
+          byKind.set(kind, entry);
+          order.push(entry);
+        }
+        byKind.get(kind).need++;
+      }
+    }
+    order.sort((a, b) => (a.hardware === b.hardware ? 0 : a.hardware ? -1 : 1));
+    this.spec = order;
+    this.required = {
+      hw: order.filter(e => e.hardware).reduce((n, e) => n + e.need, 0),
+      sw: order.filter(e => !e.hardware).reduce((n, e) => n + e.need, 0)
+    };
+  }
+
+  specFor(kind) { return this.spec.find(e => e.kind === kind); }
 
   /* -------------------------------------------------------------- helpers */
   inBounds(x, y) { return x >= 0 && y >= 0 && x < this.w && y < this.h; }
   tileAt(x, y) { return this.inBounds(x, y) ? this.grid[y][x] : T.WALL; }
   blockAt(x, y) { return this.blocks.find(b => b.x === x && b.y === y); }
   monsterAt(x, y) { return this.monsters.find(m => m.alive && m.x === x && m.y === y); }
-  partsDone() { return this.collected.hw >= this.required.hw && this.collected.sw >= this.required.sw; }
+  partsDone() { return this.spec.every(e => e.got >= e.need); }
   emit(name, data) { this.events.push({ name, data }); }
   drainEvents() { const e = this.events; this.events = []; return e; }
 
@@ -160,14 +214,74 @@ class Game {
     return true;
   }
 
+  /* ------------------------------------------------------------- rewind */
+  /* A compact copy of everything a step can change. The clock is deliberately
+     left out: rewinding costs you the time you already spent. */
+  snapshot() {
+    return {
+      grid: this.grid.map(r => r.join("")),
+      items: this.items.map(r => r.map(i => i || ".").join("")),
+      player: { ...this.player },
+      blocks: this.blocks.map(b => ({ ...b })),
+      monsters: this.monsters.map(m => ({ ...m })),
+      keys: { ...this.keys },
+      tools: { ...this.tools },
+      got: this.spec.map(e => e.got),
+      collected: { ...this.collected },
+      slide: this.slide, state: this.state, deathReason: this.deathReason,
+      moves: this.moves, rejects: this.rejects, onHint: this.onHint, tick: this.tick
+    };
+  }
+
+  restore(s) {
+    this.grid = s.grid.map(r => r.split(""));
+    this.items = s.items.map(r => r.split("").map(c => (c === "." ? null : c)));
+    this.player = { ...s.player };
+    this.blocks = s.blocks.map(b => ({ ...b }));
+    this.monsters = s.monsters.map(m => ({ ...m }));
+    this.keys = { ...s.keys };
+    this.tools = { ...s.tools };
+    this.spec.forEach((e, i) => { e.got = s.got[i]; });
+    this.collected = { ...s.collected };
+    this.slide = s.slide;
+    this.state = s.state;
+    this.deathReason = s.deathReason;
+    this.moves = s.moves;
+    this.rejects = s.rejects;
+    this.onHint = s.onHint;
+    this.tick = s.tick;
+    this.events = [];
+  }
+
+  canUndo() { return this.history.length > 0; }
+
+  /* Step back one move — including the one that killed you. */
+  undo() {
+    if (!this.history.length) return false;
+    this.restore(this.history.pop());
+    this.rewinds++;
+    this.emit("rewind");
+    return true;
+  }
+
   /* ------------------------------------------------------------- one step */
   step(inputDir) {
     if (this.state !== "playing") return;
+    const before = this.snapshot();
     this.tick++;
     this.stepPlayer(inputDir);
-    if (this.state !== "playing") return;
-    this.stepMonsters();
-    this.checkMonsterHit();
+    if (this.state === "playing") {
+      this.stepMonsters();
+      this.checkMonsterHit();
+    }
+    /* Only remember steps where the player actually did something, so the
+       rewind buffer is not filled up by standing still near a monster. */
+    const p = this.player;
+    if (before.player.x !== p.x || before.player.y !== p.y ||
+        before.moves !== this.moves || before.state !== this.state) {
+      this.history.push(before);
+      if (this.history.length > HISTORY_LIMIT) this.history.shift();
+    }
   }
 
   stepPlayer(inputDir) {
@@ -276,12 +390,20 @@ class Game {
   }
 
   collectItem(item, x, y) {
-    if (item === "c") {
-      this.collected.hw++;
-      this.lastPickup = HARDWARE_NAMES[partKind(x, y, true)];
-    } else if (item === "s") {
-      this.collected.sw++;
-      this.lastPickup = SOFTWARE_NAMES[partKind(x, y, false)];
+    if (PART_CHARS.includes(item)) {
+      const kind = this.kindAt.get(x + "," + y);
+      const entry = this.specFor(kind);
+      if (entry) entry.got++;
+      if (item === "c") this.collected.hw++; else this.collected.sw++;
+      this.lastPickup = PART_NAMES[kind] || kind;
+    } else if (DECOY_CHARS.includes(item)) {
+      const kind = this.kindAt.get(x + "," + y);
+      this.lastPickup = PART_NAMES[kind] || kind;
+      this.timeLeft -= DECOY_PENALTY_MS;                 // wrong part for this build
+      this.rejects++;
+      this.emit("reject", this.lastPickup);
+      if (this.timeLeft <= 0) { this.timeLeft = 0; this.die("Ran out of time"); }
+      return;
     } else if (CARD_CHARS.includes(item)) {
       this.keys[item]++;
       this.lastPickup = CARD_INFO[item].name;
@@ -390,4 +512,4 @@ class Game {
   }
 }
 
-if (typeof module !== "undefined") { module.exports = { Game, T, DIRS, TOOL_INFO, CARD_INFO, partKind, HARDWARE_NAMES, SOFTWARE_NAMES }; }
+if (typeof module !== "undefined") { module.exports = { Game, T, DIRS, TOOL_INFO, CARD_INFO, partKind, PART_NAMES, HARDWARE_NAMES, SOFTWARE_NAMES, PART_CHARS, DECOY_CHARS, ITEM_CHARS, MONSTER_CHARS, DECOY_PENALTY_MS }; }
