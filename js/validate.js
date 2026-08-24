@@ -17,7 +17,7 @@
   const WALL = "#";
   const HAZARD = { "~": "F", "*": "H" };
   const DOORS = { R: "r", B: "b", Y: "y", G: "g" };
-  const ITEMS = "cszxrbygFHKM";
+  const ITEMS = "cszxrbygFHKMQ";
   const PARTS = "cs";
 
   function parse(level) {
@@ -130,7 +130,7 @@
       hardware: items.filter(i => i.ch === "c").length,
       software: items.filter(i => i.ch === "s").length,
       decoys: items.filter(i => i.ch === "x" || i.ch === "z").length,
-      kit: [...have].filter(c => "FHKMrbyg".includes(c)).join("")
+      kit: [...have].filter(c => "FHKMQrbyg".includes(c)).join("")
     };
     return { ok: problems.length === 0, problems, info };
   }

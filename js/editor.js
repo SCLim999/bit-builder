@@ -59,6 +59,7 @@ const BRUSHES = [
   ["H", "Heatsink", (c, s) => Sprites.tool(c, 0, 0, s, "H")],
   ["K", "Grip Pads", (c, s) => Sprites.tool(c, 0, 0, s, "K")],
   ["M", "Mag Grips", (c, s) => Sprites.tool(c, 0, 0, s, "M")],
+  ["Q", "Quarantine kit", (c, s) => Sprites.tool(c, 0, 0, s, "Q")],
 
   ["group", "Malware"],
   ["@", "Bug", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "@", "down", 0); }],
@@ -165,7 +166,7 @@ function draw() {
     bctx.save();
     bctx.translate(x * S, y * S);
     /* things that sit on the floor need the floor drawn under them first */
-    if ("csxzPO@%&$rbygFHKM".includes(ch)) Sprites.floor(bctx, 0, 0, S, x, y);
+    if ("csxzPO@%&$rbygFHKMQ".includes(ch)) Sprites.floor(bctx, 0, 0, S, x, y);
     if ("csxz".includes(ch)) {
       const kind = kindFor(ch, x, y);
       if (ch === "c" || ch === "x") Sprites.hardware(bctx, 0, 0, S, kind, 0);

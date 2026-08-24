@@ -23,6 +23,7 @@ serve the folder anywhere static.
 | Rewind one move | <kbd>Z</kbd> — works after a fatal move too |
 | Restart level | <kbd>R</kbd> |
 | Pause | <kbd>P</kbd> |
+| Practice (clock stopped) | the *Practice* button — a practice run records no time, stars or best |
 | Confirm on an overlay | <kbd>Enter</kbd> / <kbd>Space</kbd> |
 
 Progress, best times and stars are kept in `localStorage`, so finishing a level
@@ -41,6 +42,8 @@ hard on purpose.
 | ★★★ | finishing within 125% of par, with no rewinds and no wrong parts picked up |
 
 Rewinding never refunds the clock, so it costs time as well as the third star.
+Practice mode stops the clock while you learn a level; it unlocks the next level
+but records nothing.
 
 ## Mechanics
 
@@ -57,11 +60,12 @@ Rewinding never refunds the clock, so it costs time as well as the third star.
 | Data bus | carries you one tile per beat; **Mag Grips** ignore it |
 | Crate | push it; shoved into coolant or fire it plugs the hazard |
 | Surge trap | one-shot — destroys whatever steps on it, you or a monster |
-| Scrubber | wipes every tool off your belt (cards survive) |
+| Quarantine kit | walk into malware to shut it down; one kit per monster, and there are never enough |
+| Scrubber | wipes every tool and kit off your belt (cards survive) |
 | Network port | throws you out of the next port, still moving |
 | Toggle switch / toggle walls | the switch flips every toggle wall on the map |
 | Bug / Glitch | wall followers (left hand / right hand) |
-| Trojan | hunts you down | 
+| Trojan | hunts you down |
 | Packet | flies straight and bounces |
 
 ## Files

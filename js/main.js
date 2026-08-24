@@ -14,6 +14,8 @@ const ctx = canvas.getContext("2d");
 let game = null;
 let levelIndex = 0;
 let custom = null;            // a level from a #lvl= share code, or null
+let practice = false;         // clock stopped while you learn a level
+let practiceUsed = false;     // this run used it, so nothing gets recorded
 let mode = "intro";           // intro | playing | paused | dead | won | complete
 let acc = 0;
 let lastFrame = 0;
@@ -77,6 +79,7 @@ const Sound = {
       win: [[660, 0, .1], [880, .1, .1], [1100, .2, .1], [1320, .3, .25]],
       reject: [[240, 0, .1, "sawtooth", .06], [150, .1, .18, "sawtooth", .06]],
       rewind: [[700, 0, .05], [520, .05, .05], [380, .1, .08]],
+      quarantine: [[880, 0, .06], [660, .06, .06], [440, .12, .14, "sawtooth"]],
       step: [[150, 0, .03, "triangle", .02]]
     }[name];
     if (!seq) return;
@@ -191,8 +194,8 @@ function chipCanvas(draw) {
 function updateHUD() {
   el("level-no").textContent = custom ? "Custom level" : `Level ${levelIndex + 1} of ${LEVELS.length}`;
   el("level-name").textContent = game.level.name;
-  el("time-left").textContent = fmtTime(game.timeLeft);
-  el("time-left").parentElement.classList.toggle("warn", game.timeLeft < 20000);
+  el("time-left").textContent = practice ? "\u221e" : fmtTime(game.timeLeft);
+  el("time-left").parentElement.classList.toggle("warn", !practice && game.timeLeft < 20000);
   const got = game.collected.hw + game.collected.sw;
   el("parts-count").textContent = `${got}/${game.required.hw + game.required.sw}`;
   el("par-count").textContent = game.level.par ? `${game.moves}/${game.level.par}` : String(game.moves);
@@ -240,6 +243,16 @@ function updateHUD() {
     chip.className = "chip";
     chip.appendChild(chipCanvas((c, s) => Sprites.tool(c, 0, 0, s, tool)));
     chip.append(TOOL_INFO[tool].name);
+    inv.appendChild(chip);
+  }
+  if (game.kits) {
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.appendChild(chipCanvas((c, s) => Sprites.tool(c, 0, 0, s, "Q")));
+    chip.append(TOOL_INFO.Q.name);
+    const b = document.createElement("b");
+    b.textContent = `\u00d7${game.kits}`;
+    chip.appendChild(b);
     inv.appendChild(chip);
   }
   if (!inv.children.length) inv.innerHTML = '<span class="empty">nothing yet</span>';
@@ -347,8 +360,8 @@ function winOverlay() {
   const seconds = Math.round(elapsedMs / 1000);
   const stars = starsFor(game);
   const prev = progress.best[name];
-  const record = !prev || seconds < prev.time || stars > (prev.stars || 0);
-  progress.best[name] = {
+  const record = !practiceUsed && (!prev || seconds < prev.time || stars > (prev.stars || 0));
+  if (!practiceUsed) progress.best[name] = {
     time: Math.min(seconds, prev ? prev.time : seconds),
     moves: Math.min(game.moves, prev ? prev.moves : game.moves),
     stars: Math.max(stars, prev ? prev.stars || 0 : 0)
@@ -372,11 +385,11 @@ function winOverlay() {
     `<span>Time <b>${seconds}s</b></span><span>Moves <b>${game.moves}</b></span>` +
     (game.level.par ? `<span>Par <b>${game.level.par}</b></span>` : "") +
     (game.rewinds ? `<span>Rewinds <b>${game.rewinds}</b></span>` : "") +
-    (record ? "<span><b>New best</b></span>" : ""),
+    (practiceUsed ? "<span><b>Practice run — not recorded</b></span>" : record ? "<span><b>New best</b></span>" : ""),
     primary,
     { label: "Levels", action: () => el("levels-dialog").showModal() }
   );
-  runBootSequence(seconds, stars);
+  runBootSequence(seconds, practiceUsed ? 0 : stars);
 }
 
 /* The payoff: a POST screen listing exactly what you installed. */
@@ -406,7 +419,7 @@ function runBootSequence(seconds, stars) {
       bootTimer = setTimeout(tick, 70);
       return;
     }
-    starLine.textContent = starString(stars);
+    starLine.textContent = stars ? starString(stars) : "";
     for (const n of [text, stats, buttons]) n.style.visibility = "";
     bootTimer = null;
   };
@@ -416,8 +429,7 @@ function runBootSequence(seconds, stars) {
 function skipBoot() {
   if (!bootTimer) return false;
   stopBoot();
-  const stars = starsFor(game);
-  el("ov-stars").textContent = starString(stars);
+  el("ov-stars").textContent = practiceUsed ? "" : starString(starsFor(game));
   for (const n of [el("ov-text"), el("ov-stats"), document.querySelector(".overlay-buttons")]) n.style.visibility = "";
   return true;
 }
@@ -508,6 +520,7 @@ function handleEvent(ev) {
   if (ev.name === "pickup" && game.lastPickup) toast(`Picked up: ${game.lastPickup}`);
   if (ev.name === "reject") toast(`${ev.data} does not fit this build — 10s lost`, true);
   if (ev.name === "rewind") toast("Rewound one move");
+  if (ev.name === "quarantine") toast("Malware quarantined — kit used up");
   if (ev.name === "door") toast("Access card used");
   if (ev.name === "scrub") toast("Scrubber wiped your tools!");
   if (ev.name === "ready") toast("All parts collected — socket unlocked");
@@ -520,14 +533,16 @@ function frame(now) {
   animT = now / 1000;
 
   if (mode === "playing") {
-    game.advanceClock(dt);
-    elapsedMs += dt;
+    if (!practice) {
+      game.advanceClock(dt);
+      elapsedMs += dt;
+    }
     if (game.state === "dead") { deathOverlay(); updateHUD(); }
     else {
       acc += dt;
       while (acc >= STEP_MS && mode === "playing") { acc -= STEP_MS; takeStep(); }
     }
-    el("time-left").textContent = fmtTime(game.timeLeft);
+    el("time-left").textContent = practice ? "\u221e" : fmtTime(game.timeLeft);
   }
 
   render(mode === "playing" ? Math.min(acc / STEP_MS, 1) : 1);
@@ -548,6 +563,7 @@ function loadCustomLevel(level) {
 
 function startGame(level) {
   game = new Game(level);
+  practiceUsed = practice;
   elapsedMs = 0;
   acc = 0;
   held.length = 0;
@@ -595,6 +611,7 @@ function buildLegend() {
     [(c, s) => Sprites.port(c, 0, 0, s, 0), "Network port", "throws you out of the next port"],
     [(c, s) => Sprites.toggleSwitch(c, 0, 0, s), "Toggle switch", "flips every toggle wall on the map"],
     [(c, s) => Sprites.tool(c, 0, 0, s, "F"), "Tools", "Coolant Seal, Heatsink, Grip Pads, Mag Grips"],
+    [(c, s) => Sprites.tool(c, 0, 0, s, "Q"), "Quarantine kit", "walk into malware to shut it down — one use each"],
     [(c, s) => Sprites.monster(c, 0, 0, s, "@", "down", 0), "Bug", "walks hugging the left-hand wall"],
     [(c, s) => Sprites.monster(c, 0, 0, s, "&", "down", 0), "Trojan", "hunts you down"]
   ];
@@ -621,6 +638,13 @@ el("btn-restart").onclick = () => (custom ? loadCustomLevel(custom) : loadLevel(
 el("btn-pause").onclick = togglePause;
 el("btn-levels").onclick = () => el("levels-dialog").showModal();
 el("btn-help").onclick = () => el("help-dialog").showModal();
+el("btn-practice").onclick = e => {
+  practice = !practice;
+  if (practice) practiceUsed = true;
+  e.target.textContent = `Practice: ${practice ? "on" : "off"}`;
+  e.target.setAttribute("aria-pressed", String(practice));
+  updateHUD();
+};
 el("btn-sound").onclick = e => {
   Sound.on = !Sound.on;
   e.target.textContent = `Sound: ${Sound.on ? "on" : "off"}`;

@@ -32,9 +32,10 @@ const ICE_WALLS = { "1": ["up", "left"], "2": ["up", "right"], "3": ["down", "ri
 const DOOR_CARD = { R: "r", B: "b", Y: "y", G: "g" };
 const CARD_CHARS = "rbyg";
 const TOOL_CHARS = "FHKM";
+const KIT_CHAR = "Q";              // quarantine kit — consumable, so it is counted not flagged
 const PART_CHARS = "cs";           // parts the build spec asks for
 const DECOY_CHARS = "xz";          // parts that do not fit this build
-const ITEM_CHARS = PART_CHARS + DECOY_CHARS + CARD_CHARS + TOOL_CHARS;
+const ITEM_CHARS = PART_CHARS + DECOY_CHARS + CARD_CHARS + TOOL_CHARS + KIT_CHAR;
 const MONSTER_CHARS = "@%&$";
 const MONSTER_SPEED = { "@": 2, "%": 2, "&": 2, "$": 1 };
 
@@ -42,7 +43,8 @@ const TOOL_INFO = {
   F: { name: "Coolant Seal", blurb: "wade through coolant" },
   H: { name: "Heatsink", blurb: "cross overheat zones" },
   K: { name: "Grip Pads", blurb: "walk on cryo ice" },
-  M: { name: "Mag Grips", blurb: "ignore data buses" }
+  M: { name: "Mag Grips", blurb: "ignore data buses" },
+  Q: { name: "Quarantine kit", blurb: "walk into malware to shut it down" }
 };
 const CARD_INFO = {
   r: { name: "Red access card" }, b: { name: "Blue access card" },
@@ -106,6 +108,7 @@ class Game {
     this.collected = { hw: 0, sw: 0 };
     this.keys = { r: 0, b: 0, y: 0, g: 0 };
     this.tools = { F: false, H: false, K: false, M: false };
+    this.kits = 0;
 
     this.timeLeft = this.level.time * 1000;
     this.state = "playing";              // playing | won | dead
@@ -226,6 +229,7 @@ class Game {
       monsters: this.monsters.map(m => ({ ...m })),
       keys: { ...this.keys },
       tools: { ...this.tools },
+      kits: this.kits,
       got: this.spec.map(e => e.got),
       collected: { ...this.collected },
       slide: this.slide, state: this.state, deathReason: this.deathReason,
@@ -241,6 +245,7 @@ class Game {
     this.monsters = s.monsters.map(m => ({ ...m }));
     this.keys = { ...s.keys };
     this.tools = { ...s.tools };
+    this.kits = s.kits;
     this.spec.forEach((e, i) => { e.got = s.got[i]; });
     this.collected = { ...s.collected };
     this.slide = s.slide;
@@ -369,6 +374,7 @@ class Game {
     }
     if (t === T.SCRUBBER) {
       this.tools = { F: false, H: false, K: false, M: false };
+      this.kits = 0;
       this.emit("scrub");
     }
     if (t === T.SWITCH) this.flipToggles();
@@ -410,6 +416,9 @@ class Game {
     } else if (TOOL_CHARS.includes(item)) {
       this.tools[item] = true;
       this.lastPickup = TOOL_INFO[item].name;
+    } else if (item === KIT_CHAR) {
+      this.kits++;
+      this.lastPickup = TOOL_INFO.Q.name;
     }
     this.emit("pickup", item);
     if (this.partsDone()) this.emit("ready");
@@ -497,7 +506,14 @@ class Game {
       if (!m.alive) continue;
       const sameTile = m.x === p.x && m.y === p.y;
       const swapped = m.x === p.prevX && m.y === p.prevY && m.prevX === p.x && m.prevY === p.y;
-      if (sameTile || swapped) return this.die("Caught by malware");
+      if (!sameTile && !swapped) continue;
+      if (this.kits > 0) {                      // a kit shuts one down instead
+        this.kits--;
+        m.alive = false;
+        this.emit("quarantine");
+        continue;
+      }
+      return this.die("Caught by malware");
     }
   }
 
@@ -512,4 +528,4 @@ class Game {
   }
 }
 
-if (typeof module !== "undefined") { module.exports = { Game, T, DIRS, TOOL_INFO, CARD_INFO, partKind, PART_NAMES, HARDWARE_NAMES, SOFTWARE_NAMES, PART_CHARS, DECOY_CHARS, ITEM_CHARS, MONSTER_CHARS, DECOY_PENALTY_MS }; }
+if (typeof module !== "undefined") { module.exports = { Game, T, DIRS, TOOL_INFO, KIT_CHAR, CARD_INFO, partKind, PART_NAMES, HARDWARE_NAMES, SOFTWARE_NAMES, PART_CHARS, DECOY_CHARS, ITEM_CHARS, MONSTER_CHARS, DECOY_PENALTY_MS }; }

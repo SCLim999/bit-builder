@@ -388,6 +388,28 @@ const Sprites = {
       ctx.fill();
       ctx.fillStyle = "#78350f";
       for (let i = 0; i < 4; i++) ctx.fillRect(S * (0.28 + i * 0.13), S * 0.78, S * 0.08, S * 0.08);
+    } else if (kind === "Q") {                // quarantine kit
+      ctx.fillStyle = "#1e1b4b";
+      rr(ctx, S * 0.16, S * 0.2, S * 0.68, S * 0.6, S * 0.1);
+      ctx.fill();
+      ctx.strokeStyle = "#f87171";
+      ctx.lineWidth = S * 0.05;
+      ctx.setLineDash([S * 0.09, S * 0.07]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#f87171";              // the bug it holds
+      ctx.beginPath();
+      ctx.ellipse(S * 0.5, S * 0.5, S * 0.11, S * 0.15, 0, 0, 7);
+      ctx.fill();
+      ctx.strokeStyle = "#fecaca";
+      ctx.lineWidth = S * 0.03;
+      for (let i = 0; i < 2; i++) {
+        const yy = S * (0.44 + i * 0.12);
+        ctx.beginPath();
+        ctx.moveTo(S * 0.39, yy); ctx.lineTo(S * 0.28, yy - S * 0.04);
+        ctx.moveTo(S * 0.61, yy); ctx.lineTo(S * 0.72, yy - S * 0.04);
+        ctx.stroke();
+      }
     } else {                                  // mag grips
       ctx.strokeStyle = "#ef4444";
       ctx.lineWidth = S * 0.16;
