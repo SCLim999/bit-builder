@@ -1,5 +1,7 @@
 # Bit Builder
 
+[![Level checks](https://github.com/SCLim999/bit-builder/actions/workflows/checks.yml/badge.svg)](https://github.com/SCLim999/bit-builder/actions/workflows/checks.yml)
+
 **English · [中文](#中文)**
 
 A tile-based puzzle game in the spirit of *Chip's Challenge*: you play a
@@ -158,6 +160,22 @@ node show.js 7               # print a level with a coordinate ruler
 
 `validate-levels.js` and `solve.js` are the useful ones: the first catches
 broken geometry, the second proves a level can actually be finished.
+`check-wiring.js` covers what neither can see: a string translated into one
+language but not the other, a key the markup asks for that nobody defined, a
+component a level names that the knowledge base has never heard of, or a level
+with no par value.
+
+## Continuous checks
+
+`.github/workflows/checks.yml` runs the wiring check, the level checker, both
+hand routes and a sample of full solves on every push and pull request — about
+twenty seconds, and nothing to install, since the tools have no dependencies.
+Once a week (and on demand from the Actions tab) it also solves every level the
+search can reach, levels 1–9, which takes a few minutes.
+
+So a change that makes a level unfinishable — a wall in the wrong place, a
+part sealed off, a route to the power button that skips the socket, a card
+short of a locked port — fails the build instead of reaching a student.
 
 ---
 
@@ -182,3 +200,7 @@ canvas 绘制。点击顶栏的 **中文 / EN** 按钮即可切换语言，**背
 
 **自制关卡**：打开[编辑器](editor.html)绘制地图、指定零件、检查可玩性，然后复制分享链接。
 关卡数据完整地存在网址里，不会上传到任何服务器。
+
+**自动检查**：每次 push 与 pull request 都会自动运行关卡检查器、两条手工通关路线和部分完整求解
+（约 20 秒）；每周还会完整求解 1–9 关。因此「某一关被改到无解」这类问题会在合并前就被拦下，
+而不是等学生玩到才发现。

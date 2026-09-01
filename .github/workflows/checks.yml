@@ -1,0 +1,62 @@
+# Every level must stay finishable. These are the same checks that run locally
+# in tools/ — no dependencies, so there is nothing to install.
+name: Level checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"        # Mondays 03:00 UTC: solve every level
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Wiring, maps and routes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Translations, knowledge base and par values
+        run: node tools/check-wiring.js
+
+      - name: Map geometry, reachable parts, cards vs ports
+        run: node tools/validate-levels.js
+
+      - name: Hand routes through the crate levels
+        run: node tools/replay.js
+
+      - name: Solve a sample of levels through the engine
+        run: |
+          for n in 1 2 5 6; do
+            node --max-old-space-size=4096 tools/solve.js "$n"
+          done
+
+  full-solve:
+    name: Solve every level
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Levels 3 and 10 have too many crate permutations for the search;
+      # replay.js walks their hand-written routes instead.
+      - name: Breadth-first search, levels 1-9
+        run: |
+          for n in 1 2 4 5 6 7 8 9; do
+            node --max-old-space-size=6144 tools/solve.js "$n"
+          done
+
+      - name: Hand routes, levels 3 and 10
+        run: node tools/replay.js
