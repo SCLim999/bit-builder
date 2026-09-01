@@ -12,6 +12,7 @@ const I18N = {
     "btn.levels": "Levels", "btn.editor": "Editor", "btn.help": "How to play", "btn.knowledge": "Knowledge",
     "btn.fullscreen": "Full screen", "btn.exitFullscreen": "Exit full screen",
     "btn.practice": "Practice: {state}", "btn.sound": "Sound: {state}",
+    "btn.theme": "Theme: {state}", "theme.bright": "bright", "theme.dark": "dark",
     "state.on": "on", "state.off": "off",
     "btn.rewind": "Rewind", "btn.restart": "Restart", "btn.pause": "Pause", "btn.close": "Close",
 
@@ -138,6 +139,7 @@ const I18N = {
     "btn.levels": "关卡", "btn.editor": "编辑器", "btn.help": "玩法说明", "btn.knowledge": "知识库",
     "btn.fullscreen": "全屏", "btn.exitFullscreen": "退出全屏",
     "btn.practice": "练习模式：{state}", "btn.sound": "音效：{state}",
+    "btn.theme": "背景：{state}", "theme.bright": "明亮", "theme.dark": "暗色",
     "state.on": "开", "state.off": "关",
     "btn.rewind": "回退", "btn.restart": "重来", "btn.pause": "暂停", "btn.close": "关闭",
 

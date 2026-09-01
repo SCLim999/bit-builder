@@ -27,6 +27,7 @@ serve the folder anywhere static.
 | Pause | <kbd>P</kbd> |
 | Full screen | <kbd>F</kbd>, or the *Full screen* button — the board scales up to fill the display |
 | Language | the *中文 / EN* button — the whole interface, including the editor |
+| Brightness | the *Theme* button — a brighter slate board (default) or the original night palette |
 | Practice (clock stopped) | the *Practice* button — a practice run records no time, stars or best |
 | Confirm on an overlay | <kbd>Enter</kbd> / <kbd>Space</kbd> |
 
@@ -168,7 +169,8 @@ broken geometry, the second proves a level can actually be finished.
 十秒。集齐清单后，**装配插槽**才会打开，你需要在时限内抵达**电源按钮**启动机器。
 
 纯静态 HTML / CSS / JS：没有构建步骤，没有第三方依赖，也没有图片素材 —— 所有图形都由
-canvas 绘制。点击顶栏的 **中文 / EN** 按钮即可切换语言，游戏与编辑器都会跟着切换。
+canvas 绘制。点击顶栏的 **中文 / EN** 按钮即可切换语言，**背景**按钮可在明亮与暗色两种配色
+之间切换（默认明亮），游戏与编辑器都会跟着切换。
 
 **学习内容**：每个零件都是真实的计算机部件。拾取时侧栏会显示它的作用（知识卡），
 **知识库**按钮汇总了全部 23 条说明，通关后还有一道**知识检测**小题。这些说明面向计算机入门

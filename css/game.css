@@ -1,10 +1,11 @@
 :root {
-  --bg: #070b12;
-  --panel: #101823;
-  --panel-2: #16202e;
-  --line: #24334a;
-  --text: #dbe6f3;
-  --muted: #8ea3bd;
+  /* bright is the default; body.theme-dark below restores the original night look */
+  --bg: #1b2534;
+  --panel: #222f42;
+  --panel-2: #2b3a51;
+  --line: #3d5171;
+  --text: #eaf1fb;
+  --muted: #b3c4dc;
   --cyan: #45d0e0;
   --green: #4ade80;
   --amber: #f5a524;
@@ -17,8 +18,8 @@
 body {
   margin: 0;
   background:
-    radial-gradient(1100px 600px at 20% -10%, #142033 0%, transparent 60%),
-    radial-gradient(900px 500px at 110% 10%, #10202b 0%, transparent 55%),
+    radial-gradient(1100px 600px at 20% -10%, #2b3c55 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, #24404f 0%, transparent 55%),
     var(--bg);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
@@ -37,6 +38,21 @@ kbd {
 }
 
 /* ------------------------------------------------------------------ chrome */
+body.theme-dark {
+  --bg: #070b12;
+  --panel: #101823;
+  --panel-2: #16202e;
+  --line: #24334a;
+  --text: #dbe6f3;
+  --muted: #8ea3bd;
+  background:
+    radial-gradient(1100px 600px at 20% -10%, #142033 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, #10202b 0%, transparent 55%),
+    var(--bg);
+}
+body.theme-dark .stage { background: #0a0f18; }
+body.theme-dark #board { background: #05080d; }
+
 .topbar {
   display: flex;
   flex-wrap: wrap;
@@ -89,7 +105,7 @@ kbd {
 }
 .stage {
   position: relative;
-  background: #0a0f18;
+  background: #1a2434;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 10px;
@@ -102,7 +118,7 @@ kbd {
   aspect-ratio: 1 / 1;
   image-rendering: auto;
   border-radius: 6px;
-  background: #05080d;
+  background: #1a2434;
   touch-action: none;
 }
 
@@ -112,7 +128,7 @@ kbd {
   display: grid;
   place-items: center;
   overflow-y: auto;
-  background: rgba(5, 8, 13, .82);
+  background: rgba(12, 18, 28, .86);
   border-radius: 6px;
   backdrop-filter: blur(2px);
 }

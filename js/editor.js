@@ -154,7 +154,7 @@ function draw() {
   fitCanvas();
   const S = tileSize();
   bctx.setTransform(1, 0, 0, 1, 0, 0);
-  bctx.fillStyle = "#05080d";
+  bctx.fillStyle = C.void;
   bctx.fillRect(0, 0, board.width, board.height);
 
   const kindFor = (ch, x, y) => {
@@ -382,6 +382,7 @@ function edApplyLanguage(lang) {
   document.documentElement.lang = currentLang() === "zh" ? "zh-CN" : "en";
   for (const node of document.querySelectorAll("[data-i18n]")) node.textContent = t(node.dataset.i18n);
   document.getElementById("btn-lang").textContent = t("lang.other");
+  document.getElementById("btn-theme").textContent = t("btn.theme", { state: t("theme." + currentTheme()) });
   document.getElementById("ed-name").placeholder = t("ed.name");
   buildPalette();
   renderKinds();
@@ -389,13 +390,29 @@ function edApplyLanguage(lang) {
 }
 document.getElementById("btn-lang").onclick = () => edApplyLanguage(currentLang() === "zh" ? "en" : "zh");
 
+const ED_THEME_KEY = "bitbuilder.theme";
+function edUseTheme(name) {
+  applyTheme(name);
+  try { localStorage.setItem(ED_THEME_KEY, currentTheme()); } catch (err) { /* storage disabled */ }
+  document.body.classList.toggle("theme-dark", currentTheme() === "dark");
+  document.getElementById("btn-theme").textContent = t("btn.theme", { state: t("theme." + currentTheme()) });
+  buildPalette();
+  renderKinds();
+  draw();
+}
+document.getElementById("btn-theme").onclick = () => edUseTheme(currentTheme() === "bright" ? "dark" : "bright");
+
 let startLang = "en";
 try {
   startLang = localStorage.getItem(ED_LANG_KEY) ||
     ((navigator.language || "en").toLowerCase().startsWith("zh") ? "zh" : "en");
 } catch (err) { /* storage disabled */ }
 
+let startTheme = "bright";
+try { startTheme = localStorage.getItem(ED_THEME_KEY) || "bright"; } catch (err) { /* storage disabled */ }
+
 buildPalette();
 resize(15, 13);
+edUseTheme(startTheme);
 edApplyLanguage(startLang);
 report(t("ed.ready"), null);

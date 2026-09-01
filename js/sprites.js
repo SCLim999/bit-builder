@@ -4,18 +4,39 @@
    assets. Each function fills the tile box at (px, py) with side S.
    ========================================================================== */
 
+/* Two palettes. Only the ground, walls and page-facing tones change: hazards,
+   parts and characters keep their colours so the board still reads the same. */
+const THEMES = {
+  bright: {
+    floor: "#26334a", floorLine: "#33445f", via: "#42567a",
+    wallTop: "#647ca5", wallFace: "#4a5f85", wallEdge: "#8398bd",
+    bus: "#2b3a52", void: "#1a2434", portBg: "#16233a"
+  },
+  dark: {
+    floor: "#131a24", floorLine: "#1a2431", via: "#22303f",
+    wallTop: "#3a4a66", wallFace: "#26324a", wallEdge: "#4c6088",
+    bus: "#152130", void: "#05080d", portBg: "#0a1626"
+  }
+};
+
 const C = {
-  floor: "#131a24", floorLine: "#1a2431", via: "#22303f",
-  wallTop: "#3a4a66", wallFace: "#26324a", wallEdge: "#5madeup",
   coolant: "#0e3a8a", coolantLite: "#38bdf8",
   heat: "#4a1206", flame: "#fb923c", flameHot: "#fde047",
   ice: "#9fe8f5", iceLite: "#e6fbff", iceEdge: "#5fc7dd",
-  bus: "#152130", busArrow: "#38bdf8",
+  busArrow: "#38bdf8",
   gold: "#f5c451", green: "#4ade80", red: "#f87171",
   purple: "#a78bfa", cyan: "#45d0e0", amber: "#f5a524",
   steel: "#94a3b8", dark: "#0b0f16", pcb: "#116b45"
 };
-C.wallEdge = "#4c6088";
+
+let THEME = "bright";
+function applyTheme(name) {
+  THEME = THEMES[name] ? name : "bright";
+  Object.assign(C, THEMES[THEME]);
+  return THEME;
+}
+function currentTheme() { return THEME; }
+applyTheme("bright");
 
 const CARD_COLOR = { r: "#f87171", b: "#60a5fa", y: "#facc15", g: "#4ade80" };
 
@@ -254,7 +275,7 @@ const Sprites = {
   },
 
   port(ctx, px, py, S, t) {
-    ctx.fillStyle = "#0a1626";
+    ctx.fillStyle = C.portBg;
     ctx.fillRect(px, py, S, S);
     ctx.save();
     ctx.translate(px + S / 2, py + S / 2);

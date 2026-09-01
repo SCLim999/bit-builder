@@ -37,6 +37,21 @@ function saveProgress(p) {
 }
 let progress = loadProgress();
 
+/* ------------------------------------------------------------------ theme */
+const THEME_KEY = "bitbuilder.theme";
+function loadTheme() {
+  try { return localStorage.getItem(THEME_KEY) || "bright"; } catch (e) { return "bright"; }
+}
+function useTheme(name) {
+  applyTheme(name);
+  try { localStorage.setItem(THEME_KEY, currentTheme()); } catch (e) { /* storage disabled */ }
+  document.body.classList.toggle("theme-dark", currentTheme() === "dark");
+  el("btn-theme").textContent = t("btn.theme", { state: t("theme." + currentTheme()) });
+  buildLegend();                 // the small canvases are drawn once, so redraw them
+  buildKnowledge();
+  if (game) updateHUD();
+}
+
 /* --------------------------------------------------------------- language */
 const LANG_KEY = "bitbuilder.lang";
 function loadLang() {
@@ -58,6 +73,7 @@ function applyLanguage(lang) {
   el("btn-sound").textContent = t("btn.sound", { state: t(Sound.on ? "state.on" : "state.off") });
   el("btn-practice").textContent = t("btn.practice", { state: t(practice ? "state.on" : "state.off") });
   el("btn-fullscreen").textContent = t(fullscreenOn() ? "btn.exitFullscreen" : "btn.fullscreen");
+  el("btn-theme").textContent = t("btn.theme", { state: t("theme." + currentTheme()) });
   buildLevelList();
   buildLegend();
   buildKnowledge();
@@ -191,7 +207,7 @@ function render(alpha) {
   const py = lerp(p.prevY, p.y, alpha);
   const { ox, oy } = cameraOrigin(px, py);
 
-  ctx.fillStyle = "#05080d";
+  ctx.fillStyle = C.void;
   ctx.fillRect(0, 0, BOARD, BOARD);
 
   const x0 = Math.floor(ox) - 1, y0 = Math.floor(oy) - 1;
@@ -217,7 +233,7 @@ function render(alpha) {
 
   const vig = ctx.createRadialGradient(BOARD / 2, BOARD / 2, BOARD * 0.3, BOARD / 2, BOARD / 2, BOARD * 0.75);
   vig.addColorStop(0, "rgba(0,0,0,0)");
-  vig.addColorStop(1, "rgba(0,0,0,0.45)");
+  vig.addColorStop(1, currentTheme() === "bright" ? "rgba(0,0,0,0.22)" : "rgba(0,0,0,0.45)");
   ctx.fillStyle = vig;
   ctx.fillRect(0, 0, BOARD, BOARD);
 }
@@ -879,6 +895,7 @@ el("btn-practice").onclick = e => {
   e.target.setAttribute("aria-pressed", String(practice));
   updateHUD();
 };
+el("btn-theme").onclick = () => useTheme(currentTheme() === "bright" ? "dark" : "bright");
 el("btn-knowledge").onclick = () => el("knowledge-dialog").showModal();
 el("btn-lang").onclick = () => applyLanguage(currentLang() === "zh" ? "en" : "zh");
 el("btn-sound").onclick = e => {
@@ -890,6 +907,7 @@ el("btn-sound").onclick = e => {
 
 setupCanvas();
 window.addEventListener("resize", setupCanvas);
+useTheme(loadTheme());
 applyLanguage(loadLang());
 startFromHash();
 requestAnimationFrame(frame);
