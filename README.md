@@ -1,5 +1,7 @@
 # Bit Builder
 
+**English · [中文](#中文)**
+
 A tile-based puzzle game in the spirit of *Chip's Challenge*: you play a
 technician walking a grid of server rooms, filling a **build spec**: this rig
 needs a motherboard, a CPU, two sticks of RAM, an SSD, an OS image and a
@@ -24,6 +26,7 @@ serve the folder anywhere static.
 | Restart level | <kbd>R</kbd> |
 | Pause | <kbd>P</kbd> |
 | Full screen | <kbd>F</kbd>, or the *Full screen* button — the board scales up to fill the display |
+| Language | the *中文 / EN* button — the whole interface, including the editor |
 | Practice (clock stopped) | the *Practice* button — a practice run records no time, stars or best |
 | Confirm on an overlay | <kbd>Enter</kbd> / <kbd>Space</kbd> |
 
@@ -45,6 +48,26 @@ hard on purpose.
 Rewinding never refunds the clock, so it costs time as well as the third star.
 Practice mode stops the clock while you learn a level; it unlocks the next level
 but records nothing.
+
+## Learning content
+
+Every part in the game is a real component, and the game says what each one
+actually does:
+
+- **Field note** — pick a part up and the sidebar explains it: what RAM is for
+  and why it forgets, what a compiler does before your program runs, why a
+  network card has a MAC address.
+- **Knowledge base** — the *Knowledge* button lists all 23 entries (hardware,
+  software, equipment, malware) in one reference, in the current language.
+- **Knowledge check** — after the boot screen, one definition from the parts you
+  just collected, three candidates, immediate feedback. Answering is optional;
+  the running tally is kept in `localStorage`.
+
+The notes are written for an introductory computing course and lean towards the
+things that actually catch students out — volatile versus non-volatile storage,
+compile time versus run time, what the operating system is actually doing.
+Editing them means editing one file, `js/knowledge.js`, which holds both
+languages side by side.
 
 ## Mechanics
 
@@ -80,6 +103,8 @@ but records nothing.
 | `js/engine.js` | rules: movement, sliding, pushing, hazards, monsters, the build spec, rewind |
 | `js/sprites.js` | every sprite, drawn with canvas paths |
 | `js/main.js` | game loop, camera, input, HUD, level select, sound |
+| `js/i18n.js` | every interface string in English and Mandarin, plus level names and hints |
+| `js/knowledge.js` | what each component actually is, in both languages — field notes, reference and quiz |
 | `js/validate.js` | the level checker, shared by the editor and the Node tools |
 | `js/codec.js` | share codes — a level packed into a URL |
 | `js/editor.js` | the editor: painting, part kinds, checking, sharing |
@@ -132,3 +157,26 @@ node show.js 7               # print a level with a coordinate ruler
 
 `validate-levels.js` and `solve.js` are the useful ones: the first catches
 broken geometry, the second proves a level can actually be finished.
+
+---
+
+## 中文
+
+**Bit Builder（组装大师）** 是一款受《Chip's Challenge》启发的方格解谜游戏。你扮演一名技术员，
+在机房的方格地图中按**装配清单**收集零件：一块主板、一颗 CPU、两条内存、一块固态硬盘、
+一份操作系统镜像和一个驱动程序。地图上还散落着属于其他机器的零件（带红叉），拿错要损失
+十秒。集齐清单后，**装配插槽**才会打开，你需要在时限内抵达**电源按钮**启动机器。
+
+纯静态 HTML / CSS / JS：没有构建步骤，没有第三方依赖，也没有图片素材 —— 所有图形都由
+canvas 绘制。点击顶栏的 **中文 / EN** 按钮即可切换语言，游戏与编辑器都会跟着切换。
+
+**学习内容**：每个零件都是真实的计算机部件。拾取时侧栏会显示它的作用（知识卡），
+**知识库**按钮汇总了全部 23 条说明，通关后还有一道**知识检测**小题。这些说明面向计算机入门
+课程，重点讲清学生最容易混淆的地方：易失性与非易失性存储、编译期与运行期、操作系统到底
+在做什么。
+
+**操作**：方向键或 WASD 移动，<kbd>Z</kbd> 回退一步（连致命的一步也能撤销），
+<kbd>R</kbd> 重来，<kbd>P</kbd> 暂停，<kbd>F</kbd> 全屏。手机上可以滑动屏幕或使用方向按钮。
+
+**自制关卡**：打开[编辑器](editor.html)绘制地图、指定零件、检查可玩性，然后复制分享链接。
+关卡数据完整地存在网址里，不会上传到任何服务器。

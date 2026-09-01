@@ -10,68 +10,68 @@ const BOARD_PX = 640;
 
 /* Every brush: the character it paints, a label, and how to draw a preview. */
 const BRUSHES = [
-  ["group", "Ground"],
-  [" ", "Floor", (c, s) => Sprites.floor(c, 0, 0, s, 1, 1)],
-  ["#", "Wall", (c, s) => Sprites.wall(c, 0, 0, s)],
-  ["P", "Start", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.player(c, 0, 0, s, "down", 0); }],
-  ["X", "Power button", (c, s) => Sprites.exit(c, 0, 0, s, 0)],
-  ["S", "Assembly socket", (c, s) => Sprites.socket(c, 0, 0, s, false, 0)],
-  ["+", "Help terminal", (c, s) => Sprites.hint(c, 0, 0, s)],
+  ["group", "ed.g.ground"],
+  [" ", "ed.b.floor", (c, s) => Sprites.floor(c, 0, 0, s, 1, 1)],
+  ["#", "ed.b.wall", (c, s) => Sprites.wall(c, 0, 0, s)],
+  ["P", "ed.b.start", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.player(c, 0, 0, s, "down", 0); }],
+  ["X", "ed.b.exit", (c, s) => Sprites.exit(c, 0, 0, s, 0)],
+  ["S", "ed.b.socket", (c, s) => Sprites.socket(c, 0, 0, s, false, 0)],
+  ["+", "ed.b.terminal", (c, s) => Sprites.hint(c, 0, 0, s)],
 
-  ["group", "Parts"],
-  ["c", "Hardware part", (c, s) => Sprites.hardware(c, 0, 0, s, "cpu", 0)],
-  ["s", "Software part", (c, s) => Sprites.software(c, 0, 0, s, "os", 0)],
-  ["x", "Wrong hardware", (c, s) => { Sprites.hardware(c, 0, 0, s, "ram", 0); Sprites.incompatible(c, 0, 0, s); }],
-  ["z", "Wrong software", (c, s) => { Sprites.software(c, 0, 0, s, "browser", 0); Sprites.incompatible(c, 0, 0, s); }],
+  ["group", "ed.g.parts"],
+  ["c", "ed.b.hw", (c, s) => Sprites.hardware(c, 0, 0, s, "cpu", 0)],
+  ["s", "ed.b.sw", (c, s) => Sprites.software(c, 0, 0, s, "os", 0)],
+  ["x", "ed.b.badHw", (c, s) => { Sprites.hardware(c, 0, 0, s, "ram", 0); Sprites.incompatible(c, 0, 0, s); }],
+  ["z", "ed.b.badSw", (c, s) => { Sprites.software(c, 0, 0, s, "browser", 0); Sprites.incompatible(c, 0, 0, s); }],
 
-  ["group", "Hazards"],
-  ["~", "Coolant", (c, s) => Sprites.coolant(c, 0, 0, s, 0, 1, 1)],
-  ["*", "Overheat", (c, s) => Sprites.overheat(c, 0, 0, s, 0, 1, 1)],
-  ["!", "Surge trap", (c, s) => Sprites.surge(c, 0, 0, s, 0)],
-  ["T", "Scrubber", (c, s) => Sprites.scrubber(c, 0, 0, s, 0)],
-  [".", "Cryo ice", (c, s) => Sprites.ice(c, 0, 0, s, null)],
-  ["1", "Ice corner NW", (c, s) => Sprites.ice(c, 0, 0, s, "1")],
-  ["2", "Ice corner NE", (c, s) => Sprites.ice(c, 0, 0, s, "2")],
-  ["3", "Ice corner SE", (c, s) => Sprites.ice(c, 0, 0, s, "3")],
-  ["4", "Ice corner SW", (c, s) => Sprites.ice(c, 0, 0, s, "4")],
+  ["group", "ed.g.hazards"],
+  ["~", "ed.b.coolant", (c, s) => Sprites.coolant(c, 0, 0, s, 0, 1, 1)],
+  ["*", "ed.b.overheat", (c, s) => Sprites.overheat(c, 0, 0, s, 0, 1, 1)],
+  ["!", "ed.b.surge", (c, s) => Sprites.surge(c, 0, 0, s, 0)],
+  ["T", "ed.b.scrubber", (c, s) => Sprites.scrubber(c, 0, 0, s, 0)],
+  [".", "ed.b.ice", (c, s) => Sprites.ice(c, 0, 0, s, null)],
+  ["1", "ed.b.iceNW", (c, s) => Sprites.ice(c, 0, 0, s, "1")],
+  ["2", "ed.b.iceNE", (c, s) => Sprites.ice(c, 0, 0, s, "2")],
+  ["3", "ed.b.iceSE", (c, s) => Sprites.ice(c, 0, 0, s, "3")],
+  ["4", "ed.b.iceSW", (c, s) => Sprites.ice(c, 0, 0, s, "4")],
 
-  ["group", "Movement"],
-  ["<", "Bus west", (c, s) => Sprites.bus(c, 0, 0, s, "left", 0)],
-  [">", "Bus east", (c, s) => Sprites.bus(c, 0, 0, s, "right", 0)],
-  ["^", "Bus north", (c, s) => Sprites.bus(c, 0, 0, s, "up", 0)],
-  ["v", "Bus south", (c, s) => Sprites.bus(c, 0, 0, s, "down", 0)],
-  ["0", "Network port", (c, s) => Sprites.port(c, 0, 0, s, 0)],
-  ["O", "Crate", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.crate(c, 0, 0, s); }],
+  ["group", "ed.g.movement"],
+  ["<", "ed.b.busW", (c, s) => Sprites.bus(c, 0, 0, s, "left", 0)],
+  [">", "ed.b.busE", (c, s) => Sprites.bus(c, 0, 0, s, "right", 0)],
+  ["^", "ed.b.busN", (c, s) => Sprites.bus(c, 0, 0, s, "up", 0)],
+  ["v", "ed.b.busS", (c, s) => Sprites.bus(c, 0, 0, s, "down", 0)],
+  ["0", "ed.b.port", (c, s) => Sprites.port(c, 0, 0, s, 0)],
+  ["O", "ed.b.crate", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.crate(c, 0, 0, s); }],
 
-  ["group", "Locks and tools"],
-  ["r", "Red card", (c, s) => Sprites.card(c, 0, 0, s, "r")],
-  ["R", "Red port", (c, s) => Sprites.door(c, 0, 0, s, "r")],
-  ["b", "Blue card", (c, s) => Sprites.card(c, 0, 0, s, "b")],
-  ["B", "Blue port", (c, s) => Sprites.door(c, 0, 0, s, "b")],
-  ["y", "Yellow card", (c, s) => Sprites.card(c, 0, 0, s, "y")],
-  ["Y", "Yellow port", (c, s) => Sprites.door(c, 0, 0, s, "y")],
-  ["g", "Root access", (c, s) => Sprites.card(c, 0, 0, s, "g")],
-  ["G", "Green port", (c, s) => Sprites.door(c, 0, 0, s, "g")],
-  ["k", "Toggle switch", (c, s) => Sprites.toggleSwitch(c, 0, 0, s)],
-  ["-", "Toggle wall shut", (c, s) => Sprites.toggleWall(c, 0, 0, s, false)],
-  ["|", "Toggle wall open", (c, s) => Sprites.toggleWall(c, 0, 0, s, true)],
-  ["F", "Coolant Seal", (c, s) => Sprites.tool(c, 0, 0, s, "F")],
-  ["H", "Heatsink", (c, s) => Sprites.tool(c, 0, 0, s, "H")],
-  ["K", "Grip Pads", (c, s) => Sprites.tool(c, 0, 0, s, "K")],
-  ["M", "Mag Grips", (c, s) => Sprites.tool(c, 0, 0, s, "M")],
-  ["Q", "Quarantine kit", (c, s) => Sprites.tool(c, 0, 0, s, "Q")],
+  ["group", "ed.g.locks"],
+  ["r", "ed.b.cardR", (c, s) => Sprites.card(c, 0, 0, s, "r")],
+  ["R", "ed.b.doorR", (c, s) => Sprites.door(c, 0, 0, s, "r")],
+  ["b", "ed.b.cardB", (c, s) => Sprites.card(c, 0, 0, s, "b")],
+  ["B", "ed.b.doorB", (c, s) => Sprites.door(c, 0, 0, s, "b")],
+  ["y", "ed.b.cardY", (c, s) => Sprites.card(c, 0, 0, s, "y")],
+  ["Y", "ed.b.doorY", (c, s) => Sprites.door(c, 0, 0, s, "y")],
+  ["g", "ed.b.cardG", (c, s) => Sprites.card(c, 0, 0, s, "g")],
+  ["G", "ed.b.doorG", (c, s) => Sprites.door(c, 0, 0, s, "g")],
+  ["k", "ed.b.switch", (c, s) => Sprites.toggleSwitch(c, 0, 0, s)],
+  ["-", "ed.b.toggleShut", (c, s) => Sprites.toggleWall(c, 0, 0, s, false)],
+  ["|", "ed.b.toggleOpen", (c, s) => Sprites.toggleWall(c, 0, 0, s, true)],
+  ["F", "ed.b.seal", (c, s) => Sprites.tool(c, 0, 0, s, "F")],
+  ["H", "ed.b.heatsink", (c, s) => Sprites.tool(c, 0, 0, s, "H")],
+  ["K", "ed.b.grips", (c, s) => Sprites.tool(c, 0, 0, s, "K")],
+  ["M", "ed.b.mag", (c, s) => Sprites.tool(c, 0, 0, s, "M")],
+  ["Q", "ed.b.kit", (c, s) => Sprites.tool(c, 0, 0, s, "Q")],
 
-  ["group", "Malware"],
-  ["@", "Bug", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "@", "down", 0); }],
-  ["%", "Glitch", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "%", "down", 0); }],
-  ["&", "Trojan", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "&", "down", 0); }],
-  ["$", "Packet", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "$", "left", 0); }]
+  ["group", "ed.g.malware"],
+  ["@", "ed.b.bug", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "@", "down", 0); }],
+  ["%", "ed.b.glitch", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "%", "down", 0); }],
+  ["&", "ed.b.trojan", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "&", "down", 0); }],
+  ["$", "ed.b.packet", (c, s) => { Sprites.floor(c, 0, 0, s, 1, 1); Sprites.monster(c, 0, 0, s, "$", "left", 0); }]
 ];
 
 const DRAW = new Map(BRUSHES.filter(b => b[0] !== "group").map(([ch, , draw]) => [ch, draw]));
 const HARDWARE = ["cpu", "ram", "gpu", "ssd", "psu", "fan", "nic", "mobo"];
 const SOFTWARE = ["os", "driver", "compiler", "antivirus", "database", "browser"];
-const NAMES = Object.assign({}, HARDWARE_NAMES, SOFTWARE_NAMES);
+const nameOf = kind => (knowledgeFor(kind, currentLang()) || { name: kind }).name;
 
 let grid = [];
 let brush = "#";
@@ -223,14 +223,14 @@ function buildPalette() {
       h.className = "gauge-label";
       h.style.gridColumn = "1 / -1";
       h.style.margin = "6px 0 0";
-      h.textContent = entry[1];
+      h.textContent = t(entry[1]);
       box.appendChild(h);
       continue;
     }
     const [ch, label, drawFn] = entry;
     const b = document.createElement("button");
     b.className = "ed-swatch";
-    b.title = `${label}  (${ch === " " ? "space" : ch})`;
+    b.title = `${t(label)}  (${ch === " " ? "space" : ch})`;
     b.setAttribute("aria-pressed", String(ch === brush));
     const c = document.createElement("canvas");
     c.width = c.height = 40;
@@ -252,7 +252,7 @@ function renderKinds() {
   for (const ch of ["c", "s", "x", "z"]) {
     const tiles = partTiles(ch);
     const options = ch === "c" || ch === "x" ? HARDWARE : SOFTWARE;
-    tiles.forEach((t, i) => {
+    tiles.forEach((tile, i) => {
       any = true;
       const row = document.createElement("div");
       row.className = "ed-kind-row" + ("xz".includes(ch) ? " bad" : "");
@@ -264,12 +264,12 @@ function renderKinds() {
       if ("xz".includes(ch)) Sprites.incompatible(cc, 0, 0, 30);
       const at = document.createElement("span");
       at.className = "at";
-      at.textContent = `${t.x},${t.y}`;
+      at.textContent = `${tile.x},${tile.y}`;
       const sel = document.createElement("select");
       for (const k of options) {
         const o = document.createElement("option");
         o.value = k;
-        o.textContent = NAMES[k] + ("xz".includes(ch) ? " (does not fit)" : "");
+        o.textContent = nameOf(k) + ("xz".includes(ch) ? " " + t("ed.doesNotFit") : "");
         if (k === kinds[ch][i]) o.selected = true;
         sel.appendChild(o);
       }
@@ -278,7 +278,12 @@ function renderKinds() {
       box.appendChild(row);
     });
   }
-  if (!any) box.innerHTML = '<span class="empty" style="color:var(--muted);font-size:12px">paint some parts and they will be listed here</span>';
+  if (!any) {
+    const empty = document.createElement("span");
+    empty.style.cssText = "color:var(--muted);font-size:12px";
+    empty.textContent = t("ed.partsEmpty");
+    box.appendChild(empty);
+  }
 }
 
 function report(msg, kind) {
@@ -291,13 +296,14 @@ function check() {
   const level = currentLevel();
   const { ok, problems, info } = validateLevel(level);
   if (!ok) {
-    report("Not playable yet:\n• " + problems.join("\n• "), "bad");
+    report(t("ed.bad") + "\n• " + problems.join("\n• "), "bad");
     return false;
   }
   const g = new Game(level);
-  const spec = g.spec.map(e => `${e.need}× ${e.name}`).join(", ");
-  report(`Looks playable.\n${info.width}×${info.height}, ${info.hardware} hardware, ` +
-    `${info.software} software, ${info.decoys} that do not fit.\nBuild spec: ${spec}`, "good");
+  const spec = g.spec.map(e => `${e.need}× ${nameOf(e.kind)}`).join(", ");
+  report([t("ed.good"),
+    t("ed.summary", { w: info.width, h: info.height, hardware: info.hardware, software: info.software, decoys: info.decoys }),
+    t("ed.spec", { spec })].join("\n"), "good");
   return true;
 }
 
@@ -306,9 +312,9 @@ async function copyLink() {
   const link = Codec.link(currentLevel(), location.href.replace(/editor\.html.*$/, "index.html"));
   try {
     await navigator.clipboard.writeText(link);
-    report(`Share link copied (${link.length} characters). Anyone who opens it plays your level.`, "good");
+    report(t("ed.copied", { n: link.length }), "good");
   } catch (e) {
-    report("Copy the link below:\n" + link, "good");
+    report(t("ed.copyManual") + "\n" + link, "good");
   }
 }
 
@@ -333,30 +339,30 @@ document.getElementById("ed-play").onclick = () => {
   location.href = Codec.link(currentLevel(), location.href.replace(/editor\.html.*$/, "index.html"));
 };
 document.getElementById("ed-load").onclick = () => {
-  const input = prompt("Paste a share link or level code:");
+  const input = prompt(t("ed.loadPrompt"));
   if (!input) return;
   const code = (/[#&]lvl=([A-Za-z0-9\-_]+)/.exec(input) || [null, input.trim()])[1];
   try {
     applyLevel(Codec.decode(code));
-    report("Loaded. Edit away.", "good");
+    report(t("ed.loaded"), "good");
   } catch (e) {
-    report("That code could not be read: " + e.message, "bad");
+    report(t("ed.loadFail", { message: e.message }), "bad");
   }
 };
 document.getElementById("ed-start").onclick = () => {
-  const list = LEVELS.map((l, i) => `${i + 1}. ${l.name}`).join("\n");
-  const pick = prompt("Start from which level?\n\n" + list, "1");
+  const list = LEVELS.map((l, i) => `${i + 1}. ${levelName(l)}`).join("\n");
+  const pick = prompt(t("ed.startPrompt") + "\n\n" + list, "1");
   const i = Number(pick) - 1;
   if (LEVELS[i]) {
     applyLevel(JSON.parse(JSON.stringify(LEVELS[i])));
-    report(`Loaded ${LEVELS[i].name} as a starting point.`, "good");
+    report(t("ed.startedFrom", { name: levelName(LEVELS[i]) }), "good");
   }
 };
 document.getElementById("ed-clear").onclick = () => {
-  if (!confirm("Clear the map?")) return;
+  if (!confirm(t("ed.clearConfirm"))) return;
   kinds = { c: [], s: [], x: [], z: [] };
   resize(Number(document.getElementById("ed-w").value), Number(document.getElementById("ed-h").value));
-  report("Cleared.", null);
+  report(t("ed.cleared"), null);
 };
 for (const id of ["ed-w", "ed-h"]) {
   document.getElementById(id).onchange = () => {
@@ -368,5 +374,28 @@ for (const id of ["ed-w", "ed-h"]) {
   };
 }
 
+/* --------------------------------------------------------------- language */
+const ED_LANG_KEY = "bitbuilder.lang";
+function edApplyLanguage(lang) {
+  setLang(lang);
+  try { localStorage.setItem(ED_LANG_KEY, currentLang()); } catch (err) { /* storage disabled */ }
+  document.documentElement.lang = currentLang() === "zh" ? "zh-CN" : "en";
+  for (const node of document.querySelectorAll("[data-i18n]")) node.textContent = t(node.dataset.i18n);
+  document.getElementById("btn-lang").textContent = t("lang.other");
+  document.getElementById("ed-name").placeholder = t("ed.name");
+  buildPalette();
+  renderKinds();
+  if (!document.getElementById("ed-report").textContent.trim()) report(t("ed.ready"), null);
+}
+document.getElementById("btn-lang").onclick = () => edApplyLanguage(currentLang() === "zh" ? "en" : "zh");
+
+let startLang = "en";
+try {
+  startLang = localStorage.getItem(ED_LANG_KEY) ||
+    ((navigator.language || "en").toLowerCase().startsWith("zh") ? "zh" : "en");
+} catch (err) { /* storage disabled */ }
+
 buildPalette();
 resize(15, 13);
+edApplyLanguage(startLang);
+report(t("ed.ready"), null);

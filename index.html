@@ -13,16 +13,18 @@
     <span class="logo">&#9636;</span>
     <div>
       <h1>Bit Builder</h1>
-      <p>Collect every hardware and software part, plug them into the assembly socket, and boot the machine.</p>
+      <p data-i18n="app.tagline">Collect the parts on the build spec, plug them into the assembly socket, and boot the machine.</p>
     </div>
   </div>
   <div class="topbar-actions">
-    <button id="btn-levels" class="btn">Levels</button>
-    <a class="btn" href="editor.html">Editor</a>
+    <button id="btn-lang" class="btn" title="Language / 语言">中文</button>
+    <button id="btn-levels" class="btn" data-i18n="btn.levels">Levels</button>
+    <a class="btn" href="editor.html" data-i18n="btn.editor">Editor</a>
     <button id="btn-fullscreen" class="btn" aria-pressed="false">Full screen</button>
     <button id="btn-practice" class="btn" aria-pressed="false">Practice: off</button>
     <button id="btn-sound" class="btn" aria-pressed="true">Sound: on</button>
-    <button id="btn-help" class="btn">How to play</button>
+    <button id="btn-knowledge" class="btn" data-i18n="btn.knowledge">Knowledge</button>
+    <button id="btn-help" class="btn" data-i18n="btn.help">How to play</button>
   </div>
 </header>
 
@@ -35,6 +37,7 @@
         <pre id="ov-boot" class="boot hidden"></pre>
         <p id="ov-text"></p>
         <p id="ov-stars" class="stars"></p>
+        <div id="ov-quiz" class="quiz hidden"></div>
         <div id="ov-stats" class="ov-stats"></div>
         <div class="overlay-buttons">
           <button id="ov-primary" class="btn btn-primary"></button>
@@ -61,77 +64,80 @@
 
     <div class="gauges">
       <div class="gauge">
-        <span class="gauge-label">Time</span>
+        <span class="gauge-label" data-i18n="gauge.time">Time</span>
         <strong id="time-left">0:00</strong>
       </div>
       <div class="gauge">
-        <span class="gauge-label">Parts</span>
+        <span class="gauge-label" data-i18n="gauge.parts">Parts</span>
         <strong id="parts-count">0/0</strong>
       </div>
       <div class="gauge">
-        <span class="gauge-label">Par</span>
+        <span class="gauge-label" data-i18n="gauge.par">Par</span>
         <strong id="par-count">&mdash;</strong>
       </div>
     </div>
 
     <div class="belt">
-      <h3>Build spec</h3>
+      <h3 data-i18n="head.spec">Build spec</h3>
       <div id="spec-list" class="spec-list"></div>
     </div>
 
-    <div id="socket-state" class="socket-state">Socket locked &mdash; parts still missing</div>
+    <div id="socket-state" class="socket-state"></div>
 
     <div class="belt">
-      <h3>Belt</h3>
+      <h3 data-i18n="head.belt">Belt</h3>
       <div id="inventory" class="inventory"><span class="empty">nothing yet</span></div>
     </div>
 
+    <div class="belt note-box">
+      <h3 data-i18n="head.note">Field note</h3>
+      <div id="field-note" class="field-note"></div>
+    </div>
+
     <div id="hint-box" class="hint-box">
-      <h3>Objective</h3>
+      <h3 data-i18n="head.objective">Objective</h3>
       <p id="hint-text"></p>
     </div>
 
     <p id="toast" class="toast"></p>
 
     <div class="panel-buttons">
-      <button id="btn-rewind" class="btn">Rewind <kbd>Z</kbd></button>
-      <button id="btn-restart" class="btn">Restart <kbd>R</kbd></button>
-      <button id="btn-pause" class="btn">Pause <kbd>P</kbd></button>
+      <button id="btn-rewind" class="btn"><span data-i18n="btn.rewind">Rewind</span> <kbd>Z</kbd></button>
+      <button id="btn-restart" class="btn"><span data-i18n="btn.restart">Restart</span> <kbd>R</kbd></button>
+      <button id="btn-pause" class="btn"><span data-i18n="btn.pause">Pause</span> <kbd>P</kbd></button>
     </div>
   </aside>
 </main>
 
 <dialog id="levels-dialog">
-  <h2>Levels</h2>
-  <p class="muted">Finish a level to unlock the next one.</p>
+  <h2 data-i18n="levels.title">Levels</h2>
+  <p class="muted" data-i18n="levels.sub">Finish a level to unlock the next one.</p>
   <div id="level-list" class="level-list"></div>
-  <form method="dialog"><button class="btn">Close</button></form>
+  <form method="dialog"><button class="btn" data-i18n="btn.close">Close</button></form>
+</dialog>
+
+<dialog id="knowledge-dialog">
+  <h2 data-i18n="know.title">Knowledge base</h2>
+  <p class="muted" data-i18n="know.sub"></p>
+  <div id="knowledge-list" class="know-list"></div>
+  <form method="dialog"><button class="btn" data-i18n="btn.close">Close</button></form>
 </dialog>
 
 <dialog id="help-dialog">
-  <h2>How to play</h2>
-  <p>Move with the <strong>arrow keys</strong> or <strong>WASD</strong> (swipe or use the pad on a phone).
-     Every level is a <strong>build spec</strong>: fetch exactly the components it lists, walk through the
-     <strong>assembly socket</strong> &mdash; it only opens once the spec is complete &mdash; and reach the
-     <strong>power button</strong> before the clock runs out. Parts marked with a red cross belong to a
-     different machine: picking one up costs you ten seconds.</p>
-  <p>Malware kills on contact &mdash; unless you are carrying a <strong>quarantine kit</strong>, which shuts
-     one down and is used up doing it. There are never enough kits for every monster, so pick your fights.
-     <strong>Practice</strong> in the top bar stops the clock while you learn a level; nothing is recorded
-     from a practice run.</p>
-  <p>Made a mess of a crate push? <kbd>Z</kbd> <strong>rewinds</strong> one move, even the one that killed you
-     &mdash; the clock keeps running, and a clean run with no rewinds is worth the third star.
-     <kbd>R</kbd> restarts, <kbd>P</kbd> pauses, <kbd>F</kbd> goes full screen. Every level has a <strong>par</strong> move count from the
-     solver; beat 125% of it with no rewinds and no wrong parts for three stars.
-     You can also <a href="editor.html">build your own levels</a> and share them as a link.</p>
+  <h2 data-i18n="help.title">How to play</h2>
+  <p data-i18n-html="help.p1"></p>
+  <p data-i18n-html="help.p2"></p>
+  <p data-i18n-html="help.p3"></p>
   <div class="legend" id="legend"></div>
-  <form method="dialog"><button class="btn">Close</button></form>
+  <form method="dialog"><button class="btn" data-i18n="btn.close">Close</button></form>
 </dialog>
 
-<footer class="foot">
+<footer class="foot" data-i18n="foot.text">
   Built for PPS2114. Keyboard, mouse or touch &mdash; no install, no plugins.
 </footer>
 
+<script src="js/i18n.js"></script>
+<script src="js/knowledge.js"></script>
 <script src="js/levels.js"></script>
 <script src="js/codec.js"></script>
 <script src="js/engine.js"></script>

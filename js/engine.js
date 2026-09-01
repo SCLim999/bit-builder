@@ -366,11 +366,11 @@ class Game {
     const t = this.grid[p.y][p.x];
     this.onHint = t === T.HINT;
 
-    if (t === T.COOLANT && !this.tools.F) return this.die("Drowned in coolant");
-    if (t === T.OVERHEAT && !this.tools.H) return this.die("Cooked in an overheat zone");
+    if (t === T.COOLANT && !this.tools.F) return this.die("coolant");
+    if (t === T.OVERHEAT && !this.tools.H) return this.die("overheat");
     if (t === T.SURGE) {
       this.grid[p.y][p.x] = T.FLOOR;
-      return this.die("Fried by a power surge");
+      return this.die("surge");
     }
     if (t === T.SCRUBBER) {
       this.tools = { F: false, H: false, K: false, M: false };
@@ -401,24 +401,24 @@ class Game {
       const entry = this.specFor(kind);
       if (entry) entry.got++;
       if (item === "c") this.collected.hw++; else this.collected.sw++;
-      this.lastPickup = PART_NAMES[kind] || kind;
+      this.lastPickup = { type: "part", id: kind };
     } else if (DECOY_CHARS.includes(item)) {
       const kind = this.kindAt.get(x + "," + y);
-      this.lastPickup = PART_NAMES[kind] || kind;
+      this.lastPickup = { type: "decoy", id: kind };
       this.timeLeft -= DECOY_PENALTY_MS;                 // wrong part for this build
       this.rejects++;
-      this.emit("reject", this.lastPickup);
-      if (this.timeLeft <= 0) { this.timeLeft = 0; this.die("Ran out of time"); }
+      this.emit("reject", kind);
+      if (this.timeLeft <= 0) { this.timeLeft = 0; this.die("time"); }
       return;
     } else if (CARD_CHARS.includes(item)) {
       this.keys[item]++;
-      this.lastPickup = CARD_INFO[item].name;
+      this.lastPickup = { type: "card", id: item };
     } else if (TOOL_CHARS.includes(item)) {
       this.tools[item] = true;
-      this.lastPickup = TOOL_INFO[item].name;
+      this.lastPickup = { type: "tool", id: item };
     } else if (item === KIT_CHAR) {
       this.kits++;
-      this.lastPickup = TOOL_INFO.Q.name;
+      this.lastPickup = { type: "tool", id: KIT_CHAR };
     }
     this.emit("pickup", item);
     if (this.partsDone()) this.emit("ready");
@@ -456,6 +456,7 @@ class Game {
     this.slide = null;
   }
 
+  /* `reason` is a key; the interface turns it into text (see js/i18n.js). */
   die(reason) {
     if (this.state !== "playing") return;
     this.state = "dead";
@@ -513,7 +514,7 @@ class Game {
         this.emit("quarantine");
         continue;
       }
-      return this.die("Caught by malware");
+      return this.die("malware");
     }
   }
 
@@ -523,7 +524,7 @@ class Game {
     this.timeLeft -= ms;
     if (this.timeLeft <= 0) {
       this.timeLeft = 0;
-      this.die("Ran out of time");
+      this.die("time");
     }
   }
 }
