@@ -99,6 +99,7 @@ kbd {
   display: block;
   width: 100%;
   height: auto;
+  aspect-ratio: 1 / 1;
   image-rendering: auto;
   border-radius: 6px;
   background: #05080d;
@@ -332,3 +333,32 @@ dialog p strong { color: var(--text); }
 .boot.hidden { display: none; }
 .overlay-card .stars, .stars { margin: 0 0 12px; font-size: 22px; letter-spacing: 4px; color: var(--amber); min-height: 26px; }
 .level-card .stars { color: var(--amber); font-size: 13px; letter-spacing: 2px; margin: 0; min-height: 0; }
+
+/* --------------------------------------------------------------- full screen */
+body.fs { overflow: hidden; }
+body.fs .topbar { padding: 8px clamp(12px, 3vw, 28px); }
+body.fs .topbar p { display: none; }
+body.fs .topbar h1 { font-size: 17px; }
+body.fs .logo { width: 34px; height: 34px; font-size: 17px; }
+body.fs .foot { display: none; }
+body.fs .shell {
+  grid-template-columns: auto minmax(260px, 340px);
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px clamp(10px, 2vw, 28px);
+}
+body.fs .stage { padding: 8px; }
+body.fs #board {
+  width: auto;
+  max-width: none;
+  height: min(calc(100vh - 116px), calc(100vw - 420px));
+}
+body.fs .panel { max-height: calc(100vh - 96px); overflow-y: auto; }
+
+@media (max-width: 900px) {
+  body.fs { overflow: auto; }
+  body.fs .shell { grid-template-columns: minmax(0, 1fr); }
+  body.fs #board { height: min(calc(100vh - 300px), calc(100vw - 44px)); }
+  body.fs .panel { max-height: none; }
+}

@@ -4,8 +4,8 @@
 
 const STEP_MS = 145;          // one engine step
 const VIEW = 11;              // tiles visible across the board
-const LOGICAL = 528;          // css pixels of the square board
-const TILE = LOGICAL / VIEW;
+let BOARD = 528;              // css pixels of the square board, remeasured on resize
+let TILE = BOARD / VIEW;
 const STORE_KEY = "bitbuilder.v1";
 
 const canvas = document.getElementById("board");
@@ -88,10 +88,15 @@ const Sound = {
 };
 
 /* --------------------------------------------------------------- rendering */
+/* The canvas is square and sized by CSS; match the backing store to whatever
+   size it ended up, so the board stays crisp full screen and on retina. */
 function setupCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = LOGICAL * dpr;
-  canvas.height = LOGICAL * dpr;
+  const css = Math.max(200, Math.round(canvas.getBoundingClientRect().width) || BOARD);
+  BOARD = css;
+  TILE = BOARD / VIEW;
+  canvas.width = Math.round(css * dpr);
+  canvas.height = Math.round(css * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
@@ -145,7 +150,7 @@ function render(alpha) {
   const { ox, oy } = cameraOrigin(px, py);
 
   ctx.fillStyle = "#05080d";
-  ctx.fillRect(0, 0, LOGICAL, LOGICAL);
+  ctx.fillRect(0, 0, BOARD, BOARD);
 
   const x0 = Math.floor(ox) - 1, y0 = Math.floor(oy) - 1;
   for (let gy = y0; gy <= y0 + VIEW + 1; gy++) {
@@ -168,11 +173,11 @@ function render(alpha) {
   }
   if (game.state !== "dead") Sprites.player(ctx, (px - ox) * TILE, (py - oy) * TILE, TILE, p.dir, animT);
 
-  const vig = ctx.createRadialGradient(LOGICAL / 2, LOGICAL / 2, LOGICAL * 0.3, LOGICAL / 2, LOGICAL / 2, LOGICAL * 0.75);
+  const vig = ctx.createRadialGradient(BOARD / 2, BOARD / 2, BOARD * 0.3, BOARD / 2, BOARD / 2, BOARD * 0.75);
   vig.addColorStop(0, "rgba(0,0,0,0)");
   vig.addColorStop(1, "rgba(0,0,0,0.45)");
   ctx.fillStyle = vig;
-  ctx.fillRect(0, 0, LOGICAL, LOGICAL);
+  ctx.fillRect(0, 0, BOARD, BOARD);
 }
 
 /* --------------------------------------------------------------------- HUD */
@@ -469,6 +474,7 @@ document.addEventListener("keydown", e => {
   }
   if (e.key === "r" || e.key === "R") { custom ? loadCustomLevel(custom) : loadLevel(levelIndex); return; }
   if (e.key === "z" || e.key === "Z") { if (mode === "playing" || mode === "dead") rewind(); return; }
+  if (e.key === "f" || e.key === "F") { toggleFullscreen(); return; }
   if (e.key === "p" || e.key === "P") { togglePause(); return; }
   if (e.key === "Enter" || e.key === " ") {
     if (!el("overlay").classList.contains("hidden")) {
@@ -638,6 +644,47 @@ el("btn-restart").onclick = () => (custom ? loadCustomLevel(custom) : loadLevel(
 el("btn-pause").onclick = togglePause;
 el("btn-levels").onclick = () => el("levels-dialog").showModal();
 el("btn-help").onclick = () => el("help-dialog").showModal();
+/* Real full screen where the browser allows it; on iOS, where a non-video
+   element cannot go full screen, the same class still maximises the layout. */
+function fullscreenOn() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement) ||
+    document.body.classList.contains("fs");
+}
+
+function syncFullscreen() {
+  const on = fullscreenOn();
+  document.body.classList.toggle("fs", on);
+  const b = el("btn-fullscreen");
+  b.textContent = on ? "Exit full screen" : "Full screen";
+  b.setAttribute("aria-pressed", String(on));
+  requestAnimationFrame(setupCanvas);
+}
+
+function toggleFullscreen() {
+  const root = document.documentElement;
+  const real = document.fullscreenElement || document.webkitFullscreenElement;
+  if (real) {
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    document.body.classList.remove("fs");
+    syncFullscreen();
+    return;
+  }
+  const request = root.requestFullscreen || root.webkitRequestFullscreen;
+  document.body.classList.add("fs");
+  if (request) {
+    Promise.resolve(request.call(root)).catch(() => { /* keep the maximised layout */ });
+  }
+  syncFullscreen();
+}
+
+for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) {
+  document.addEventListener(ev, () => {
+    if (!(document.fullscreenElement || document.webkitFullscreenElement)) document.body.classList.remove("fs");
+    syncFullscreen();
+  });
+}
+
+el("btn-fullscreen").onclick = toggleFullscreen;
 el("btn-practice").onclick = e => {
   practice = !practice;
   if (practice) practiceUsed = true;

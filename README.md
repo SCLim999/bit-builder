@@ -23,6 +23,7 @@ serve the folder anywhere static.
 | Rewind one move | <kbd>Z</kbd> — works after a fatal move too |
 | Restart level | <kbd>R</kbd> |
 | Pause | <kbd>P</kbd> |
+| Full screen | <kbd>F</kbd>, or the *Full screen* button — the board scales up to fill the display |
 | Practice (clock stopped) | the *Practice* button — a practice run records no time, stars or best |
 | Confirm on an overlay | <kbd>Enter</kbd> / <kbd>Space</kbd> |
 
