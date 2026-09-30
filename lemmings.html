@@ -45,7 +45,11 @@
   </div>
 
   <section class="stage rush-stage">
-    <canvas id="world" width="800" height="400" aria-label="game world"></canvas>
+    <div id="viewport" class="viewport">
+      <canvas id="world" width="800" height="400" aria-label="game world"></canvas>
+      <canvas id="world3d" class="layer" width="800" height="400" aria-hidden="true" hidden></canvas>
+      <canvas id="fx" class="layer fx" width="800" height="400" aria-hidden="true" hidden></canvas>
+    </div>
     <div id="overlay" class="overlay hidden">
       <div class="overlay-card">
         <h2 id="ov-title"></h2>
@@ -65,6 +69,7 @@
     <div class="controls">
       <button id="btn-pause" class="btn ctl"><span data-t="ctl.pause">Pause</span> <kbd>P</kbd></button>
       <button id="btn-fast" class="btn ctl" aria-pressed="false"><span data-t="ctl.fast">Fast</span> <kbd>F</kbd></button>
+      <button id="btn-view" class="btn ctl"><span>View: 3D</span> <kbd>V</kbd></button>
       <button id="btn-restart" class="btn ctl"><span data-t="ctl.restart">Restart</span> <kbd>R</kbd></button>
       <button id="btn-nuke" class="btn ctl nuke"><span data-t="ctl.nuke">kill -9</span> <kbd>K</kbd></button>
     </div>
@@ -95,6 +100,7 @@
 
 <script src="js/lem-engine.js"></script>
 <script src="js/lem-levels.js"></script>
+<script src="js/lem-3d.js"></script>
 <script src="js/lem-main.js"></script>
 </body>
 </html>

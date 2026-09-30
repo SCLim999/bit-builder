@@ -15,6 +15,8 @@ const TEXT = {
     "theme.soft": "Theme: Soft", "theme.energy": "Theme: Energy", "theme.excited": "Theme: Excited",
     "btn.sound": "Sound: {state}", "state.on": "on", "state.off": "off",
     "hud.level": "Level {n}", "hud.out": "Out", "hud.in": "Delivered", "hud.need": "Need", "hud.lost": "Lost", "hud.ttl": "TTL",
+    "view.3d": "View: 3D", "view.2d": "View: 2D",
+    "view.hint": "3D view — drag empty space to tilt the camera, scroll to zoom, double-click to reset.",
     "ctl.pause": "Pause", "ctl.resume": "Resume", "ctl.fast": "Fast", "ctl.restart": "Restart", "ctl.nuke": "kill -9",
     "ctl.nukeConfirm": "Press again to end the run",
     "levels.title": "Levels", "levels.sub": "Deliver enough packets to unlock the next network.",
@@ -38,7 +40,7 @@ const TEXT = {
     "help.title": "How to play",
     "help.p1": "Packets drop out of the <b>router</b> and walk forward until they hit a wall, then turn around. They step up small ledges, but a fall that is too long <b>corrupts</b> them, and walking off the edge of the map <b>drops</b> them.",
     "help.p2": "Choose a skill in the toolbar (or press <kbd>1</kbd>–<kbd>7</kbd>), then click a packet to give it that job. Each level hands out a limited number of each skill. Get enough packets into the <b>server</b> before their <b>TTL</b> — time to live — runs out.",
-    "help.p3": "<kbd>P</kbd> pause · <kbd>F</kbd> fast forward · <kbd>R</kbd> restart · <kbd>K</kbd> twice: <b>kill -9</b> ends the run by overflowing every packet.",
+    "help.p3": "<kbd>P</kbd> pause · <kbd>F</kbd> fast forward · <kbd>V</kbd> 3D / 2D view · <kbd>R</kbd> restart · <kbd>K</kbd> twice: <b>kill -9</b> ends the run by overflowing every packet.",
     "foot.text": "A Lemmings-style companion to Bit Builder. Mouse, keyboard or touch — no install, no plugins.",
     "skill.uplink": "Uplink", "skill.buffer": "Buffer", "skill.overflow": "Overflow", "skill.firewall": "Firewall",
     "skill.bridge": "Bridge", "skill.tunnel": "Tunnel", "skill.pipe": "Pipe",
@@ -59,6 +61,8 @@ const TEXT = {
     "theme.soft": "配色：柔和", "theme.energy": "配色：活力", "theme.excited": "配色：热烈",
     "btn.sound": "声音：{state}", "state.on": "开", "state.off": "关",
     "hud.level": "第 {n} 关", "hud.out": "已发出", "hud.in": "已送达", "hud.need": "需要", "hud.lost": "丢失", "hud.ttl": "TTL",
+    "view.3d": "视图：3D", "view.2d": "视图：2D",
+    "view.hint": "3D 视图 —— 拖动空白处旋转镜头，滚轮缩放，双击复位。",
     "ctl.pause": "暂停", "ctl.resume": "继续", "ctl.fast": "快进", "ctl.restart": "重来", "ctl.nuke": "kill -9",
     "ctl.nukeConfirm": "再按一次结束本局",
     "levels.title": "关卡", "levels.sub": "送达足够的数据包即可解锁下一个网络。",
@@ -82,7 +86,7 @@ const TEXT = {
     "help.title": "玩法说明",
     "help.p1": "数据包从<b>路由器</b>里掉出来，一直向前走，碰到墙就掉头。它们能迈上小台阶，但摔得太远会<b>损坏</b>，走出地图边缘会<b>丢失</b>。",
     "help.p2": "在工具栏选择一个技能（或按 <kbd>1</kbd>–<kbd>7</kbd>），再点击一个数据包，把这项工作交给它。每关每种技能的数量有限。要在数据包的 <b>TTL</b>（生存时间）耗尽之前，把足够多的数据包送进<b>服务器</b>。",
-    "help.p3": "<kbd>P</kbd> 暂停 · <kbd>F</kbd> 快进 · <kbd>R</kbd> 重来 · 连按两次 <kbd>K</kbd>：<b>kill -9</b> 让所有数据包溢出，结束本局。",
+    "help.p3": "<kbd>P</kbd> 暂停 · <kbd>F</kbd> 快进 · <kbd>V</kbd> 切换 3D / 2D · <kbd>R</kbd> 重来 · 连按两次 <kbd>K</kbd>：<b>kill -9</b> 让所有数据包溢出，结束本局。",
     "foot.text": "组装大师的旅鼠风格姊妹篇。鼠标、键盘或触屏均可 —— 无需安装，无需插件。",
     "skill.uplink": "上行链路", "skill.buffer": "缓冲区", "skill.overflow": "溢出", "skill.firewall": "防火墙",
     "skill.bridge": "网桥", "skill.tunnel": "隧道", "skill.pipe": "管道",
@@ -138,6 +142,13 @@ function beep(freq, ms, type = "square", vol = 0.05, slide = 0) {
 
 /* --------------------------------------------------------------- state */
 const canvas = el("world");
+const fxCanvas = el("fx");
+const fx = fxCanvas.getContext("2d");
+/* The 3D view needs WebGL2; without it the game simply stays flat. */
+let r3 = null;
+try { r3 = typeof createRenderer3D === "function" ? createRenderer3D(el("world3d")) : null; } catch (e) { r3 = null; }
+let view3d = !!r3 && store.get("packetrush.view", "3d") === "3d";
+let hoverScreen = null;           // pointer position in CSS pixels, for the 3D overlay
 const ctx = canvas.getContext("2d");
 const SCALE = canvas.width / LW;
 const terrainCanvas = document.createElement("canvas");
@@ -376,19 +387,24 @@ function drawPacket(p, highlight) {
   }
 }
 
-function drawEffects() {
+function stepEffects() {
   effects = effects.filter(e => e.life > 0);
   for (const e of effects) {
     e.life--;
+    if (e.kind === "text") e.y -= 0.35;
+    else { e.x += e.vx; e.y += e.vy; e.vy += 0.12; }
+  }
+}
+
+function drawEffects() {
+  for (const e of effects) {
     if (e.kind === "text") {
-      e.y -= 0.35;
       ctx.globalAlpha = Math.min(1, e.life / 20);
       ctx.fillStyle = e.color;
       ctx.font = "bold 7px ui-sans-serif, system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(e.text, e.x, e.y);
     } else {
-      e.x += e.vx; e.y += e.vy; e.vy += 0.12;
       ctx.globalAlpha = Math.min(1, e.life / 15);
       ctx.fillStyle = e.color;
       ctx.fillRect(e.x, e.y, 1.2, 1.2);
@@ -400,12 +416,78 @@ function drawEffects() {
 function burst(x, y, colors, n) {
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2 + Math.random() * 0.4, s = 0.6 + Math.random() * 1.6;
-    effects.push({ kind: "spark", x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 1, life: 25 + Math.random() * 20, color: colors[i % colors.length] });
+    effects.push({ kind: "spark", x, y, z: (Math.random() - 0.5) * 18, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 1, life: 25 + Math.random() * 20, color: colors[i % colors.length] });
   }
 }
 
 function render() {
   frame++;
+  stepEffects();
+  if (view3d) render3D(); else render2D();
+}
+
+/* The 3D renderer draws the world; this overlay adds what reads better flat:
+   floating labels, overflow countdowns, the target ring and the pause card. */
+function render3D() {
+  const target = hover && running ? game.pick(hover.x, hover.y, selected) : null;
+  r3.render(game, { pal: palette(), frame, hot: target, effects });
+
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = Math.round(fxCanvas.clientWidth * dpr), H = Math.round(fxCanvas.clientHeight * dpr);
+  if (fxCanvas.width !== W || fxCanvas.height !== H) { fxCanvas.width = W; fxCanvas.height = H; }
+  fx.setTransform(1, 0, 0, 1, 0, 0);
+  fx.clearRect(0, 0, W, H);
+  const unit = W / 400;                     // roughly one world pixel on screen
+  const at = (x, y, z) => { const s = r3.project(x, y, z); return [s.x * W, s.y * H]; };
+  fx.textAlign = "center";
+
+  for (const e of effects) {
+    if (e.kind !== "text") continue;
+    const [sx, sy] = at(e.x, e.y, 4);
+    fx.globalAlpha = Math.min(1, e.life / 20);
+    fx.font = `bold ${Math.round(8 * unit)}px ui-sans-serif, system-ui, sans-serif`;
+    fx.lineWidth = 3 * dpr; fx.strokeStyle = "rgba(0,0,0,0.55)";
+    fx.strokeText(e.text, sx, sy);
+    fx.fillStyle = e.color;
+    fx.fillText(e.text, sx, sy);
+  }
+  fx.globalAlpha = 1;
+  for (const p of game.packets) {
+    if (!p.alive || p.bomb <= 0) continue;
+    const secs = Math.ceil(p.bomb / TICK_HZ);
+    const [sx, sy] = at(p.x, p.y - 16, 0);
+    fx.font = `bold ${Math.round(9 * unit)}px ui-monospace, monospace`;
+    fx.lineWidth = 3 * dpr; fx.strokeStyle = "rgba(0,0,0,0.6)";
+    fx.strokeText(String(secs), sx, sy);
+    fx.fillStyle = secs <= 1 && frame % 4 < 2 ? "#ffffff" : "#fb7185";
+    fx.fillText(String(secs), sx, sy);
+  }
+  if (target) {
+    const [sx, sy] = at(target.x, target.y - 6, 0);
+    fx.strokeStyle = "#4ade80";
+    fx.lineWidth = 1.5 * dpr;
+    fx.beginPath();
+    fx.arc(sx, sy, 11 * unit, 0, Math.PI * 2);
+    fx.stroke();
+  } else if (hoverScreen && running) {
+    const sx = hoverScreen.x * dpr, sy = hoverScreen.y * dpr, r = 5 * dpr;
+    fx.strokeStyle = "rgba(255,255,255,0.6)";
+    fx.lineWidth = 1 * dpr;
+    fx.beginPath();
+    fx.moveTo(sx - r, sy); fx.lineTo(sx - r / 3, sy); fx.moveTo(sx + r / 3, sy); fx.lineTo(sx + r, sy);
+    fx.moveTo(sx, sy - r); fx.lineTo(sx, sy - r / 3); fx.moveTo(sx, sy + r / 3); fx.lineTo(sx, sy + r);
+    fx.stroke();
+  }
+  if (paused && running) {
+    fx.fillStyle = "rgba(0,0,0,0.35)";
+    fx.fillRect(0, 0, W, H);
+    fx.fillStyle = "#ffffff";
+    fx.font = `bold ${Math.round(16 * unit)}px ui-sans-serif, system-ui, sans-serif`;
+    fx.fillText(t("ov.paused"), W / 2, H / 2);
+  }
+}
+
+function render2D() {
   const pal = palette();
   if (game.dirty) paintTerrain();
   ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
@@ -699,21 +781,76 @@ function worldPoint(ev) {
   return { x: (ev.clientX - r.left) / r.width * LW, y: (ev.clientY - r.top) / r.height * LH };
 }
 
-canvas.addEventListener("pointermove", ev => { hover = worldPoint(ev); });
-canvas.addEventListener("pointerleave", () => { hover = null; });
-canvas.addEventListener("pointerdown", ev => {
-  if (!running || game.state !== "playing") return;
-  hover = worldPoint(ev);
-  if (!selected) return;
-  if (game.skills[selected] <= 0) { el("skill-note").innerHTML = t("note.none", { skill: t("skill." + selected) }); return; }
-  const p = game.pick(hover.x, hover.y, selected);
+/* Returns true if the click landed on a packet (whether or not it took the skill). */
+function clickAt(pt) {
+  if (!running || game.state !== "playing") return false;
+  hover = pt;
+  const any = game.pick(pt.x, pt.y, null);
+  if (!selected) return !!any;
+  if (game.skills[selected] <= 0) { el("skill-note").innerHTML = t("note.none", { skill: t("skill." + selected) }); return !!any; }
+  const p = game.pick(pt.x, pt.y, selected);
   if (p && game.assign(p, selected)) {
     effects.push({ kind: "text", text: t("skill." + selected), x: p.x, y: p.y - 12, life: 30, color: "#fef08a" });
     beep(740, 50, "square", 0.04, 120);
     drainEvents();
     updateSkills();
+    return true;
   }
-});
+  return !!any;
+}
+
+canvas.addEventListener("pointermove", ev => { hover = worldPoint(ev); });
+canvas.addEventListener("pointerleave", () => { hover = null; });
+canvas.addEventListener("pointerdown", ev => { clickAt(worldPoint(ev)); });
+
+/* In 3D a click on a packet assigns the skill; a drag that starts anywhere
+   else tilts the camera. */
+if (r3) {
+  const c3 = el("world3d");
+  let drag = null;
+  const local = ev => { const r = c3.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; };
+  c3.addEventListener("pointermove", ev => {
+    hoverScreen = local(ev);
+    hover = r3.pickPoint(ev.clientX, ev.clientY);
+    if (drag) {
+      r3.orbit(ev.clientX - drag.x, ev.clientY - drag.y);
+      drag.x = ev.clientX; drag.y = ev.clientY;
+    }
+  });
+  c3.addEventListener("pointerleave", () => { hover = null; hoverScreen = null; });
+  c3.addEventListener("pointerdown", ev => {
+    hoverScreen = local(ev);
+    if (clickAt(r3.pickPoint(ev.clientX, ev.clientY))) return;
+    drag = { x: ev.clientX, y: ev.clientY };
+    c3.classList.add("orbiting");
+    c3.setPointerCapture(ev.pointerId);
+  });
+  const stop = () => { drag = null; c3.classList.remove("orbiting"); };
+  c3.addEventListener("pointerup", stop);
+  c3.addEventListener("pointercancel", stop);
+  c3.addEventListener("dblclick", () => r3.resetView());
+  c3.addEventListener("wheel", ev => { ev.preventDefault(); r3.zoom(ev.deltaY > 0 ? 1.08 : 1 / 1.08); }, { passive: false });
+  c3.addEventListener("contextmenu", ev => ev.preventDefault());
+}
+
+function applyView() {
+  if (!r3) { el("btn-view").hidden = true; view3d = false; }
+  document.body.classList.toggle("view-3d", view3d);
+  el("world3d").hidden = !view3d;
+  el("fx").hidden = !view3d;
+  el("btn-view").querySelector("span").textContent = t(view3d ? "view.3d" : "view.2d");
+  if (r3) r3.markDirty();
+  if (game) game.dirty = true;
+  if (r3) r3.markDirty();
+}
+
+function toggleView() {
+  if (!r3) return;
+  view3d = !view3d;
+  store.set("packetrush.view", view3d ? "3d" : "2d");
+  applyView();
+  el("skill-note").innerHTML = view3d ? t("view.hint") : "";
+}
 
 function nuke() {
   if (!running || game.state !== "playing") return;
@@ -735,6 +872,7 @@ function toggleFast() {
 
 el("btn-pause").onclick = togglePause;
 el("btn-fast").onclick = toggleFast;
+el("btn-view").onclick = toggleView;
 el("btn-restart").onclick = () => startLevel(levelIndex, true);
 el("btn-nuke").onclick = nuke;
 
@@ -746,6 +884,7 @@ document.addEventListener("keydown", ev => {
   if (skill) { selectSkill(skill.id); ev.preventDefault(); return; }
   if (k === "p" || k === " " && running) { togglePause(); ev.preventDefault(); }
   else if (k === "f") toggleFast();
+  else if (k === "v") toggleView();
   else if (k === "r") startLevel(levelIndex, true);
   else if (k === "k") nuke();
   else if (k === "enter" && !running && !el("overlay").classList.contains("hidden")) { el("ov-primary").click(); ev.preventDefault(); }
@@ -796,6 +935,7 @@ function applyText() {
   el("theme-pick").title = t("theme.label");
   el("btn-pause").querySelector("span").textContent = t(paused ? "ctl.resume" : "ctl.pause");
   buildHelp();
+  el("btn-view").querySelector("span").textContent = t(view3d ? "view.3d" : "view.2d");
   if (game) {
     buildSkills();
     if (selected) selectSkill(selected);
@@ -826,6 +966,7 @@ el("btn-help").onclick = () => el("help-dialog").showModal();
 /* ---------------------------------------------------------------- boot */
 applyTheme();
 applyText();
+applyView();
 const saved = Number(store.get("packetrush.level", "0"));
 startLevel(Math.min(Number.isFinite(saved) ? saved : 0, progress.unlocked - 1, PACKET_LEVELS.length - 1));
 requestAnimationFrame(t0 => { last = t0; requestAnimationFrame(loop); });

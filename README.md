@@ -114,6 +114,14 @@ silicon can be dug and blown up, shielded steel cannot.
 | Tunnel | <kbd>6</kbd> | digs sideways through silicon | a VPN tunnel carries traffic through a network that would block it |
 | Pipe | <kbd>7</kbd> | digs straight down | a pipe passes one program's output down to the next |
 
+It opens in a **3D view**: the same simulation drawn as a diorama in WebGL2,
+with extruded circuit-board silicon, steel blocks and packets modelled as
+little envelopes on legs. Drag empty space to tilt the camera, scroll to zoom,
+double-click to reset; packets hidden inside a tunnel or shaft show through as
+glowing silhouettes. <kbd>V</kbd> (or the *View* button) switches to the flat
+2D view, which is also what browsers without WebGL2 get. The renderer is
+hand-written, with no library, so the page still has no dependencies.
+
 Seven levels, one skill introduced at a time, each with a short computing
 concept on its intro and result cards, in English and Mandarin. It shares the
 language setting with Bit Builder, and the *Theme* picker offers five colour
@@ -121,7 +129,7 @@ schemes that recolour both the page and the game world: **Bright** and **Dark**
 (the same two as Bit Builder), **Soft** (pastel lavender, mint and peach),
 **Energy** (deep teal, lime and hot orange) and **Excited** (neon magenta and
 electric yellow on violet, with a pulsing grid). <kbd>P</kbd> pauses,
-<kbd>F</kbd> fast-forwards, <kbd>R</kbd> restarts and <kbd>K</kbd> twice
+<kbd>F</kbd> fast-forwards, <kbd>V</kbd> switches 3D / 2D, <kbd>R</kbd> restarts and <kbd>K</kbd> twice
 (*kill -9*) ends the run.
 
 | File | Purpose |
@@ -129,7 +137,8 @@ electric yellow on violet, with a pulsing grid). <kbd>P</kbd> pauses,
 | `lemmings.html`, `css/lemmings.css` | the page (reuses `css/game.css` for the chrome) |
 | `js/lem-engine.js` | deterministic tick-based simulation: terrain, packets, skills |
 | `js/lem-levels.js` | the levels — rectangles of silicon and steel, hazards, skill budgets, concept notes |
-| `js/lem-main.js` | rendering, input, overlays, progress, interface text |
+| `js/lem-main.js` | 2D rendering, input, overlays, progress, interface text |
+| `js/lem-3d.js` | the 3D view — a WebGL2 renderer built from one instanced cube, plus camera and picking |
 | `tools/lem-check.js` | replays a scripted solution for every level and checks that doing nothing loses |
 
 `node tools/lem-check.js` runs in CI next to the Bit Builder checks, so a
