@@ -111,7 +111,7 @@ body.fs .fw-stage .overlay { inset: 0; }
 .fw-timeline-title { margin-top: 22px; scroll-margin-top: 12px; }
 .fw-count { color: var(--green); font-weight: 600; white-space: nowrap; }
 .fw-timeline { list-style: none; margin: 10px 0 8px; padding: 0 0 0 4px; display: grid; gap: 0; }
-.fw-timeline li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 0 10px; border-left: 2px solid var(--line); position: relative; padding-left: 14px; }
+.fw-timeline li { display: grid; grid-template-columns: 44px 40px 1fr; gap: 12px; padding: 8px 0 10px; border-left: 2px solid var(--line); position: relative; padding-left: 14px; }
 .fw-timeline li::before { content: ""; position: absolute; left: -6px; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--line); }
 .fw-timeline li.got::before { background: var(--green); border-color: var(--green); }
 .fw-timeline .yr { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--cyan); padding-top: 1px; }
@@ -124,3 +124,5 @@ body.fs .fw-stage .overlay { inset: 0; }
 .fw-source { font-size: 12.5px; }
 .fw-source a { color: var(--cyan); }
 #fw-intel-dialog { max-width: min(760px, 94vw); }
+.fw-timeline .pic { width: 40px; height: 40px; image-rendering: pixelated; background: var(--panel-2); border-radius: 6px; }
+.fw-timeline li > div { min-width: 0; }

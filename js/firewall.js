@@ -623,6 +623,155 @@ SPR.shot.player = spriteFrom(drawOrb("#a5f3fc", "rgba(40,120,255,0)"));
 SPR.spark = spriteFrom(drawSpark);
 SPR.bits = spriteFrom(drawBlood);
 
+/* Each real virus from the timeline gets its own design, taken from its history.
+   Viruses without an entry here use the generic green one above. */
+function drawElkCloner(g, f) {       // 1982: an Apple II floppy disk with antlers
+  g.strokeStyle = "#c8a36a"; g.lineWidth = 3; g.lineCap = "round";
+  const tilt = f === 1 ? 3 : 0;
+  for (const s of [-1, 1]) {
+    const bx = 32 + s * 12;
+    g.beginPath();
+    g.moveTo(bx, 16); g.lineTo(bx + s * (8 + tilt), 4);
+    g.moveTo(bx + s * 4, 10); g.lineTo(bx + s * 14, 10 - tilt);
+    g.moveTo(bx + s * 6, 7); g.lineTo(bx + s * 4, 1);
+    g.stroke();
+  }
+  rrect(g, 10, 14, 44, 42, 3, "#1b1f1a");
+  g.strokeStyle = "#39ff6a"; g.lineWidth = 1.5; g.strokeRect(11.5, 15.5, 41, 39);
+  g.fillStyle = "#d9f7d0"; g.fillRect(16, 18, 32, 8);
+  g.fillStyle = "#135c26"; g.font = "bold 7px monospace"; g.fillText("ELK", 26, 25);
+  circle(g, 32, 46, 6, "#39ff6a"); circle(g, 32, 46, 4, "#0a0c0a");
+  g.fillStyle = "#0a0c0a"; g.fillRect(49, 30, 5, 5);                     // write-protect notch
+  const eye = f === 2 ? "#eaffea" : "#39ff6a";                           // blocky Apple II pixels
+  g.fillStyle = eye; g.fillRect(19, 30, 7, 7); g.fillRect(38, 30, 7, 7);
+  g.fillStyle = "#000"; g.fillRect(22, 33, 3, 3); g.fillRect(39, 33, 3, 3);
+  if (f === 2) { g.fillStyle = "#39ff6a"; g.fillRect(24, 38, 16, 3); }
+  g.fillStyle = "#1b1f1a";
+  g.fillRect(f === 1 ? 18 : 20, 56, 6, 7); g.fillRect(f === 1 ? 42 : 40, 56, 6, 7);
+}
+function drawBrain(g, f) {           // 1986: Brain, a creature with a real brain
+  g.strokeStyle = "#c2587f"; g.lineWidth = 3; g.lineCap = "round";
+  for (const s of [-1, 1]) {                                            // tentacles
+    g.beginPath(); g.moveTo(32 + s * 6, 46);
+    g.quadraticCurveTo(32 + s * (f === 1 ? 20 : 12), 54, 32 + s * 14, 63); g.stroke();
+  }
+  g.fillStyle = "#e47aa8"; g.fillRect(29, 44, 6, 19);                    // stem
+  g.beginPath(); g.ellipse(24, 30, 15, 16, 0, 0, TAU); g.fillStyle = "#f49ac1"; g.fill();
+  g.beginPath(); g.ellipse(40, 30, 15, 16, 0, 0, TAU); g.fill();
+  g.strokeStyle = "#c2587f"; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(32, 15); g.lineTo(32, 44); g.stroke();       // the two halves
+  for (const [x, y, r, a] of [[20, 20, 6, 0.4], [44, 20, 6, 2.2], [15, 32, 5, -0.9], [49, 32, 5, 3.6], [22, 42, 5, 2.8], [42, 42, 5, 0.2]]) {
+    g.beginPath(); g.arc(x, y, r, a, a + Math.PI * 1.2); g.stroke();
+  }
+  const px = f === 1 ? 1.5 : 0;
+  circle(g, 25, 32, 5.5, "#fff"); circle(g, 39, 32, 5.5, "#fff");
+  circle(g, 25 + px, 33, 2.6, "#401024"); circle(g, 39 + px, 33, 2.6, "#401024");
+  if (f === 2) {                                                         // thinking very hard
+    g.strokeStyle = "#ffe14a"; g.lineWidth = 2;
+    for (const [x1, y1, x2, y2] of [[8, 10, 3, 4], [56, 10, 61, 4], [4, 26, 0, 24], [60, 26, 64, 24]]) { g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); }
+    circle(g, 32, 41, 3, "#401024");
+  }
+  g.fillStyle = "#8c2f57"; g.font = "bold 5px monospace"; g.fillText("(c)BRAIN", 20, 24);
+}
+function drawMichelangelo(g, f) {    // 1992: a marble sculpture that goes off on 6 March
+  rrect(g, 20, 54, 24, 9, 1, "#d6d3cb");                                 // plinth
+  g.fillStyle = "#b7b3a8"; g.fillRect(20, 54, 24, 2);
+  const paints = ["#e63946", "#457b9d", "#f4a261", "#2a9d8f", "#9b5de5", "#ffd166"];
+  g.strokeStyle = "#8d8a80"; g.lineWidth = 2.5; g.lineCap = "round";
+  for (let i = 0; i < 6; i++) {                                          // paintbrush spikes
+    const a = -Math.PI / 2 + (i - 2.5) * 0.55 + (f === 1 ? 0.08 : 0);
+    g.beginPath(); g.moveTo(32 + Math.cos(a) * 15, 34 + Math.sin(a) * 15);
+    g.lineTo(32 + Math.cos(a) * 25, 34 + Math.sin(a) * 25); g.stroke();
+    circle(g, 32 + Math.cos(a) * 26, 34 + Math.sin(a) * 26, 3, paints[i]);
+  }
+  const grad = g.createRadialGradient(26, 26, 2, 32, 34, 18);
+  grad.addColorStop(0, "#ffffff"); grad.addColorStop(0.6, "#e7e4dc"); grad.addColorStop(1, "#a9a69c");
+  circle(g, 32, 36, 17, grad);
+  g.strokeStyle = "rgba(120,115,105,.55)"; g.lineWidth = 1;              // marble veins
+  g.beginPath(); g.moveTo(18, 30); g.bezierCurveTo(24, 36, 20, 42, 28, 50); g.stroke();
+  g.beginPath(); g.moveTo(42, 22); g.bezierCurveTo(38, 30, 46, 34, 44, 46); g.stroke();
+  for (let i = 0; i < 9; i++) {                                          // laurel wreath
+    const a = Math.PI + i * (Math.PI / 8);
+    g.save(); g.translate(32 + Math.cos(a) * 16, 36 + Math.sin(a) * 16); g.rotate(a + Math.PI / 2);
+    g.beginPath(); g.ellipse(0, 0, 4, 2, 0, 0, TAU); g.fillStyle = i % 2 ? "#6b8e23" : "#556b2f"; g.fill(); g.restore();
+  }
+  const eye = f === 2 ? "#ff3b3b" : "#8d8a80";                           // blank statue eyes
+  g.beginPath(); g.ellipse(26, 34, 3.5, 2.5, 0, 0, TAU); g.fillStyle = eye; g.fill();
+  g.beginPath(); g.ellipse(38, 34, 3.5, 2.5, 0, 0, TAU); g.fill();
+  g.fillStyle = "#fff"; g.fillRect(34, 40, 14, 13);                      // the calendar page
+  g.fillStyle = "#e63946"; g.fillRect(34, 40, 14, 4);
+  g.fillStyle = "#fff"; g.font = "bold 4px sans-serif"; g.fillText("MAR", 36, 43.5);
+  g.fillStyle = "#111"; g.font = "bold 8px sans-serif"; g.fillText("6", 38.5, 52);
+}
+function drawCIH(g, f) {             // 1998: CIH / Chernobyl, which wiped the BIOS chip
+  if (f !== 0) { circle(g, 32, 28, f === 2 ? 25 : 22, f === 2 ? "rgba(190,242,100,.55)" : "rgba(190,242,100,.3)"); }
+  g.strokeStyle = "#9aa3ad"; g.lineWidth = 2;
+  for (let i = 0; i < 4; i++) {                                          // chip pins as legs
+    const x = 20 + i * 8, k = (i + f) % 2 ? 2 : 0;
+    g.beginPath(); g.moveTo(x, 50); g.lineTo(x - 2, 58 + k); g.lineTo(x - 3, 63); g.stroke();
+  }
+  rrect(g, 14, 42, 36, 10, 2, "#111318");
+  g.fillStyle = "#e5e7eb"; g.font = "bold 7px monospace"; g.fillText("BIOS", 24, 50);
+  circle(g, 32, 26, 17, "#facc15");
+  g.strokeStyle = "#111"; g.lineWidth = 1.5; g.beginPath(); g.arc(32, 26, 17, 0, TAU); g.stroke();
+  g.fillStyle = "#111";                                                  // radiation trefoil
+  for (let i = 0; i < 3; i++) {
+    const a = -Math.PI / 2 + i * TAU / 3;
+    g.beginPath(); g.moveTo(32, 30); g.arc(32, 30, 10, a - 0.5, a + 0.5); g.closePath(); g.fill();
+  }
+  circle(g, 32, 30, 3, "#facc15"); circle(g, 32, 30, 2, "#111");
+  g.fillStyle = f === 2 ? "#ff2d2d" : "#b91c1c";                         // eyes, in the gaps
+  g.beginPath(); g.moveTo(21, 20); g.lineTo(28, 22); g.lineTo(21, 24); g.fill();
+  g.beginPath(); g.moveTo(43, 20); g.lineTo(36, 22); g.lineTo(43, 24); g.fill();
+}
+function drawMelissa(g, f) {         // 1999: a Word document that mails itself to 50 people
+  const flap = f === 1 ? -4 : 2;
+  for (const s of [-1, 1]) {                                             // envelope wings
+    const x = s < 0 ? 1 : 49;
+    g.save(); g.translate(x + 7, 30); g.rotate(s * (f === 1 ? -0.35 : 0.15));
+    g.fillStyle = "#e2e8f0"; g.fillRect(-7, -5 + flap, 14, 10);
+    g.strokeStyle = "#64748b"; g.lineWidth = 1;
+    g.strokeRect(-6.5, -4.5 + flap, 13, 9);
+    g.beginPath(); g.moveTo(-6.5, -4.5 + flap); g.lineTo(0, 1 + flap); g.lineTo(6.5, -4.5 + flap); g.stroke();
+    g.restore();
+  }
+  g.fillStyle = "#f8fafc"; g.beginPath();
+  g.moveTo(16, 10); g.lineTo(40, 10); g.lineTo(48, 18); g.lineTo(48, 54); g.lineTo(16, 54); g.closePath(); g.fill();
+  g.fillStyle = "#cbd5e1"; g.beginPath(); g.moveTo(40, 10); g.lineTo(40, 18); g.lineTo(48, 18); g.fill();
+  g.fillStyle = "#2b579a"; g.fillRect(16, 10, 16, 14);
+  g.fillStyle = "#fff"; g.font = "bold 12px sans-serif"; g.fillText("W", 18, 22);
+  g.fillStyle = "#94a3b8";
+  for (let y = 40; y < 52; y += 4) g.fillRect(20, y, 24 - (y % 8), 2);
+  g.fillStyle = "#1e293b";
+  circle(g, 26, 31, 2.5, "#1e293b"); circle(g, 38, 31, 2.5, "#1e293b");
+  g.fillRect(21, 25, 8, 1.5); g.fillRect(35, 25, 8, 1.5);
+  if (f === 2) { g.fillStyle = "#1e293b"; g.fillRect(28, 35, 8, 4); g.fillStyle = "#2b579a"; g.font = "bold 7px sans-serif"; g.fillText("@", 29, 39); }
+  g.strokeStyle = "#2b579a"; g.lineWidth = 2;                            // { } macro legs
+  g.beginPath(); g.moveTo(24, 54); g.lineTo(f === 1 ? 20 : 22, 63); g.moveTo(40, 54); g.lineTo(f === 1 ? 44 : 42, 63); g.stroke();
+}
+function drawEnvelope(g) {
+  g.fillStyle = "#f8fafc"; g.fillRect(14, 20, 36, 24);
+  g.strokeStyle = "#2b579a"; g.lineWidth = 3; g.strokeRect(15.5, 21.5, 33, 21);
+  g.beginPath(); g.moveTo(15, 21); g.lineTo(32, 35); g.lineTo(49, 21); g.stroke();
+}
+const VARIANTS = {
+  "Elk Cloner":      { draw: drawElkCloner,    shot: "green",  corpse: ["#1b1f1a", "#39ff6a", "#c8a36a"] },
+  "Brain":           { draw: drawBrain,        shot: "pink",   corpse: ["#f49ac1", "#c2587f", "#fff"] },
+  "Michelangelo":    { draw: drawMichelangelo, shot: "paint",  corpse: ["#e7e4dc", "#e63946", "#457b9d", "#6b8e23"] },
+  "CIH (Chernobyl)": { draw: drawCIH,          shot: "lime",   corpse: ["#facc15", "#111318", "#bef264"] },
+  "Melissa":         { draw: drawMelissa,      shot: "mail",   corpse: ["#f8fafc", "#2b579a", "#94a3b8"] }
+};
+SPR.shot.pink = spriteFrom(drawOrb("#ff9cc8", "rgba(220,60,140,0)"));
+SPR.shot.paint = spriteFrom(drawOrb("#ffd166", "rgba(230,57,70,0)"));
+SPR.shot.lime = spriteFrom(drawOrb("#d9f99d", "rgba(132,204,22,0)"));
+SPR.shot.mail = spriteFrom(drawEnvelope);
+SPR.variant = {};
+for (const [name, v] of Object.entries(VARIANTS)) {
+  SPR.variant[name] = [0, 1, 2].map(f => spriteFrom(g => v.draw(g, f)));
+  SPR.variant[name].corpse = spriteFrom(drawCorpse(v.corpse));
+}
+const spritesFor = e => SPR.variant[e.hist.name] || SPR.enemy[e.ch];
+
 const WEAPONS = [
   { key: "scanner", ammo: null, cool: 0.38, pellets: 1, spread: 0.012, dmg: [10, 18], sound: "scanner" },
   { key: "filter", ammo: "sig", cool: 0.85, pellets: 7, spread: 0.075, dmg: [6, 12], sound: "filter" },
@@ -912,7 +1061,7 @@ function wake(e) {
   if (e.awake) return;
   e.awake = true;
   if (e.disguised) return;
-  meetThreat(e.def.key);
+  meetThreat(e.def.key, e);
 }
 function hurtEnemy(e, dmg) {
   e.hp -= dmg; e.flash = 0.1;
@@ -930,7 +1079,7 @@ function hurtEnemy(e, dmg) {
 function reveal(e) {
   e.disguised = false; e.awake = true; e.cd = 0.6;
   say(T("reveal")); Sound.play("reveal");
-  meetThreat("trojan");
+  meetThreat("trojan", e);
 }
 function hurtPlayer(amount, src) {
   const p = player;
@@ -990,7 +1139,7 @@ function updateEnemies(dt) {
       const base = Math.atan2(dy, dx), n = def.spread || 1;
       for (let i = 0; i < n; i++) {
         const a = base + (n > 1 ? (i - (n - 1) / 2) * 0.16 : rand(-0.06, 0.06));
-        shots.push({ x: e.x + Math.cos(a) * def.radius, y: e.y + Math.sin(a) * def.radius, vx: Math.cos(a) * def.shotSpeed, vy: Math.sin(a) * def.shotSpeed, dmg: rand(...def.dmg), mine: false, spr: SPR.shot[def.shot], src: e, life: 5, z: def.z + (def.boss ? 0.4 : 0.2) });
+        shots.push({ x: e.x + Math.cos(a) * def.radius, y: e.y + Math.sin(a) * def.radius, vx: Math.cos(a) * def.shotSpeed, vy: Math.sin(a) * def.shotSpeed, dmg: rand(...def.dmg), mine: false, spr: SPR.shot[(VARIANTS[e.hist.name] || def).shot], src: e, life: 5, z: def.z + (def.boss ? 0.4 : 0.2) });
       }
       Sound.play("enemyShot");
     }
@@ -1155,10 +1304,10 @@ function render() {
   const list = [];
   for (const it of items) if (!it.taken) list.push({ x: it.x, y: it.y, spr: SPR.item[it.ch], scale: 0.42, z: 0 });
   for (const e of enemies) {
-    if (e.dead) { list.push({ x: e.x, y: e.y, spr: SPR.enemy[e.ch].corpse, scale: e.def.boss ? 1 : 0.55, z: 0 }); continue; }
+    if (e.dead) { list.push({ x: e.x, y: e.y, spr: spritesFor(e).corpse, scale: e.def.boss ? 1 : 0.55, z: 0 }); continue; }
     if (e.disguised) { list.push({ x: e.x, y: e.y, spr: SPR.gift, scale: 0.5, z: 0 }); continue; }
     const fr = e.attackT > 0 ? 2 : (e.awake && Math.floor(e.t * 4) % 2 ? 1 : 0);
-    list.push({ x: e.x, y: e.y, spr: SPR.enemy[e.ch][fr], scale: e.def.scale, z: e.def.z + (e.ch === "s" ? Math.sin(e.t * 3) * 0.05 : 0), flash: e.flash > 0, ghost: e.ch === "s" });
+    list.push({ x: e.x, y: e.y, spr: spritesFor(e)[fr], scale: e.def.scale, z: e.def.z + (e.ch === "s" ? Math.sin(e.t * 3) * 0.05 : 0), flash: e.flash > 0, ghost: e.ch === "s" });
   }
   for (const s of shots) list.push({ x: s.x, y: s.y, spr: s.spr, scale: 0.28, z: s.z ?? 0.3, bright: true });
   for (const pf of puffs) list.push({ x: pf.x, y: pf.y, spr: pf.spr, scale: 0.3, z: pf.z, bright: true });
@@ -1367,7 +1516,7 @@ function present() {
 
 /* ================================================================ threats */
 let cardTimer = 0;
-function meetThreat(key) {
+function meetThreat(key, e) {
   if (!intel.has(key)) { intel.add(key); save(INTEL_KEY, [...intel]); }
   if (shownThisSession.has(key)) return;
   shownThisSession.add(key);
@@ -1377,7 +1526,7 @@ function meetThreat(key) {
   const names = FW_HISTORY.filter(h => h.kind === key).map(h => `${h.name} (${h.year})`).join(", ");
   $("fw-card-text").textContent = `${text} ${T("examples", { list: names })}`;
   const art = $("fw-card-art").getContext("2d"), ch = Object.keys(ENEMY).find(c => ENEMY[c].key === key);
-  art.clearRect(0, 0, 64, 64); art.drawImage(SPR.enemy[ch][0].canvas, 0, 0);
+  art.clearRect(0, 0, 64, 64); art.drawImage((e ? spritesFor(e) : SPR.enemy[ch])[0].canvas, 0, 0);
   $("fw-card").classList.remove("hidden");
   clearTimeout(cardTimer);
   cardTimer = setTimeout(() => $("fw-card").classList.add("hidden"), 8000);
@@ -1510,13 +1659,16 @@ function buildTimeline() {
     const li = document.createElement("li"), got = removed.has(h.name);
     if (got) li.className = "got";
     const year = document.createElement("span"); year.className = "yr"; year.textContent = h.year;
+    const ch = Object.keys(ENEMY).find(c => ENEMY[c].key === h.kind);
+    const pic = makeCanvas(64, 64); pic.className = "pic";
+    pic.getContext("2d").drawImage((SPR.variant[h.name] || SPR.enemy[ch])[0].canvas, 0, 0);
     const head = document.createElement("b"); head.textContent = h.name;
     const kind = document.createElement("span"); kind.className = "kind k-" + h.kind; kind.textContent = THREATS[h.kind][lang][0];
     head.append(" ", kind);
     if (got) { const tick = document.createElement("span"); tick.className = "tick"; tick.textContent = "✓ " + T("removedMark"); head.append(" ", tick); }
     const text = document.createElement("p"); text.textContent = h[lang] || h.en;
     const body = document.createElement("div"); body.append(head, text);
-    li.append(year, body);
+    li.append(year, pic, body);
     list.appendChild(li);
   }
 }

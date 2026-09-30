@@ -117,7 +117,11 @@ code and rendered by a raycaster on a 320×200 buffer.
 Every monster is a real piece of malware from history, after Wikipedia's
 [Timeline of computer viruses and worms](https://en.wikipedia.org/wiki/Timeline_of_computer_viruses_and_worms):
 aim at a worm and the scanner names it (*Morris worm · 1988*, *ILOVEYOU ·
-2000*, *WannaCry · 2017*…), and the rootkit boss is Stuxnet. The *Timeline*
+2000*, *WannaCry · 2017*…), and the rootkit boss is Stuxnet. The five viruses
+each have their own design drawn from their history: Elk Cloner is an Apple II
+floppy with antlers, Brain is a brain, Michelangelo is a marble bust with a
+6 March calendar page, CIH is a radioactive BIOS chip and Melissa is a Word
+document that throws envelopes. The *Timeline*
 button lists all 24 specimens from Creeper (1971) to NotPetya (2017) with a
 short note on each, and ticks off the ones you have removed in the game. The
 entries live in `js/firewall-history.js`, in both languages.
