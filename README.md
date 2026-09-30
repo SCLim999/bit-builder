@@ -95,6 +95,40 @@ languages side by side.
 | Trojan | hunts you down |
 | Packet | flies straight and bounces |
 
+## Firewall 3D
+
+**[firewall.html](firewall.html)** (the *Firewall 3D* button in the game) is a
+bonus first-person shooter in the style of the early-90s classics, set inside
+an infected network. You are the security software: clear three sectors of
+malware, pick up encryption keys to open locked ports, and press <kbd>E</kbd>
+at the reboot terminal to finish. Same rules as the rest of the project — no
+dependencies, no image files; the walls, monsters and weapons are all drawn in
+code and rendered by a raycaster on a 320×200 buffer.
+
+| Malware | What it does in the game — and in real life |
+|---|---|
+| Virus | shoots from range; attaches to a host file and needs someone to run it |
+| Worm | fast, bites up close, and **copies itself** if you leave it alive |
+| Trojan horse | sits disguised as a "FREE" gift box until you get close |
+| Spyware | half-invisible and quick; built not to be noticed |
+| Ransomware | its hits **encrypt some of your ammo** |
+| Rootkit | the boss of the last sector, with admin rights; the exit stays locked until it is gone |
+
+Your weapons are defences: the **Antivirus Scanner** (signature matching,
+unlimited), the **Packet Filter** (a firewall-shotgun) and the **Quarantine
+Cannon**. The first time you meet each kind of malware a card says what it
+really is, and they are all collected in the *Threat database*.
+
+Controls: click the view to aim with the mouse, <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+or arrows to move, <kbd>Shift</kbd> to run, click / <kbd>Space</kbd> / <kbd>Ctrl</kbd>
+to fire, <kbd>E</kbd> to open doors, <kbd>1</kbd>–<kbd>3</kbd> or <kbd>Q</kbd> for
+weapons, <kbd>M</kbd> for the map, <kbd>P</kbd> / <kbd>Esc</kbd> to pause. Touch
+devices get a stick and fire / use buttons.
+
+The maps are ASCII art in `js/firewall-levels.js` (legend at the top), and
+`node tools/check-firewall.js` proves each one can be finished — the keys can
+be collected in an order that opens the way to the terminal.
+
 ## Files
 
 | File | Purpose |
@@ -111,6 +145,7 @@ languages side by side.
 | `js/validate.js` | the level checker, shared by the editor and the Node tools |
 | `js/codec.js` | share codes — a level packed into a URL |
 | `js/editor.js` | the editor: painting, part kinds, checking, sharing |
+| `firewall.html`, `js/firewall.js`, `js/firewall-levels.js`, `css/firewall.css` | Firewall 3D, the first-person bonus game, and its maps |
 | `tools/*.js` | Node scripts that check the maps (not shipped to the browser) |
 
 ## Making your own levels

@@ -1,0 +1,108 @@
+/* Firewall 3D — only what the shared game.css does not already cover. */
+.fw-shell {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 18px clamp(12px, 3vw, 40px);
+}
+.fw-stage {
+  position: relative;
+  width: min(100%, 960px);
+  background: #05070b;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .45);
+}
+#fw-screen {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  image-rendering: pixelated;
+  border-radius: 4px;
+  background: #000;
+  cursor: crosshair;
+  touch-action: none;
+}
+.fw-keys { color: var(--muted); font-size: 13px; text-align: center; margin: 0; max-width: 960px; line-height: 1.6; }
+
+/* threat intel card: slides in when a new kind of malware shows up */
+.fw-card {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: min(330px, 60%);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  background: rgba(10, 16, 24, .9);
+  border: 1px solid var(--green);
+  border-radius: 10px;
+  pointer-events: none;
+  transition: opacity .3s, transform .3s;
+}
+.fw-card.hidden { opacity: 0; transform: translateY(-8px); }
+.fw-card canvas { width: 52px; height: 52px; flex: none; image-rendering: pixelated; }
+.fw-card b { display: block; color: var(--text); font-size: 15px; }
+.fw-card p { margin: 3px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.fw-kicker { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--green); }
+
+.fw-stage .overlay { inset: 8px; }
+.fw-level-list .level-card, .level-card { text-align: left; }
+.fw-intel-list canvas { image-rendering: pixelated; }
+.fw-intel-list .locked { opacity: .45; }
+#fw-help-body p { color: var(--muted); line-height: 1.55; font-size: 14px; }
+#fw-help-body table { border-collapse: collapse; font-size: 13px; margin: 8px 0 14px; }
+#fw-help-body td { padding: 3px 12px 3px 0; color: var(--muted); vertical-align: top; }
+#fw-help-body td:first-child { color: var(--text); white-space: nowrap; }
+
+/* touch controls: only on coarse pointers */
+.fw-touch { display: none; }
+@media (pointer: coarse) {
+  .fw-touch {
+    display: flex;
+    position: absolute;
+    left: 8px; right: 8px; bottom: 8px;
+    height: 44%;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 10px;
+    pointer-events: none;
+  }
+  .fw-stick {
+    pointer-events: auto;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, .25);
+    background: rgba(255, 255, 255, .06);
+    position: relative;
+    touch-action: none;
+  }
+  .fw-stick span {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 48px; height: 48px;
+    margin: -24px 0 0 -24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .25);
+  }
+  .fw-touch-buttons { display: flex; gap: 10px; align-items: flex-end; pointer-events: auto; }
+  .fw-touch-buttons button {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, .3);
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+    font-size: 20px;
+    touch-action: none;
+  }
+  .fw-touch-buttons .fire { width: 78px; height: 78px; background: rgba(248, 113, 113, .3); }
+}
+
+/* full screen: the stage fills the display, the chrome goes away */
+body.fs .topbar, body.fs .foot, body.fs .fw-keys { display: none; }
+body.fs .fw-shell { padding: 0; height: 100vh; place-items: center; }
+body.fs .fw-stage { width: min(100vw, calc(100vh * 4 / 3)); border: 0; border-radius: 0; padding: 0; }
+body.fs .fw-stage .overlay { inset: 0; }

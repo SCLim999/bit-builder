@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firewall 3D — hunt the malware</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/firewall.css">
+</head>
+<body class="fw">
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">&#9762;</span>
+    <div>
+      <h1>Firewall 3D</h1>
+      <p id="fw-tagline"></p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a id="fw-back" class="btn" href="index.html"></a>
+    <button id="fw-lang" class="btn" title="Language / 语言">中文</button>
+    <button id="fw-levels" class="btn"></button>
+    <button id="fw-intel" class="btn"></button>
+    <button id="fw-sound" class="btn" aria-pressed="true"></button>
+    <button id="fw-full" class="btn"></button>
+    <button id="fw-help" class="btn"></button>
+  </div>
+</header>
+
+<main class="fw-shell">
+  <section id="fw-stage" class="fw-stage">
+    <canvas id="fw-screen" width="640" height="480" aria-label="Firewall 3D view"></canvas>
+
+    <div id="fw-card" class="fw-card hidden" aria-live="polite">
+      <canvas id="fw-card-art" width="64" height="64"></canvas>
+      <div>
+        <span id="fw-card-kicker" class="fw-kicker"></span>
+        <b id="fw-card-name"></b>
+        <p id="fw-card-text"></p>
+      </div>
+    </div>
+
+    <div id="fw-overlay" class="overlay">
+      <div class="overlay-card">
+        <h2 id="fw-ov-title"></h2>
+        <p id="fw-ov-text"></p>
+        <div id="fw-ov-stats" class="ov-stats"></div>
+        <div id="fw-ov-extra"></div>
+        <div class="overlay-buttons">
+          <button id="fw-ov-primary" class="btn btn-primary"></button>
+          <button id="fw-ov-secondary" class="btn"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fw-touch" aria-hidden="true">
+      <div id="fw-stick" class="fw-stick"><span></span></div>
+      <div class="fw-touch-buttons">
+        <button data-act="weapon">&#8635;</button>
+        <button data-act="use">E</button>
+        <button data-act="fire" class="fire">&#10038;</button>
+      </div>
+    </div>
+  </section>
+
+  <p id="fw-keys" class="fw-keys"></p>
+</main>
+
+<dialog id="fw-levels-dialog">
+  <h2 id="fw-levels-title"></h2>
+  <div id="fw-level-list" class="level-list"></div>
+  <form method="dialog"><button class="btn fw-close"></button></form>
+</dialog>
+
+<dialog id="fw-intel-dialog">
+  <h2 id="fw-intel-title"></h2>
+  <p id="fw-intel-sub" class="muted"></p>
+  <div id="fw-intel-list" class="legend fw-intel-list"></div>
+  <form method="dialog"><button class="btn fw-close"></button></form>
+</dialog>
+
+<dialog id="fw-help-dialog">
+  <h2 id="fw-help-title"></h2>
+  <div id="fw-help-body"></div>
+  <form method="dialog"><button class="btn fw-close"></button></form>
+</dialog>
+
+<footer class="foot" id="fw-foot"></footer>
+
+<script src="js/firewall-levels.js"></script>
+<script src="js/firewall.js"></script>
+</body>
+</html>

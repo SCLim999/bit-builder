@@ -9,7 +9,7 @@ const I18N = {
   en: {
     "lang.other": "中文",
     "app.tagline": "Collect the parts on the build spec, plug them into the assembly socket, and boot the machine.",
-    "btn.levels": "Levels", "btn.editor": "Editor", "btn.help": "How to play", "btn.knowledge": "Knowledge",
+    "btn.levels": "Levels", "btn.editor": "Editor", "btn.firewall": "Firewall 3D", "btn.help": "How to play", "btn.knowledge": "Knowledge",
     "btn.fullscreen": "Full screen", "btn.exitFullscreen": "Exit full screen",
     "btn.practice": "Practice: {state}", "btn.sound": "Sound: {state}",
     "btn.theme": "Theme: {state}", "theme.bright": "bright", "theme.dark": "dark",
@@ -136,7 +136,7 @@ const I18N = {
   zh: {
     "lang.other": "EN",
     "app.tagline": "按装配清单收集零件，插入装配插槽，然后启动这台机器。",
-    "btn.levels": "关卡", "btn.editor": "编辑器", "btn.help": "玩法说明", "btn.knowledge": "知识库",
+    "btn.levels": "关卡", "btn.editor": "编辑器", "btn.firewall": "防火墙 3D", "btn.help": "玩法说明", "btn.knowledge": "知识库",
     "btn.fullscreen": "全屏", "btn.exitFullscreen": "退出全屏",
     "btn.practice": "练习模式：{state}", "btn.sound": "音效：{state}",
     "btn.theme": "背景：{state}", "theme.bright": "明亮", "theme.dark": "暗色",
