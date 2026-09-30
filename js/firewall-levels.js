@@ -5,11 +5,13 @@
  *   D  door (press E)    R/B/Y  door locked by the red / blue / yellow key
  *   X  reboot terminal — the exit. Walk up to it and press E.
  *   M  mail terminal — press E to judge an email: phishing or genuine?
+ *   U  unpatched vulnerability — lets worms in until you press E on it to patch it
  * Floor: "." plus anything below, which stands on a floor tile.
  *   P  you
  *   v  virus   w  worm   t  trojan   s  spyware   r  ransomware   K  rootkit (boss)
  *   d  adware   l  keylogger   n  bots (a swarm of three)   m  fileless malware
  *   x  wiper    o  mobile malware
+ *   L  ILOVEYOU (boss)   W  WannaCry (boss)   z  backup drive
  *   h  patch (+15)   H  security update (+50)   f  firewall (+100 armour)
  *   a  signatures (shotgun ammo)   c  energy cells (cannon ammo)
  *   g  Packet Filter (shotgun)     p  Quarantine Cannon
@@ -38,12 +40,12 @@ const FW_LEVELS = [
       "#....#.........#..h.a..#",
       "####D#####M#############",
       "#......#.......#.......#",
-      "#..v...#...k...#..d....#",
+      "#..v...#...k...U..d....#",
       "#......D.......#.......#",
       "#..a...#...v...R.......#",
       "#......#.......#...v...#",
       "#####D##########....h..#",
-      "#......#.......#.......#",
+      "#......#.......#...L...#",
       "#..h...D...l...#..f....#",
       "#......#.......#.......#",
       "#..a...#..H....#...n...#",
@@ -59,7 +61,7 @@ const FW_LEVELS = [
     map: [
       "#########3##################",
       "#......a.3......n.#..r....H#",
-      "#.P......3..1..1..#........#",
+      "#.P...z..3..1..1..#........#",
       "#........D....w...B....y...#",
       "#.....v..3..1..1..#........#",
       "#.h......3.a......#......w.#",
@@ -67,10 +69,10 @@ const FW_LEVELS = [
       "#........3.h.....w#.......o#",
       "#......v.3..1..1..#..t.....#",
       "#..t.....D....r...Y........X",
-      "#........3..1..1..#.....r..#",
+      "#........3..1..1..#....Wr..#",
       "#.p...c..3w.......#.f.....a#",
       "3333D333333333333333333M3333",
-      "#.w.....h3.......c#.o.....f#",
+      "#.w.....hU.......cU.o.....f#",
       "#........3...m....#......c.#",
       "#....b...D........D...d....#",
       "#........3......t.#...H..a.#",
@@ -87,10 +89,10 @@ const FW_LEVELS = [
     map: [
       "###############################",
       "2.......a.#....h...s#.d.....f.2",
-      "2.P...c...#..1...1..#.........2",
+      "2.P.z.c...#..1...1..U.........2",
       "2.........D....r....#....k....2",
       "2....l....#.........Y.........2",
-      "2..H....y.#..1...1..#.....w...2",
+      "2..H....y.U..1...1..#.....w...2",
       "2.........#.x.......#.c.....r.2",
       "22222M2222#2222R2222#2222222222",
       "2.............................2",
@@ -108,4 +110,38 @@ const FW_LEVELS = [
   }
 ];
 
-if (typeof module !== "undefined") { module.exports = { FW_LEVELS }; }
+/* Incident Response (endless mode) is played here: an open server hall with
+   pillars for cover. Waves are spawned by the game, so the map only needs a
+   start and a few supplies. */
+const FW_ARENA = {
+  name: { en: "Incident Response", zh: "应急响应" },
+  map: [
+    "2222222222222222222222222",
+    "2.......................2",
+    "2..h....1.......1....a..2",
+    "2.......................2",
+    "2...33.....3...3.....33.2",
+    "2...3.................3.2",
+    "2.........1.....1.......2",
+    "2.1.....................2",
+    "2.......3.......3.....1.2",
+    "2..........1.1..........2",
+    "2...1...................2",
+    "2.........3.....3.......2",
+    "2...........P...........2",
+    "2.........3.....3.......2",
+    "2...................1...2",
+    "2..........1.1..........2",
+    "2.1.....3.......3.......2",
+    "2.....................1.2",
+    "2.......1.....1.........2",
+    "2...3.................3.2",
+    "2...33.....3...3.....33.2",
+    "2.......................2",
+    "2..c....1.......1....h..2",
+    "2.......................2",
+    "2222222222222222222222222"
+  ]
+};
+
+if (typeof module !== "undefined") { module.exports = { FW_LEVELS, FW_ARENA }; }

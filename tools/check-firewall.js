@@ -1,10 +1,10 @@
 /* Checks the Firewall 3D maps in js/firewall-levels.js: rectangular, sealed
  * at the edges, one start, known characters, and a route to the reboot
  * terminal that picks the keys up in some order before the doors they open. */
-const { FW_LEVELS } = require("../js/firewall-levels.js");
+const { FW_LEVELS, FW_ARENA } = require("../js/firewall-levels.js");
 
-const WALLS = "#123DRBYXMN";
-const FLOOR = ".Pvwtsrdlnmxokhfacgpkby".split("").concat(["K", "H"]);
+const WALLS = "#123DRBYXMNUQ";
+const FLOOR = ".Pvwtsrdlnmxokhfacgpkbyz".split("").concat(["K", "H", "L", "W"]);
 const KNOWN = new Set(WALLS.split("").concat(FLOOR));
 const LOCKS = { R: "k", B: "b", Y: "y" };
 
@@ -27,8 +27,8 @@ function check(level) {
       if (edge && "DRBY".includes(c)) problems.push(`door on the edge at ${x},${y}`);
       if (c === "P") { if (start) problems.push("more than one start"); start = [x, y]; }
       if (c === "X") exits++;
-      if (c === "M" && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => ".PK".includes(map[y + dy]?.[x + dx]) || FLOOR.includes(map[y + dy]?.[x + dx])))
-        problems.push(`mail terminal at ${x},${y} cannot be reached from any floor tile`);
+      if ((c === "M" || c === "U") && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => ".PK".includes(map[y + dy]?.[x + dx]) || FLOOR.includes(map[y + dy]?.[x + dx])))
+        problems.push(`${c === "M" ? "mail terminal" : "vulnerability"} at ${x},${y} cannot be reached from any floor tile`);
     }
   }
   if (!start) problems.push("no start (P)");
@@ -48,7 +48,7 @@ function check(level) {
         const nx = x + dx, ny = y + dy;
         const c = map[ny][nx];
         if (c === "X") { reachedExit = true; continue; }
-        if ("#123MN".includes(c)) continue;
+        if ("#123MNUQ".includes(c)) continue;
         if (LOCKS[c] && !keys.has(LOCKS[c])) continue;
         const id = nx + "," + ny;
         if (seen.has(id)) continue;
@@ -79,6 +79,23 @@ FW_LEVELS.forEach((level, i) => {
     console.log(`ok   ${label}  ${level.map[0].length}x${level.map.length}`);
   }
 });
+// the endless-mode arena: sealed, one start, known tiles, no exit needed
+{
+  const m = FW_ARENA.map, w = m[0].length, arenaProblems = [];
+  let starts = 0;
+  m.forEach((row, y) => {
+    if (row.length !== w) arenaProblems.push(`row ${y} is ${row.length} wide`);
+    [...row].forEach((c, x) => {
+      if (!KNOWN.has(c)) arenaProblems.push(`unknown tile "${c}" at ${x},${y}`);
+      if ((x === 0 || y === 0 || x === w - 1 || y === m.length - 1) && !"#123".includes(c)) arenaProblems.push(`the edge is open at ${x},${y}`);
+      if (c === "P") starts++;
+    });
+  });
+  if (starts !== 1) arenaProblems.push(`needs exactly one start, has ${starts}`);
+  if (arenaProblems.length) { bad++; console.log("FAIL arena"); arenaProblems.forEach(p => console.log(`      - ${p}`)); }
+  else console.log(`ok   arena    ${w}x${m.length}`);
+}
+
 // every kind of monster needs at least one real namesake in the history file
 const { FW_HISTORY } = require("../js/firewall-history.js");
 const KINDS = ["virus", "worm", "trojan", "spyware", "ransomware", "rootkit", "adware", "keylogger", "bot", "fileless", "wiper", "mobile"];

@@ -152,6 +152,25 @@ security lesson:
 - **Stars.** One for clearing the sector, one for removing 75% of the
   malware, one for judging every email right and passing the quiz.
 
+**More to fight, more reasons to replay.**
+
+- **Three bosses.** Each sector ends with a famous piece of malware, and the
+  reboot terminal stays locked until it is gone: **ILOVEYOU** (2000) sheds
+  love-letter worms as it takes damage, **WannaCry** (2017) throws a
+  full-screen ransom note over your view and encrypts your ammo, and
+  **Stuxnet** (2010) spawns hidden processes.
+- **Unpatched vulnerabilities.** Red *CVE!* cracks in the walls let a worm
+  in every few seconds while you are near. Press E to patch one and it stops
+  for good.
+- **Backup drive.** Pick one up and ransomware and wipers can no longer touch
+  your files or firewall; WannaCry's ransom note does nothing.
+- **Incident Response (endless mode).** Waves of malware in an open server
+  hall, a boss every fifth wave, and a choice of three upgrades between waves
+  (firewall, security update, signature update, overclock, ammo cache, backup
+  drive). The best wave and score are kept.
+- **Feel.** A boss health bar, red markers pointing at whoever just hit you,
+  and a chiptune soundtrack (the *Music* button turns it off).
+
 Your weapons are defences: the **Antivirus Scanner** (signature matching,
 unlimited), the **Packet Filter** (a firewall-shotgun) and the **Quarantine
 Cannon**. The first time you meet each kind of malware a card says what it

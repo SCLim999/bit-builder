@@ -41,10 +41,25 @@ const STR = {
     p_g: "Got the Packet Filter! (2)", p_p: "Got the Quarantine Cannon! (3)",
     p_k: "Picked up the red encryption key", p_b: "Picked up the blue encryption key", p_y: "Picked up the yellow encryption key",
     needKey: "This port needs the {c} encryption key", red: "red", blue: "blue", yellow: "yellow",
-    exitLocked: "The rootkit still holds kernel access — remove it first",
+    exitLocked: "{n} is still active \u2014 remove it first",
     reveal: "That “free gift” was a Trojan!",
     ransom: "Ransomware encrypted some of your ammo!",
-    promptMail: "Press E to read the email", promptExit: "Press E to reboot the machine",
+    promptMail: "Press E to read the email", promptExit: "Press E to reboot the machine", promptPatch: "Press E to patch the vulnerability",
+    p_z: "Backup drive connected \u2014 ransomware and wipers can\u2019t hurt your files now",
+    backupSaved: "Your backup made the ransom note harmless",
+    vulnOpen: "Worms are getting in through a vulnerability \u2014 patch it with E",
+    patched: "Vulnerability patched \u2014 no more worms from here", patchStat: "Patched",
+    ransomTitle: "Ooops, your files have been encrypted!", ransomText: "Send $300 in Bitcoin to get them back.", ransomHint: "A backup drive makes this harmless",
+    split: "ILOVEYOU split into more love letters!",
+    survival: "Incident Response", survivalText: "Endless waves of malware. Clear a wave, choose an upgrade, and see how long the network holds.",
+    survivalStart: "Start Incident Response", endless: "Endless mode", survivalBest: "Best: wave {w}, {s} points.",
+    waveStart: "Wave {n}", waveClear: "Wave {n} cleared", chooseUpgrade: "Choose one upgrade before the next wave.",
+    survivalOver: "Network overrun", survivalOverText: "You held out until wave {w} with {s} points. Best so far: wave {bw}, {bs} points.",
+    hudWave: "WAVE", score: "Score", backToMenu: "Main menu",
+    up_firewall: "Firewall +75|Soaks up half of every hit.", up_patch: "Security update|+40 integrity.",
+    up_sig: "Signature update|+25% damage with every weapon.", up_clock: "Overclock|Fire 15% faster.",
+    up_ammo: "Ammo cache|+20 signatures and +80 cells.", up_backup: "Backup drive|Ransomware and wipers can\u2019t touch your files.",
+    musicOn: "Music: on", musicOff: "Music: off",
     identified: "Signature identified: {n}", scanning: "unknown sample \u00b7 scanning",
     mailTitle: "Incoming email \u2014 is it safe?", mailText: "Read it carefully. Report it if it is phishing; open it if it is genuine.",
     mailFrom: "From", mailSubject: "Subject", mailAttach: "Attachment",
@@ -65,7 +80,7 @@ const STR = {
     popupClose: "closes in {s}s",
     wormCopy: "A worm copied itself",
     summon: "The rootkit spawned hidden processes",
-    bossDown: "Rootkit removed — the reboot terminal is unlocked",
+    bossDown: "{n} removed \u2014 the reboot terminal is unlocked",
     noAmmo: "Out of ammo",
     newThreat: "Signature identified",
     intelSub: "Every kind of malware you have met. The ones you have not met yet stay hidden.",
@@ -89,6 +104,7 @@ const STR = {
       "<tr><td>1 2 3, Q, wheel</td><td>switch weapon</td></tr>" +
       "<tr><td>M / Tab</td><td>network map</td></tr>" +
       "<tr><td>P / Esc</td><td>pause</td></tr>" +
+      "<tr><td>E on a red CVE crack</td><td>patch the vulnerability so worms stop coming through it</td></tr>" +
       "</table>" +
       "<p>Your weapons are real defences: the <strong>Antivirus Scanner</strong> matches known signatures, the " +
       "<strong>Packet Filter</strong> is a firewall that drops a whole burst of packets, and the <strong>Quarantine Cannon</strong> " +
@@ -125,10 +141,25 @@ const STR = {
     p_g: "获得数据包过滤器！（2）", p_p: "获得隔离炮！（3）",
     p_k: "拾取了红色加密密钥", p_b: "拾取了蓝色加密密钥", p_y: "拾取了黄色加密密钥",
     needKey: "这个端口需要{c}加密密钥", red: "红色", blue: "蓝色", yellow: "黄色",
-    exitLocked: "Rootkit 仍然控制着内核 —— 先清除它",
+    exitLocked: "{n} 仍在活动 —— 先清除它",
     reveal: "那个“免费礼物”是木马！",
     ransom: "勒索软件加密了你的部分弹药！",
-    promptMail: "按 E 阅读邮件", promptExit: "按 E 重启机器",
+    promptMail: "按 E 阅读邮件", promptExit: "按 E 重启机器", promptPatch: "按 E 修补漏洞",
+    p_z: "已连接备份硬盘 —— 勒索软件和擦除器伤不到你的文件了",
+    backupSaved: "你的备份让勒索信失去了作用",
+    vulnOpen: "一个未修补的漏洞正在放蠕虫进来 —— 对着它按 E 修补",
+    patched: "漏洞已修补 —— 这里不会再有蠕虫进来", patchStat: "已修补",
+    ransomTitle: "哎呀，你的文件已被加密！", ransomText: "支付价值 300 美元的比特币才能取回。", ransomHint: "有备份硬盘就不怕它",
+    split: "ILOVEYOU 分裂出了更多情书！",
+    survival: "应急响应", survivalText: "一波又一波的恶意软件。清完一波，选一项升级，看看网络能坚持多久。",
+    survivalStart: "开始应急响应", endless: "无尽模式", survivalBest: "最佳纪录：第 {w} 波，{s} 分。",
+    waveStart: "第 {n} 波", waveClear: "第 {n} 波已清除", chooseUpgrade: "下一波来临前，选择一项升级。",
+    survivalOver: "网络已被攻陷", survivalOverText: "你坚持到了第 {w} 波，得分 {s}。最佳纪录：第 {bw} 波，{bs} 分。",
+    hudWave: "波次", score: "得分", backToMenu: "主菜单",
+    up_firewall: "防火墙 +75|抵挡每次伤害的一半。", up_patch: "安全更新|完整性 +40。",
+    up_sig: "特征码更新|所有武器伤害 +25%。", up_clock: "超频|射速提高 15%。",
+    up_ammo: "弹药补给|特征码 +20，能量电池 +80。", up_backup: "备份硬盘|勒索软件和擦除器碰不到你的文件。",
+    musicOn: "音乐：开", musicOff: "音乐：关",
     identified: "已识别特征码：{n}", scanning: "未知样本 · 扫描中",
     mailTitle: "新邮件 —— 它安全吗？", mailText: "仔细阅读。如果是钓鱼邮件就举报；如果是正常邮件就打开。",
     mailFrom: "发件人", mailSubject: "主题", mailAttach: "附件",
@@ -149,7 +180,7 @@ const STR = {
     popupClose: "{s} 秒后关闭",
     wormCopy: "一只蠕虫复制了自己",
     summon: "Rootkit 生成了隐藏进程",
-    bossDown: "Rootkit 已清除 —— 重启终端已解锁",
+    bossDown: "{n} 已清除 —— 重启终端已解锁",
     noAmmo: "弹药耗尽",
     newThreat: "已识别特征码",
     intelSub: "你遇到过的每一种恶意软件。还没遇到的会保持隐藏。",
@@ -173,6 +204,7 @@ const STR = {
       "<tr><td>1 2 3、Q、滚轮</td><td>切换武器</td></tr>" +
       "<tr><td>M / Tab</td><td>网络地图</td></tr>" +
       "<tr><td>P / Esc</td><td>暂停</td></tr>" +
+      "<tr><td>对着红色 CVE 裂缝按 E</td><td>修补漏洞，蠕虫就不会再从那里钻进来</td></tr>" +
       "</table>" +
       "<p>你的武器就是真实的防御手段：<strong>杀毒扫描器</strong>匹配已知的特征码，" +
       "<strong>数据包过滤器</strong>是一道防火墙，一次拦下一整波数据包，<strong>隔离炮</strong>把击中的东西隔离起来。" +
@@ -355,6 +387,52 @@ const Sound = {
   }
 };
 
+/* A small tracker loop: bass, a sparse arpeggio and a hi-hat, scheduled a
+   little ahead on the audio clock so it keeps time even when frames drop. */
+const Music = {
+  on: load("firewall3d.music", true) !== false, playing: false, timer: 0, step: 0, next: 0, noise: null,
+  BASS: [45, 0, 45, 0, 48, 0, 45, 0, 43, 0, 43, 0, 40, 0, 43, 0],
+  LEAD: [69, 0, 72, 0, 76, 0, 0, 72, 67, 0, 71, 0, 74, 0, 0, 0],
+  set(want) {
+    if (want === this.playing) return;
+    this.playing = want;
+    clearInterval(this.timer);
+    if (!want) return;
+    const ac = Sound.ensure(); if (!ac) { this.playing = false; return; }
+    this.next = ac.currentTime + 0.05;
+    this.timer = setInterval(() => this.tick(), 60);
+  },
+  note(midi, t, dur, type, vol) {
+    const ac = Sound.ctx, o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = 440 * Math.pow(2, (midi - 69) / 12);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
+  },
+  hat(t) {
+    const ac = Sound.ctx;
+    if (!this.noise) {
+      this.noise = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.05), ac.sampleRate);
+      const d = this.noise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    }
+    const src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    src.buffer = this.noise; f.type = "highpass"; f.frequency.value = 7000; g.gain.value = 0.025;
+    src.connect(f).connect(g).connect(ac.destination); src.start(t);
+  },
+  tick() {
+    const ac = Sound.ctx, stepLen = 60 / 128 / 4;
+    if (this.next < ac.currentTime) this.next = ac.currentTime + 0.02;     // after a stall, don't play catch-up
+    while (this.next < ac.currentTime + 0.2) {
+      const i = this.step % 16, bar = Math.floor(this.step / 16) % 4;
+      const shift = [0, 0, 3, -2][bar];
+      if (this.BASS[i]) this.note(this.BASS[i] + shift, this.next, stepLen * 1.8, "square", 0.035);
+      if (this.LEAD[i] && bar % 2 === 1) this.note(this.LEAD[i] + shift, this.next, stepLen * 1.5, "triangle", 0.02);
+      if (i % 2 === 0) this.hat(this.next);
+      this.next += stepLen; this.step++;
+    }
+  }
+};
+
 /* =============================================================== textures */
 function texFrom(draw, seed = 1) {
   const c = makeCanvas(TEX, TEX), g = c.getContext("2d");
@@ -477,6 +555,25 @@ function texMail(done) {             // a phishing-check terminal; dimmed once a
     bevel(g, "#465163", "#0b0e12");
   };
 }
+function texVuln(patched) {          // a hole in the wall, before and after the patch
+  return (g, r) => {
+    texCircuit(g, r);
+    if (patched) {
+      g.fillStyle = "#15803d"; g.fillRect(18, 12, 28, 32);
+      g.fillStyle = "#4ade80"; g.fillRect(29, 16, 6, 24); g.fillRect(22, 25, 20, 6);
+      g.fillStyle = "#052e16"; g.fillRect(8, 49, 48, 10);
+      g.fillStyle = "#4ade80"; g.font = "bold 7px monospace"; g.fillText("PATCHED", 12, 57);
+    } else {
+      const grad = g.createRadialGradient(32, 32, 2, 32, 32, 26);
+      grad.addColorStop(0, "#fff1c2"); grad.addColorStop(0.3, "#ff4d4d"); grad.addColorStop(1, "rgba(255,40,40,0)");
+      g.fillStyle = grad; g.fillRect(0, 0, 64, 64);
+      g.strokeStyle = "#1a0505"; g.lineWidth = 4; g.lineJoin = "bevel";
+      g.beginPath(); g.moveTo(30, 6); g.lineTo(36, 20); g.lineTo(26, 30); g.lineTo(38, 42); g.lineTo(30, 58); g.stroke();
+      g.fillStyle = "#fff"; g.fillRect(6, 50, 26, 9);
+      g.fillStyle = "#b91c1c"; g.font = "bold 7px monospace"; g.fillText("CVE!", 8, 57.5);
+    }
+  };
+}
 function texFloor(base, line, dot) {
   return g => {
     g.fillStyle = base; g.fillRect(0, 0, 64, 64);
@@ -494,16 +591,17 @@ function texCeil(base, light) {
   };
 }
 
-const WALL_CHARS = "#123DRBYXMN";
+const WALL_CHARS = "#123DRBYXMNUQ";
 const WALL_TEX = [
   texFrom(texCircuit, 11), texFrom(texRack, 22), texFrom(texFirewall, 33), texFrom(texCode, 44),
   texFrom(texDoor(null)), texFrom(texDoor("#e04a4a")), texFrom(texDoor("#3b82f6")), texFrom(texDoor("#facc15")),
-  texFrom(texExit), texFrom(texMail(false)), texFrom(texMail(true))
+  texFrom(texExit), texFrom(texMail(false)), texFrom(texMail(true)), texFrom(texVuln(false), 11), texFrom(texVuln(true), 11)
 ];
 const LEVEL_LOOK = [   // floor and ceiling per sector
   { floor: texFrom(texFloor("#1c2430", "#2a3544", "#45d0e0")), ceil: texFrom(texCeil("#141920", "#8aa4c2")), fog: 1 },
   { floor: texFrom(texFloor("#22262c", "#30363f", "#f5a524")), ceil: texFrom(texCeil("#121418", "#b8c4d4")), fog: 0.9 },
-  { floor: texFrom(texFloor("#2a1414", "#3d1c1c", "#ff5a3c")), ceil: texFrom(texCeil("#170b0b", "#8a3526")), fog: 0.8 }
+  { floor: texFrom(texFloor("#2a1414", "#3d1c1c", "#ff5a3c")), ceil: texFrom(texCeil("#170b0b", "#8a3526")), fog: 0.8 },
+  { floor: texFrom(texFloor("#131a2a", "#1f2a44", "#a78bfa")), ceil: texFrom(texCeil("#0d1220", "#6d5bd0")), fog: 0.85 }
 ];
 
 /* ================================================================ sprites */
@@ -693,7 +791,7 @@ const ITEM_DRAW = {
     for (let x = 14; x < 40; x += 7) { g.fillStyle = "#67e8f9"; g.fillRect(x, 44, 3, 16); }
     circle(g, 50, 52, 4, "#a5f3fc");
   },
-  k: null, b: null, y: null
+  k: null, b: null, y: null, z: null
 };
 function drawKey(color) {
   return g => {
@@ -787,6 +885,49 @@ function drawMobile(g, f) {          // a phone with a bad app
   g.fillStyle = "#f8fafc"; g.font = "bold 5px sans-serif"; g.fillText("APP", 28, 20);
 }
 
+function drawLoveBug(g, f) {         // ILOVEYOU: a love letter with a worm for a tail
+  for (let i = 0; i < 4; i++) circle(g, 32 + Math.sin(i + f) * 6, 60 - i * 3, 5 - i * 0.6, i % 2 ? "#be185d" : "#db2777");
+  const s = f === 1 ? 1.04 : 1;
+  g.save(); g.translate(32, 32); g.scale(s, s); g.translate(-32, -32);
+  g.fillStyle = "#f472b6"; g.beginPath();
+  g.moveTo(32, 56); g.bezierCurveTo(6, 40, 2, 22, 16, 14); g.bezierCurveTo(24, 9, 30, 14, 32, 20);
+  g.bezierCurveTo(34, 14, 40, 9, 48, 14); g.bezierCurveTo(62, 22, 58, 40, 32, 56); g.fill();
+  g.fillStyle = "rgba(255,255,255,.35)"; g.beginPath(); g.ellipse(20, 22, 5, 3, -0.6, 0, TAU); g.fill();
+  g.restore();
+  rrect(g, 20, 26, 24, 16, 2, "#fdf2f8");                                    // the envelope face
+  g.strokeStyle = "#be185d"; g.lineWidth = 1.5; g.beginPath(); g.moveTo(20, 26); g.lineTo(32, 35); g.lineTo(44, 26); g.stroke();
+  circle(g, 26, 31, 2.2, f === 2 ? "#ef4444" : "#831843"); circle(g, 38, 31, 2.2, f === 2 ? "#ef4444" : "#831843");
+  if (f === 2) circle(g, 32, 39, 2.5, "#831843");
+  g.fillStyle = "#831843"; g.font = "bold 5px monospace"; g.fillText("LOVE-LETTER.vbs", 12, 50);
+}
+function drawWannaCry(g, f) {        // WannaCry: a crying padlock asking for $300
+  g.strokeStyle = "#9ca3af"; g.lineWidth = 7;
+  g.beginPath(); g.arc(32, 22, 13, Math.PI, 0); g.lineTo(45, 28); g.moveTo(19, 22); g.lineTo(19, 28); g.stroke();
+  rrect(g, 8, 26, 48, 34, 6, "#b91c1c");
+  g.fillStyle = "#7f1d1d"; g.fillRect(8, 52, 48, 8);
+  g.fillStyle = "#fff"; g.beginPath(); g.ellipse(23, 36, 6, 4, 0, 0, TAU); g.fill(); g.beginPath(); g.ellipse(41, 36, 6, 4, 0, 0, TAU); g.fill();
+  circle(g, 23, 37, 2.2, "#111"); circle(g, 41, 37, 2.2, "#111");
+  g.strokeStyle = "#111"; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(16, 31); g.lineTo(28, 33); g.moveTo(48, 31); g.lineTo(36, 33); g.stroke();
+  const drop = f === 1 ? 6 : 0;                                              // tears
+  g.fillStyle = "#60a5fa";
+  for (const x of [21, 43]) { g.beginPath(); g.moveTo(x, 40 + drop); g.quadraticCurveTo(x - 3, 45 + drop, x, 47 + drop); g.quadraticCurveTo(x + 3, 45 + drop, x, 40 + drop); g.fill(); }
+  g.strokeStyle = "#111"; g.lineWidth = 2; g.beginPath();
+  if (f === 2) g.ellipse(32, 48, 5, 3, 0, 0, TAU); else g.arc(32, 51, 5, 1.15 * Math.PI, 1.85 * Math.PI);
+  g.stroke();
+  rrect(g, 44, 4, 18, 11, 2, "#facc15");                                     // the ransom tag
+  g.fillStyle = "#111"; g.font = "bold 7px sans-serif"; g.fillText("$300", 45.5, 12.5);
+  g.strokeStyle = "#facc15"; g.lineWidth = 1; g.beginPath(); g.moveTo(47, 15); g.lineTo(42, 22); g.stroke();
+}
+function drawBackup(g) {             // an external backup drive
+  rrect(g, 16, 36, 32, 26, 3, "#475569");
+  g.fillStyle = "#334155"; g.fillRect(16, 36, 32, 5);
+  circle(g, 42, 55, 2, "#38bdf8");
+  g.fillStyle = "#e2e8f0"; g.font = "bold 6px monospace"; g.fillText("BACKUP", 20, 50);
+  g.strokeStyle = "#94a3b8"; g.lineWidth = 2; g.beginPath(); g.moveTo(24, 36); g.quadraticCurveTo(24, 26, 34, 28); g.stroke();
+}
+ITEM_DRAW.z = drawBackup;
+
 /* Monsters. hp and dmg are per shot; keep is how close a shooter likes to get. */
 const ENEMY = {
   v: { key: "virus", draw: drawVirus, hp: 30, speed: 1.5, radius: 0.3, scale: 0.62, z: 0, dmg: [5, 10], cool: 1.8, range: 12, keep: 3.5, shot: "green", shotSpeed: 6, corpse: ["#34c35e", "#8dff9f", "#0b5e2b"] },
@@ -800,7 +941,9 @@ const ENEMY = {
   m: { key: "fileless", draw: drawFileless, hp: 45, speed: 1.9, radius: 0.3, scale: 0.6, z: 0.1, dmg: [6, 10], cool: 1.4, range: 10, keep: 3, shot: "purple", shotSpeed: 7, fileless: true, corpse: ["#c4b5fd"] },
   x: { key: "wiper", draw: drawWiper, hp: 130, speed: 1.0, radius: 0.38, scale: 0.78, z: 0, dmg: [12, 18], cool: 2.4, range: 11, keep: 3.5, shot: "void", shotSpeed: 6, wipes: true, corpse: ["#9ca3af", "#e2e8f0", "#dc2626"] },
   o: { key: "mobile", draw: drawMobile, hp: 24, speed: 3.0, radius: 0.26, scale: 0.48, z: 0, dmg: [5, 9], cool: 0.8, range: 1.0, melee: true, corpse: ["#111827", "#0ea5e9", "#f8fafc"] },
-  K: { key: "rootkit", draw: drawRootkit, hp: 1400, speed: 0.9, radius: 0.6, scale: 1.35, z: 0, dmg: [7, 11], cool: 1.7, range: 20, keep: 5, shot: "purple", shotSpeed: 7, spread: 5, boss: true, corpse: ["#17171f", "#d9d9d9", "#ff2d2d"] }
+  L: { key: "worm", draw: drawLoveBug, hp: 360, speed: 1.3, radius: 0.5, scale: 1.1, z: 0, dmg: [6, 10], cool: 1.3, range: 14, keep: 4, shot: "pink", shotSpeed: 7, spread: 3, boss: true, specimen: "ILOVEYOU", splits: true, corpse: ["#f472b6", "#fdf2f8", "#831843"] },
+  W: { key: "ransomware", draw: drawWannaCry, hp: 750, speed: 1.0, radius: 0.55, scale: 1.25, z: 0, dmg: [8, 12], cool: 1.8, range: 16, keep: 4.5, shot: "red", shotSpeed: 7, spread: 3, boss: true, specimen: "WannaCry", steals: true, ransomNote: true, corpse: ["#b91c1c", "#facc15", "#60a5fa"] },
+  K: { key: "rootkit", draw: drawRootkit, hp: 1400, speed: 0.9, radius: 0.6, scale: 1.35, z: 0, dmg: [7, 11], cool: 1.7, range: 20, keep: 5, shot: "purple", shotSpeed: 7, spread: 5, boss: true, specimen: "Stuxnet", summons: true, corpse: ["#17171f", "#d9d9d9", "#ff2d2d"] }
 };
 const SPR = { item: {}, shot: {}, enemy: {} };
 for (const [ch, def] of Object.entries(ENEMY)) {
@@ -981,7 +1124,8 @@ const frame = vctx.createImageData(W, H);
 const pix = new Uint32Array(frame.data.buffer);
 const zbuf = new Float32Array(W);
 
-let levelIndex = 0, map = [], mapW = 0, mapH = 0, doors = new Map(), seen = null;
+let levelIndex = 0, map = [], mapW = 0, mapH = 0, doors = new Map(), seen = null, look = null, vulns = [];
+let mode = "campaign", survival = null;
 let enemies = [], items = [], shots = [], puffs = [];
 let player = null, levelStart = null, stats = null, flow = null, flowTimer = 0, flowTile = -1;
 let state = "menu", showMap = false, messages = [], screenFlash = { color: "", t: 0 }, popups = [];
@@ -1011,19 +1155,25 @@ function snapshot(p) {
 }
 
 function loadLevel(i, loadout) {
-  levelIndex = i;
-  const L = FW_LEVELS[i];
+  levelIndex = i; mode = "campaign";
+  loadMap(FW_LEVELS[i], LEVEL_LOOK[i] || LEVEL_LOOK[0], loadout);
+}
+function loadMap(L, lookSet, loadout) {
+  look = lookSet;
   map = L.map.map(r => r.split(""));
   mapH = map.length; mapW = map[0].length;
   doors = new Map(); enemies = []; items = []; shots = []; puffs = []; messages = []; popups = [];
   seen = new Uint8Array(mapW * mapH);
   levelStart = snapshot(loadout);
-  player = Object.assign({ x: 1.5, y: 1.5, a: 0, keys: {}, cool: 0, fireT: 0, bob: 0, hurtT: 0, grinT: 0, look: 0, lookT: 0, moving: false }, snapshot(loadout));
+  player = Object.assign({ x: 1.5, y: 1.5, a: 0, keys: {}, cool: 0, fireT: 0, bob: 0, hurtT: 0, grinT: 0, look: 0, lookT: 0, moving: false,
+                           hits: [], backup: false, dmgMul: 1, coolMul: 1 }, snapshot(loadout));
+  vulns = [];
   for (let y = 0; y < mapH; y++) {
     for (let x = 0; x < mapW; x++) {
       const c = map[y][x];
       if ("DRBY".includes(c)) doors.set(y * mapW + x, { x, y, open: 0, state: 0, timer: 0, lock: c === "D" ? null : c });
       else if (c === "P") { player.x = x + 0.5; player.y = y + 0.5; map[y][x] = "."; }
+      else if (c === "U") vulns.push({ x, y, t: 3, told: false });
       else if (c === "n") { for (const [ox, oy] of [[0, -0.25], [-0.25, 0.2], [0.25, 0.2]]) spawnEnemy(c, x + 0.5 + ox, y + 0.5 + oy); map[y][x] = "."; }
       else if (ENEMY[c]) { spawnEnemy(c, x + 0.5, y + 0.5); map[y][x] = "."; }
       else if (ITEM_DRAW[c]) { items.push({ ch: c, x: x + 0.5, y: y + 0.5, taken: false }); map[y][x] = "."; }
@@ -1031,7 +1181,8 @@ function loadLevel(i, loadout) {
   }
   player.a = facingOpen(player.x, player.y);
   stats = { kills: 0, total: enemies.length, items: 0, itemTotal: items.length, time: 0,
-            phishOk: 0, phishTotal: map.reduce((n, r) => n + r.filter(c => c === "M").length, 0), quizOk: 0, quizTotal: 0 };
+            phishOk: 0, phishTotal: map.reduce((n, r) => n + r.filter(c => c === "M").length, 0), quizOk: 0, quizTotal: 0,
+            patched: 0, patchTotal: vulns.length };
   scan = { e: null, t: 0 };
   flow = null; flowTile = -1;
 }
@@ -1048,7 +1199,7 @@ function facingOpen(x, y) {           // start the player looking down the longe
    the boss is always the most notorious rootkit on the list */
 function pickSpecimen(def) {
   const pool = FW_HISTORY.filter(h => h.kind === def.key);
-  if (def.boss) return pool[pool.length - 1];
+  if (def.specimen) return FW_HISTORY.find(h => h.name === def.specimen) || pool[0];
   return pool[Math.floor(Math.random() * pool.length)];
 }
 function spawnEnemy(ch, x, y, child = false) {
@@ -1135,9 +1286,30 @@ function use() {
   if (hit.dist > 1.6) return;
   if (isDoor(hit.c)) tryOpen(door(hit.mx, hit.my));
   else if (hit.c === "M") openMail(hit.mx, hit.my);
+  else if (hit.c === "U") {
+    map[hit.my][hit.mx] = "Q"; stats.patched++;
+    say(T("patched")); Sound.play("weapon"); flash("rgba(74,222,128,.25)", 0.2); player.grinT = 1.2;
+  }
   else if (hit.c === "X") {
-    if (enemies.some(e => e.def.boss && !e.dead)) { say(T("exitLocked")); Sound.play("denied"); return; }
+    if (enemies.some(e => e.def.boss && !e.dead)) { say(T("exitLocked", { n: enemies.find(e => e.def.boss && !e.dead).hist.name })); Sound.play("denied"); return; }
     finishLevel();
+  }
+}
+/* an unpatched vulnerability lets a worm in every few seconds while you are near */
+function updateVulns(dt) {
+  const alive = enemies.filter(e => !e.dead).length;
+  for (const v of vulns) {
+    if (map[v.y][v.x] !== "U") continue;
+    if (Math.hypot(v.x + 0.5 - player.x, v.y + 0.5 - player.y) > 11) continue;
+    v.t -= dt;
+    if (v.t > 0 || alive >= 40) continue;
+    v.t = 9;
+    const out = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => [v.x + dx, v.y + dy]).filter(([x, y]) => tile(x, y) === ".")
+      .sort((a, b) => Math.hypot(a[0] - player.x, a[1] - player.y) - Math.hypot(b[0] - player.x, b[1] - player.y));
+    if (!out.length || blocked(out[0][0] + 0.5, out[0][1] + 0.5, 0.3) || hitsBody({}, out[0][0] + 0.5, out[0][1] + 0.5, 0.3)) continue;
+    const w = spawnEnemy("w", out[0][0] + 0.5, out[0][1] + 0.5, true);
+    w.awake = true; stats.total++;
+    if (!v.told) { v.told = true; say(T("vulnOpen")); }
   }
 }
 function updateDoors(dt) {
@@ -1205,6 +1377,7 @@ function take(it) {
       snd = "weapon";
       break;
     }
+    case "z": ok = !p.backup; if (ok) p.backup = true; snd = "key"; break;
     default: p.keys[it.ch] = true; snd = "key";
   }
   if (!ok) return;
@@ -1233,15 +1406,15 @@ function fire() {
     p.cool = 0.3; return;
   }
   if (def.ammo) p.ammo[def.ammo]--;
-  p.cool = def.cool; p.fireT = 0.12;
+  p.cool = def.cool * p.coolMul; p.fireT = 0.12;
   Sound.play(def.sound);
   alertNearby(p.x, p.y);
   if (def.projectile) {
     const a = p.a + rand(-0.015, 0.015);
-    shots.push({ x: p.x + Math.cos(a) * 0.35, y: p.y + Math.sin(a) * 0.35, vx: Math.cos(a) * def.speed, vy: Math.sin(a) * def.speed, dmg: rand(...def.dmg), mine: true, spr: SPR.shot.player, life: 3 });
+    shots.push({ x: p.x + Math.cos(a) * 0.35, y: p.y + Math.sin(a) * 0.35, vx: Math.cos(a) * def.speed, vy: Math.sin(a) * def.speed, dmg: rand(...def.dmg) * p.dmgMul, mine: true, spr: SPR.shot.player, life: 3 });
     return;
   }
-  for (let i = 0; i < def.pellets; i++) hitscan(p.a + rand(-def.spread, def.spread), rand(...def.dmg));
+  for (let i = 0; i < def.pellets; i++) hitscan(p.a + rand(-def.spread, def.spread), rand(...def.dmg) * p.dmgMul);
 }
 function hitscan(a, dmg) {
   const dx = Math.cos(a), dy = Math.sin(a), p = player;
@@ -1291,6 +1464,19 @@ function updateScan(dt) {
   }
 }
 function hurtEnemy(e, dmg) {
+  if (e.def.splits && !e.dead) {                       // ILOVEYOU sheds love letters as it is hurt
+    e.nextSplit = e.nextSplit ?? 0.75;
+    const max = e.def.hp * (e.hpScale || 1);
+    if (e.hp - dmg > 0 && e.hp - dmg < max * e.nextSplit) {
+      e.nextSplit -= 0.25;
+      let n = 0;
+      for (let k = 0; k < 2; k++) {
+        const spot = freeSpotNear(e.x, e.y);
+        if (spot) { const c = spawnEnemy("w", spot[0], spot[1], true); c.hist = e.hist; c.awake = true; stats.total++; n++; }
+      }
+      if (n) say(T("split"));
+    }
+  }
   if (e.def.swarm) for (const o of enemies) if (o.def.swarm && !o.dead && Math.hypot(o.x - e.x, o.y - e.y) < 10) wake(o);
   e.hp -= dmg; e.flash = 0.1;
   if (e.disguised) reveal(e);
@@ -1300,7 +1486,8 @@ function hurtEnemy(e, dmg) {
     e.dead = true; stats.kills++;
     say(T("removedMsg", { n: e.hist.name, y: e.hist.year }));
     if (!removed.has(e.hist.name)) { removed.add(e.hist.name); save(REMOVED_KEY, [...removed]); }
-    if (e.def.boss) { Sound.play("bossDie"); say(T("bossDown")); flash("rgba(255,255,255,.5)", 0.5); }
+    if (mode === "survival") survival.score += e.def.boss ? 200 : 10;
+    if (e.def.boss) { Sound.play("bossDie"); if (mode === "campaign") say(T("bossDown", { n: e.hist.name })); flash("rgba(255,255,255,.5)", 0.5); }
     else Sound.play("die");
   }
 }
@@ -1316,12 +1503,13 @@ function hurtPlayer(amount, src) {
   p.hp -= amount; p.hurtT = 0.4;
   flash("rgba(220,30,30,.35)", 0.2);
   Sound.play("hurt");
-  if (src && src.def.steals) {
+  if (src && src.x != null) p.hits.push({ a: Math.atan2(src.y - p.y, src.x - p.x), t: 0.9 });
+  if (src && src.def.steals && !p.backup) {
     const taken = Math.min(p.ammo.sig, 4) + Math.min(p.ammo.cells, 15);
     p.ammo.sig = Math.max(0, p.ammo.sig - 4); p.ammo.cells = Math.max(0, p.ammo.cells - 15);
     if (taken) say(T("ransom"));
   }
-  if (src && src.def.wipes && p.armor > 0) { p.armor = 0; say(T("wiped")); }
+  if (src && src.def.wipes && !p.backup && p.armor > 0) { p.armor = 0; say(T("wiped")); }
   if (src && src.def.popups && popups.length < 4) {
     const lines = T("popups");
     popups.push({ x: rand(40, SW - 300), y: rand(30, VIEW_H - 170), text: lines[Math.floor(Math.random() * lines.length)], t: 4, hue: Math.floor(rand(0, 360)) });
@@ -1418,7 +1606,15 @@ function updateEnemies(dt) {
       const spot = freeSpotNear(e.x, e.y);
       if (spot) { const c = spawnEnemy("w", spot[0], spot[1], true); c.awake = true; stats.total++; say(T("wormCopy")); }
     }
-    if (def.boss) {
+    if (def.ransomNote && los) {
+      e.noteT = (e.noteT ?? 6) - dt;
+      if (e.noteT <= 0) {
+        e.noteT = 14;
+        if (player.backup) say(T("backupSaved"));
+        else if (!popups.some(w => w.ransom)) { popups.push({ ransom: true, t: 3.5 }); Sound.play("reveal"); }
+      }
+    }
+    if (def.summons) {
       e.summonT -= dt;
       if (e.summonT <= 0 && alive < 30) {
         e.summonT = 10;
@@ -1475,6 +1671,10 @@ function update(dt) {
   updateEnemies(dt);
   updateShots(dt);
   updateScan(dt);
+  updateVulns(dt);
+  for (const h of player.hits) h.t -= dt;
+  player.hits = player.hits.filter(h => h.t > 0);
+  if (mode === "survival" && state === "play") updateSurvival();
   for (const m of messages) m.t -= dt;
   messages = messages.filter(m => m.t > 0);
   if (screenFlash.t > 0) screenFlash.t -= dt;
@@ -1484,7 +1684,7 @@ function update(dt) {
 
 /* =============================================================== renderer */
 function render() {
-  const p = player, look = LEVEL_LOOK[levelIndex] || LEVEL_LOOK[0];
+  const p = player;
   const dirX = Math.cos(p.a), dirY = Math.sin(p.a);
   const planeX = -dirY * 0.66, planeY = dirX * 0.66;
   const fog = look.fog, ftex = look.floor, ctex = look.ceil;
@@ -1665,10 +1865,10 @@ function drawHud() {
   hudLabel(T("hudKeys"), 501, y0 + 70);
 
   sctx.fillStyle = "#eaf1fb"; sctx.font = "bold 20px ui-monospace, Consolas, monospace"; sctx.textAlign = "center";
-  sctx.fillText(`${stats.kills}/${stats.total}`, 590, y0 + 36);
+  sctx.fillText(mode === "survival" ? `${T("hudWave")} ${survival.wave}` : `${stats.kills}/${stats.total}`, 590, y0 + 36);
   sctx.fillStyle = "#45d0e0"; sctx.font = "600 10px ui-sans-serif, system-ui, sans-serif";
-  sctx.fillText(T("w_" + def.key), 590, y0 + 54, 92);
-  hudLabel(T("hudKills"), 590, y0 + 70);
+  sctx.fillText(mode === "survival" ? `${T("score")} ${survival.score}` : T("w_" + def.key), 590, y0 + 54, 92);
+  hudLabel(mode === "survival" ? T("survival") : T("hudKills"), 590, y0 + 70);
   sctx.textAlign = "left";
 }
 /* the status-bar face is a CPU: it sweats, winces and grins like the original */
@@ -1701,6 +1901,7 @@ function drawFace(cx, cy) {
 }
 /* name the malware under the crosshair, like a scanner identifying a sample */
 function drawTarget() {
+  if (popups.some(w => w.ransom)) return;
   const best = crosshairTarget();
   if (!best) return;
   const known = identified.has(best.def.key);
@@ -1718,13 +1919,49 @@ function drawTarget() {
 /* a hint when you stand in front of something you can use */
 function drawPrompt() {
   const hit = castRay(player.x, player.y, Math.cos(player.a), Math.sin(player.a));
-  if (hit.dist > 1.6 || (hit.c !== "M" && hit.c !== "X")) return;
-  const text = T(hit.c === "M" ? "promptMail" : "promptExit");
+  if (hit.dist > 1.6 || !"MXU".includes(hit.c)) return;
+  const text = T(hit.c === "M" ? "promptMail" : hit.c === "U" ? "promptPatch" : "promptExit");
   sctx.font = "600 15px ui-sans-serif, system-ui, sans-serif"; sctx.textAlign = "center";
   const w = sctx.measureText(text).width + 24;
-  sctx.fillStyle = "rgba(5,8,12,.8)"; sctx.fillRect(SW / 2 - w / 2, VIEW_H - 64, w, 28);
-  sctx.fillStyle = "#facc15"; sctx.fillText(text, SW / 2, VIEW_H - 45);
+  sctx.fillStyle = "rgba(5,8,12,.8)"; sctx.fillRect(SW / 2 - w / 2, VIEW_H - 74, w, 28);
+  sctx.fillStyle = "#facc15"; sctx.fillText(text, SW / 2, VIEW_H - 55);
   sctx.textAlign = "left";
+}
+function drawRansomNote(w) {
+  const x = 70, y = 60, pw = SW - 140, ph = 250;
+  sctx.fillStyle = "rgba(127,29,29,.94)"; sctx.fillRect(x, y, pw, ph);
+  sctx.strokeStyle = "#fca5a5"; sctx.lineWidth = 3; sctx.strokeRect(x + 1.5, y + 1.5, pw - 3, ph - 3);
+  sctx.textAlign = "center";
+  sctx.fillStyle = "#facc15";                                                 // a padlock
+  sctx.fillRect(SW / 2 - 22, y + 44, 44, 34);
+  sctx.strokeStyle = "#facc15"; sctx.lineWidth = 7; sctx.beginPath(); sctx.arc(SW / 2, y + 44, 14, Math.PI, 0); sctx.stroke();
+  sctx.fillStyle = "#fff"; sctx.font = "bold 24px ui-sans-serif, system-ui, sans-serif"; sctx.fillText(T("ransomTitle"), SW / 2, y + 120, pw - 30);
+  sctx.fillStyle = "#fecaca"; sctx.font = "16px ui-sans-serif, system-ui, sans-serif"; sctx.fillText(T("ransomText"), SW / 2, y + 150, pw - 30);
+  sctx.fillStyle = "#facc15"; sctx.font = "bold 30px ui-monospace, Consolas, monospace"; sctx.fillText(`00:0${Math.ceil(w.t)}`, SW / 2, y + 192);
+  sctx.fillStyle = "#fecaca"; sctx.font = "13px ui-sans-serif, system-ui, sans-serif"; sctx.fillText(T("ransomHint"), SW / 2, y + 226, pw - 30);
+  sctx.textAlign = "left";
+}
+function drawBossBar() {
+  const b = enemies.find(e => e.def.boss && !e.dead && e.awake);
+  if (!b) return;
+  const w = 300, x = SW / 2 - w / 2, y = VIEW_H - 34, frac = clamp(b.hp / (b.def.hp * (b.hpScale || 1)), 0, 1);
+  sctx.fillStyle = "rgba(5,8,12,.75)"; sctx.fillRect(x - 6, y - 4, w + 12, 30);
+  sctx.fillStyle = "#3f1d1d"; sctx.fillRect(x, y + 14, w, 8);
+  sctx.fillStyle = "#ef4444"; sctx.fillRect(x, y + 14, w * frac, 8);
+  sctx.fillStyle = "#fde68a"; sctx.font = "600 12px ui-sans-serif, system-ui, sans-serif"; sctx.textAlign = "center";
+  sctx.fillText(`${b.hist.name} \u00b7 ${b.hist.year}`, SW / 2, y + 10);
+  sctx.textAlign = "left";
+}
+function drawHitMarkers() {             // red wedges pointing at whoever just hit you
+  for (const h of player.hits) {
+    const rel = Math.atan2(Math.sin(h.a - player.a), Math.cos(h.a - player.a));
+    const cx = SW / 2 + Math.sin(rel) * 110, cy = VIEW_H / 2 - Math.cos(rel) * 110;
+    sctx.save(); sctx.translate(cx, cy); sctx.rotate(rel);
+    sctx.globalAlpha = Math.min(1, h.t * 1.5);
+    sctx.fillStyle = "#ef4444"; sctx.beginPath(); sctx.moveTo(0, -16); sctx.lineTo(12, 6); sctx.lineTo(-12, 6); sctx.fill();
+    sctx.restore();
+  }
+  sctx.globalAlpha = 1;
 }
 function drawPopup(w) {
   const x = w.x, y = w.y, pw = 260, ph = 140;
@@ -1752,7 +1989,7 @@ function drawMessages() {
 function drawMap() {
   const size = Math.min(300 / mapW, 300 / mapH), ox = SW - mapW * size - 12, oy = 12;
   sctx.fillStyle = "rgba(5,8,12,.8)"; sctx.fillRect(ox - 6, oy - 6, mapW * size + 12, mapH * size + 12);
-  const col = { R: "#e04a4a", B: "#3b82f6", Y: "#facc15", D: "#f5a524", X: "#4ade80", M: "#60a5fa", N: "#475569" };
+  const col = { R: "#e04a4a", B: "#3b82f6", Y: "#facc15", D: "#f5a524", X: "#4ade80", M: "#60a5fa", N: "#475569", U: "#ff4d4d", Q: "#15803d" };
   for (let y = 0; y < mapH; y++) {
     for (let x = 0; x < mapW; x++) {
       if (!seen[y * mapW + x]) continue;
@@ -1773,7 +2010,8 @@ function present() {
   sctx.imageSmoothingEnabled = false;
   sctx.drawImage(view, 0, 0, SW, VIEW_H);
   if (screenFlash.t > 0) { sctx.fillStyle = screenFlash.color; sctx.fillRect(0, 0, SW, VIEW_H); }
-  for (const w of popups) drawPopup(w);
+  for (const w of popups) (w.ransom ? drawRansomNote : drawPopup)(w);
+  if (state === "play") { drawHitMarkers(); drawBossBar(); }
   if (state === "play") {
     sctx.fillStyle = "rgba(255,255,255,.7)";
     sctx.fillRect(SW / 2 - 1, VIEW_H / 2 - 6, 2, 4); sctx.fillRect(SW / 2 - 1, VIEW_H / 2 + 2, 2, 4);
@@ -1810,6 +2048,7 @@ function statsHtml() {
          `<span>${T("items")} <b>${stats.items}/${stats.itemTotal}</b></span>` +
          (stats.phishTotal ? `<span>${T("phishStat")} <b>${stats.phishOk}/${stats.phishTotal}</b></span>` : "") +
          (stats.quizTotal ? `<span>${T("quizStat")} <b>${stats.quizOk}/${stats.quizTotal}</b></span>` : "") +
+         (stats.patchTotal ? `<span>${T("patchStat")} <b>${stats.patched}/${stats.patchTotal}</b></span>` : "") +
          `<span>${T("time")} <b>${fmtTime(stats.time)}</b></span>`;
 }
 /* three stars: finish; remove 75%; judge every email right and pass the quiz */
@@ -1825,6 +2064,68 @@ function starsHtml() {
   return `<p class="stars">${"\u2605".repeat(n)}${"\u2606".repeat(3 - n)}</p><ul class="fw-checks">` +
     checks.map((ok, i) => `<li class="${ok ? "ok" : ""}">${ok ? "\u2713" : "\u2717"} ${T("star" + (i + 1))}</li>`).join("") + "</ul>";
 }
+
+/* ---- Incident Response: endless waves, an upgrade between each */
+const UPGRADES = {
+  firewall: p => { p.armor = Math.min(200, p.armor + 75); },
+  patch: p => { p.hp = Math.min(100, p.hp + 40); },
+  sig: p => { p.dmgMul += 0.25; },
+  clock: p => { p.coolMul *= 0.85; },
+  ammo: p => { p.ammo.sig = Math.min(AMMO_MAX.sig, p.ammo.sig + 20); p.ammo.cells = Math.min(AMMO_MAX.cells, p.ammo.cells + 80); },
+  backup: p => { p.backup = true; }
+};
+const WAVE_KINDS = ["v", "w", "s", "o", "t", "d", "n", "r", "l", "m", "x"];
+function startSurvival() {
+  loadMap(FW_ARENA, LEVEL_LOOK[3], { hp: 100, armor: 50, weapons: [true, true, true], ammo: { sig: 20, cells: 80 }, cur: 1 });
+  mode = "survival"; levelIndex = -1;
+  survival = { wave: 0, score: 0, choices: [], best: survivalBest() };
+  state = "play"; hideOverlay(); $("fw-card").classList.add("hidden");
+  nextWave();
+  grabPointer();
+}
+function randomFloor(minDist) {
+  for (let k = 0; k < 300; k++) {
+    const x = 1 + Math.floor(Math.random() * (mapW - 2)), y = 1 + Math.floor(Math.random() * (mapH - 2));
+    if (tile(x, y) !== "." || Math.hypot(x + 0.5 - player.x, y + 0.5 - player.y) < minDist) continue;
+    if (enemies.some(e => !e.dead && Math.hypot(e.x - x - 0.5, e.y - y - 0.5) < 0.8)) continue;
+    return [x + 0.5, y + 0.5];
+  }
+  return null;
+}
+function nextWave() {
+  const w = ++survival.wave;
+  enemies = enemies.filter(e => !e.dead);              // clear the old remains
+  const kinds = WAVE_KINDS.slice(0, Math.min(WAVE_KINDS.length, 2 + w));
+  const count = 3 + w * 2;
+  for (let i = 0; i < count; i++) {
+    const spot = randomFloor(7); if (!spot) break;
+    const e = spawnEnemy(kinds[Math.floor(Math.random() * kinds.length)], spot[0], spot[1]);
+    e.awake = true; e.disguised = false;
+  }
+  if (w % 5 === 0) {                                  // a boss every fifth wave
+    const spot = randomFloor(8);
+    if (spot) { const b = spawnEnemy("LWK"[(w / 5 - 1) % 3], spot[0], spot[1]); b.hpScale = 0.5 + w * 0.02; b.hp = b.def.hp * b.hpScale; b.awake = true; }
+  }
+  for (let i = 0; i < 2; i++) {                       // a couple of supplies each wave
+    const spot = randomFloor(3);
+    if (spot) items.push({ ch: "hacH"[Math.floor(Math.random() * 4)], x: spot[0], y: spot[1], taken: false });
+  }
+  stats.total = enemies.length; stats.kills = 0;
+  say(T("waveStart", { n: w })); Sound.play("wake");
+}
+function updateSurvival() {
+  if (enemies.some(e => !e.dead)) return;
+  survival.score += survival.wave * 50;
+  survival.choices = Object.keys(UPGRADES).filter(k => k !== "backup" || !player.backup).sort(() => Math.random() - 0.5).slice(0, 3);
+  state = "upgrade"; mouseDown = false; keys.clear();
+  releasePointer(); Sound.play("exit"); showOverlay();
+}
+function pickUpgrade(k) {
+  UPGRADES[k](player);
+  state = "play"; hideOverlay(); grabPointer();
+  nextWave();
+}
+function survivalBest() { return load("firewall3d.survival", { wave: 0, score: 0 }); }
 
 /* ---- phishing terminals */
 function openMail(mx, my) {
@@ -1919,8 +2220,16 @@ function finishLevel() {
 }
 function die() {
   state = "dead";
+  if (mode === "survival") {
+    const best = survivalBest();
+    survival.best = { wave: Math.max(best.wave, survival.wave), score: Math.max(best.score, survival.score) };
+    save("firewall3d.survival", survival.best);
+  }
   releasePointer();
   setTimeout(showOverlay, 700);
+}
+function restartCurrent() {
+  if (mode === "survival") startSurvival(); else startLevel(levelIndex, levelStart);
 }
 function startLevel(i, loadout) {
   loadLevel(i, loadout || defaultLoadout(i));
@@ -1940,6 +2249,7 @@ function resume() {
   state = "play"; hideOverlay(); grabPointer();
 }
 
+let extraAfter = null;
 function showOverlay() {
   const ov = $("fw-overlay"), L = FW_LEVELS[levelIndex];
   const title = $("fw-ov-title"), text = $("fw-ov-text"), st = $("fw-ov-stats"), extra = $("fw-ov-extra");
@@ -1952,6 +2262,13 @@ function showOverlay() {
     extra.innerHTML = `<p class="muted">${T("level", { n: i + 1 })} · ${FW_LEVELS[i].name[lang]}</p>`;
     b1.textContent = T("start"); b1.onclick = () => startLevel(i);
     b2.textContent = T("pickLevel"); b2.onclick = openLevels;
+    const best = survivalBest();
+    const sv = document.createElement("div"); sv.className = "fw-survival-pitch";
+    const sp = document.createElement("p"); sp.className = "muted";
+    sp.textContent = T("survivalText") + (best.wave ? " " + T("survivalBest", { w: best.wave, s: best.score }) : "");
+    const sb = document.createElement("button"); sb.className = "btn"; sb.textContent = T("survivalStart"); sb.onclick = startSurvival;
+    sv.append(sp, sb);
+    extraAfter = sv;
   } else if (state === "mail") {
     title.textContent = T("mailTitle");
     text.textContent = T("mailText");
@@ -1987,7 +2304,27 @@ function showOverlay() {
     text.textContent = T("pausedText");
     st.innerHTML = statsHtml();
     b1.textContent = T("resume"); b1.onclick = resume;
-    b2.textContent = T("restart"); b2.onclick = () => startLevel(levelIndex, levelStart);
+    b2.textContent = T("restart"); b2.onclick = restartCurrent;
+  } else if (state === "dead" && mode === "survival") {
+    title.textContent = T("survivalOver");
+    text.textContent = T("survivalOverText", { w: survival.wave, s: survival.score, bw: survival.best.wave, bs: survival.best.score });
+    b1.textContent = T("retry"); b1.onclick = startSurvival;
+    b2.textContent = T("backToMenu"); b2.onclick = () => { loadLevel(0, defaultLoadout(0)); state = "menu"; showOverlay(); };
+  } else if (state === "upgrade") {
+    title.textContent = T("waveClear", { n: survival.wave });
+    text.textContent = T("chooseUpgrade");
+    st.innerHTML = `<span>${T("score")} <b>${survival.score}</b></span>`;
+    const opts = document.createElement("div"); opts.className = "fw-options fw-upgrades";
+    for (const k of survival.choices) {
+      const [name, desc] = T("up_" + k).split("|");
+      const b = document.createElement("button"); b.className = "btn fw-option";
+      const strong = document.createElement("strong"); strong.textContent = name;
+      const small = document.createElement("span"); small.textContent = desc;
+      b.append(strong, small); b.onclick = () => pickUpgrade(k);
+      opts.append(b);
+    }
+    extra.append(opts);
+    b1.hidden = true; b2.hidden = true;
   } else if (state === "dead") {
     title.textContent = T("dead");
     text.textContent = T("deadText");
@@ -2011,6 +2348,7 @@ function showOverlay() {
     b1.textContent = T("intel"); b1.onclick = openIntel;
     b2.textContent = T("playAgain"); b2.onclick = () => startLevel(0);
   }
+  if (extraAfter) { extra.append(extraAfter); extraAfter = null; }
   if (state === "menu" || state === "dead" || state === "clear") {
     // the briefing for the level about to be played
     const i = state === "menu" ? Math.min(progress.unlocked, FW_LEVELS.length) - 1 : -1;
@@ -2033,11 +2371,19 @@ function openLevels() {
     b.onclick = () => { $("fw-levels-dialog").close(); startLevel(i); };
     list.appendChild(b);
   });
+  const sb = document.createElement("button"), best = survivalBest();
+  sb.className = "level-card";
+  sb.innerHTML = `<span class="n">${T("endless")}</span><span class="t">${T("survival")}</span><span class="best">${best.wave ? T("survivalBest", { w: best.wave, s: best.score }) : ""}</span>`;
+  sb.onclick = () => { $("fw-levels-dialog").close(); startSurvival(); };
+  list.appendChild(sb);
   $("fw-levels-dialog").showModal();
 }
 function openIntel() {
   const list = $("fw-intel-list"); list.innerHTML = "";
+  const listed = new Set();
   for (const [ch, def] of Object.entries(ENEMY)) {
+    if (listed.has(def.key)) continue;          // the bosses share a kind with an ordinary monster
+    listed.add(def.key);
     const known = intel.has(def.key);
     const row = document.createElement("div");
     row.className = "legend-item" + (known ? "" : " locked");
@@ -2062,7 +2408,8 @@ function buildTimeline() {
     const year = document.createElement("span"); year.className = "yr"; year.textContent = h.year;
     const ch = Object.keys(ENEMY).find(c => ENEMY[c].key === h.kind);
     const pic = makeCanvas(64, 64); pic.className = "pic";
-    pic.getContext("2d").drawImage((SPR.variant[h.name] || SPR.enemy[ch])[0].canvas, 0, 0);
+    const bossCh = Object.keys(ENEMY).find(c => ENEMY[c].specimen === h.name);
+    pic.getContext("2d").drawImage((SPR.variant[h.name] || SPR.enemy[bossCh || ch])[0].canvas, 0, 0);
     const head = document.createElement("b"); head.textContent = h.name;
     const kind = document.createElement("span"); kind.className = "kind k-" + h.kind; kind.textContent = THREATS[h.kind][lang][0];
     head.append(" ", kind);
@@ -2108,7 +2455,7 @@ window.addEventListener("keydown", e => {
   if (document.querySelector("dialog[open]")) return;
   if (e.code === "KeyF" && !e.ctrlKey && !e.metaKey) { toggleFullscreen(); return; }
   if (state !== "play") {
-    const choosing = state === "mail" || (state === "quiz" && !quiz.answered);
+    const choosing = state === "mail" || state === "upgrade" || (state === "quiz" && !quiz.answered);
     if ((e.code === "Enter" || e.code === "Space") && !choosing && !$("fw-ov-primary").hidden && !$("fw-overlay").classList.contains("hidden")) { e.preventDefault(); $("fw-ov-primary").click(); }
     else if (e.code === "KeyP" && state === "paused") resume();
     return;
@@ -2192,6 +2539,8 @@ function applyText() {
   $("fw-intel").textContent = T("intel");
   $("fw-sound").textContent = T(Sound.on ? "soundOn" : "soundOff");
   $("fw-sound").setAttribute("aria-pressed", String(Sound.on));
+  $("fw-music").textContent = T(Music.on ? "musicOn" : "musicOff");
+  $("fw-music").setAttribute("aria-pressed", String(Music.on));
   $("fw-full").textContent = T(fullscreenOn() ? "exitFull" : "full");
   $("fw-help").textContent = T("help");
   $("fw-keys").textContent = T("keys");
@@ -2216,6 +2565,7 @@ $("fw-lang").onclick = () => {
 };
 $("fw-sound").onclick = () => { Sound.on = !Sound.on; save(SOUND_KEY, Sound.on); applyText(); if (Sound.on) Sound.play("pickup"); };
 $("fw-full").onclick = toggleFullscreen;
+$("fw-music").onclick = () => { Music.on = !Music.on; save("firewall3d.music", Music.on); applyText(); };
 $("fw-levels").onclick = () => { pause(); openLevels(); };
 $("fw-intel").onclick = () => { pause(); openIntel(); };
 $("fw-timeline-btn").onclick = () => { pause(); openIntel(); $("fw-timeline-title").scrollIntoView(); };
@@ -2234,11 +2584,12 @@ function loop(now) {
   last = now;
   if (state === "play") update(dt);
   else if (state === "menu") player.a += dt * 0.15;   // a slow look around behind the title
+  Music.set(state === "play" && Sound.on && Music.on);
   present();
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
 // handy when poking at the game from the console or a test
-window.FW = { get state() { return state; }, get player() { return player; }, get enemies() { return enemies; }, startLevel, update, present };
+window.FW = { get state() { return state; }, get player() { return player; }, get enemies() { return enemies; }, get map() { return map; }, startLevel, startSurvival, update, present };
 })();
