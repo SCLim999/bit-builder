@@ -132,3 +132,25 @@ body.fs .fw-stage .overlay { inset: 0; }
 /* disclaimer, in the footer and the help dialog */
 .fw-disclaimer, .foot .fw-disclaimer { max-width: 80ch; margin: 6px auto 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
 .foot p { margin: 0; }
+
+/* phishing terminals: the email, and the verdict */
+.fw-mail { text-align: left; max-width: 460px; margin: 0 auto 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.fw-mail-head { padding: 10px 14px; background: var(--panel-2); border-bottom: 1px solid var(--line); font-size: 13px; display: grid; gap: 3px; }
+.fw-mail-head span { color: var(--muted); }
+.fw-mail-head b { color: var(--text); font-weight: 600; word-break: break-all; }
+.fw-mail p { margin: 0; padding: 12px 14px; white-space: pre-line; color: var(--text); font-size: 14px; line-height: 1.5; }
+.fw-attach { margin: 0 14px 12px; padding: 6px 10px; border: 1px dashed var(--line); border-radius: 6px; font-size: 13px; color: var(--amber); }
+.fw-clues { text-align: left; max-width: 460px; margin: 0 auto 16px; padding-left: 20px; color: var(--text); font-size: 14px; line-height: 1.55; }
+
+/* the end-of-sector quiz and the star checklist */
+.fw-clue { font-size: 17px; color: var(--text) !important; max-width: 46ch; margin: 0 auto 16px !important; }
+.fw-options { display: grid; gap: 8px; max-width: 360px; margin: 0 auto 14px; }
+.fw-option { font-size: 15px; padding: 10px 14px; }
+.fw-option.right { border-color: var(--green); background: #12463c; color: #d9ffe9; }
+.fw-option.wrong { border-color: var(--red); background: #4a1d1d; color: #ffe1e1; }
+.fw-option:disabled { cursor: default; }
+.fw-quiz-note { font-weight: 600; margin: 0 0 12px !important; }
+.fw-quiz-note.ok { color: var(--green) !important; }
+.fw-quiz-note.bad { color: var(--red) !important; }
+.fw-checks { list-style: none; padding: 0; margin: 0 auto 16px; max-width: 420px; text-align: left; display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.fw-checks li.ok { color: var(--green); }

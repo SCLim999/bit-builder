@@ -44,6 +44,22 @@ const STR = {
     exitLocked: "The rootkit still holds kernel access — remove it first",
     reveal: "That “free gift” was a Trojan!",
     ransom: "Ransomware encrypted some of your ammo!",
+    promptMail: "Press E to read the email", promptExit: "Press E to reboot the machine",
+    identified: "Signature identified: {n}", scanning: "unknown sample \u00b7 scanning",
+    mailTitle: "Incoming email \u2014 is it safe?", mailText: "Read it carefully. Report it if it is phishing; open it if it is genuine.",
+    mailFrom: "From", mailSubject: "Subject", mailAttach: "Attachment",
+    reportBtn: "Report as phishing", openBtn: "It\u2019s safe \u2014 open it", carryOn: "Carry on",
+    mailRight: "Correct!", mailWrong: "Not quite",
+    wasPhish: "This email was phishing. The red flags:", wasSafe: "This email was genuine. How you can tell:",
+    rewardRight: "Good call \u2014 firewall +25", phishOpened: "You opened a phishing email \u2014 a Trojan got in!", safeReported: "That email was genuine \u2014 no harm done, but keep an eye out",
+    quizTitle: "Security check \u2014 question {n} of {t}", quizAsk: "Which kind of malware is this?",
+    quizNext: "Next", quizDone: "See results", quizRight: "Right!", quizWrong: "It was: {a}",
+    phishStat: "Phishing spotted", quizStat: "Quiz",
+    star1: "Sector cleared", star2: "Removed at least 75% of the malware", star3: "Security aware: every email judged right and 2 of 3 quiz answers",
+    helpMore:
+      "<p><strong>Scan before you shoot.</strong> Keep an unknown monster in your crosshair for a moment to identify it. Once its signature is known, the Antivirus Scanner does 50% more damage to that kind \u2014 just like real signature-based antivirus.</p>" +
+      "<p><strong>Mail terminals</strong> (blue screens with an envelope) show an email. Decide whether it is phishing. Get it right and your firewall grows; open a phishing email and a Trojan gets in.</p>" +
+      "<p>After each sector there is a three-question <strong>security check</strong>, and you earn up to three <strong>stars</strong>: clear the sector, remove 75% of the malware, and judge every email right with at least 2 of 3 quiz answers.</p>",
     reported: "A keylogger reported your position!", wiped: "A wiper erased your firewall!",
     popups: ["YOU WON!!! Claim your prize", "FREE RAM \u2014 click here", "Your PC is SLOW! Fix it now", "Congratulations, visitor #1,000,000", "HOT DEALS \u2014 90% OFF"],
     popupClose: "closes in {s}s",
@@ -51,7 +67,7 @@ const STR = {
     summon: "The rootkit spawned hidden processes",
     bossDown: "Rootkit removed — the reboot terminal is unlocked",
     noAmmo: "Out of ammo",
-    newThreat: "New threat detected",
+    newThreat: "Signature identified",
     intelSub: "Every kind of malware you have met. The ones you have not met yet stay hidden.",
     unknown: "Not encountered yet",
     cardWeapon: "Defence",
@@ -112,6 +128,22 @@ const STR = {
     exitLocked: "Rootkit 仍然控制着内核 —— 先清除它",
     reveal: "那个“免费礼物”是木马！",
     ransom: "勒索软件加密了你的部分弹药！",
+    promptMail: "按 E 阅读邮件", promptExit: "按 E 重启机器",
+    identified: "已识别特征码：{n}", scanning: "未知样本 · 扫描中",
+    mailTitle: "新邮件 —— 它安全吗？", mailText: "仔细阅读。如果是钓鱼邮件就举报；如果是正常邮件就打开。",
+    mailFrom: "发件人", mailSubject: "主题", mailAttach: "附件",
+    reportBtn: "举报为钓鱼邮件", openBtn: "它是安全的 —— 打开", carryOn: "继续",
+    mailRight: "正确！", mailWrong: "判断错了",
+    wasPhish: "这是一封钓鱼邮件。危险信号：", wasSafe: "这是一封正常邮件。判断依据：",
+    rewardRight: "判断正确 —— 防火墙 +25", phishOpened: "你打开了钓鱼邮件 —— 一只木马溜了进来！", safeReported: "那封邮件是正常的 —— 没有损失，但要继续保持警惕",
+    quizTitle: "安全检测 —— 第 {n} 题，共 {t} 题", quizAsk: "这是哪一种恶意软件？",
+    quizNext: "下一题", quizDone: "查看结果", quizRight: "答对了！", quizWrong: "正确答案：{a}",
+    phishStat: "识破钓鱼", quizStat: "测验",
+    star1: "清理完本区域", star2: "清除至少 75% 的恶意软件", star3: "安全意识：每封邮件都判断正确，且测验至少答对 2 题",
+    helpMore:
+      "<p><strong>先扫描，再开火。</strong>把未知的怪物放在准星里停留片刻即可识别它。一旦掌握了它的特征码，杀毒扫描器对这类怪物的伤害提高 50% —— 就像真实的基于特征码的杀毒软件。</p>" +
+      "<p><strong>邮件终端</strong>（带信封图标的蓝色屏幕）会显示一封邮件。判断它是不是钓鱼邮件。判断正确，防火墙增强；打开钓鱼邮件，木马就会溜进来。</p>" +
+      "<p>每个区域结束后有三道<strong>安全检测</strong>题，最多可获得三颗<strong>星</strong>：清理完区域、清除 75% 的恶意软件、每封邮件都判断正确且测验至少答对 2 题。</p>",
     reported: "键盘记录器报告了你的位置！", wiped: "擦除器清空了你的防火墙！",
     popups: ["恭喜中奖！！！立即领取", "免费内存 —— 点击这里", "你的电脑太慢了！马上修复", "恭喜你成为第 1,000,000 位访客", "限时特价 —— 一折起"],
     popupClose: "{s} 秒后关闭",
@@ -119,7 +151,7 @@ const STR = {
     summon: "Rootkit 生成了隐藏进程",
     bossDown: "Rootkit 已清除 —— 重启终端已解锁",
     noAmmo: "弹药耗尽",
-    newThreat: "发现新威胁",
+    newThreat: "已识别特征码",
     intelSub: "你遇到过的每一种恶意软件。还没遇到的会保持隐藏。",
     unknown: "尚未遇到",
     cardWeapon: "防御",
@@ -200,6 +232,23 @@ const THREATS = {
     en: ["Rootkit", "Buries itself deep in the operating system — even the kernel — to keep administrator access and hide other malware from security tools. Often the only sure fix is a clean reinstall."],
     zh: ["Rootkit", "深深藏进操作系统——甚至内核——以保持管理员权限，并把其他恶意软件从安全工具眼前藏起来。往往只有重装系统才能彻底清除。"]
   }
+};
+
+/* Short clues for the end-of-sector quiz: one per kind, worded differently
+   from the threat cards so the question tests understanding, not recall. */
+const QUIZ = {
+  virus:      { en: "Needs a host file and someone to run it before it can spread.", zh: "需要寄生在文件里，并且要有人运行它才能传播。" },
+  worm:       { en: "Spreads across a network all by itself \u2014 no host file, no click.", zh: "完全靠自己在网络中传播——不需要宿主文件，也不需要点击。" },
+  trojan:     { en: "Pretends to be something useful so that you run it yourself.", zh: "伪装成有用的东西，让你自己去运行它。" },
+  spyware:    { en: "Secretly watches what you do and sends it to someone else.", zh: "偷偷监视你的一举一动，并把信息发给别人。" },
+  ransomware: { en: "Locks your files with encryption and demands payment.", zh: "用加密锁住你的文件，并索要赎金。" },
+  rootkit:    { en: "Hides deep in the operating system to keep administrator access.", zh: "深藏在操作系统里，以保持管理员权限。" },
+  adware:     { en: "Makes money by pushing unwanted adverts at you.", zh: "通过向你推送不想要的广告来赚钱。" },
+  keylogger:  { en: "Records every key you press, including passwords.", zh: "记录你按下的每一个键，包括密码。" },
+  bot:        { en: "Turns your device into one of thousands taking orders from an attacker.", zh: "把你的设备变成成千上万台听命于攻击者的机器之一。" },
+  fileless:   { en: "Runs only in memory using tools already on the computer, leaving no program file.", zh: "只在内存中运行，借用电脑上已有的工具，不留下程序文件。" },
+  wiper:      { en: "Destroys data on purpose \u2014 there is no ransom and no way to pay.", zh: "故意销毁数据——没有赎金，也无从付款。" },
+  mobile:     { en: "Targets phones and tablets, often hidden in fake apps.", zh: "以手机和平板为目标，常藏在假冒应用里。" }
 };
 
 const LANG_KEY = "bitbuilder.lang", THEME_KEY = "bitbuilder.theme";
@@ -411,6 +460,23 @@ function texExit(g) {
   for (let i = 0; i < 9; i++) { g.fillStyle = "#4b5566"; g.fillRect(14 + i * 4, 48, 3, 3); g.fillRect(14 + i * 4, 53, 3, 3); }
   bevel(g, "#465163", "#0b0e12");
 }
+function texMail(done) {             // a phishing-check terminal; dimmed once answered
+  return g => {
+    g.fillStyle = "#1c222b"; g.fillRect(0, 0, 64, 64);
+    g.fillStyle = "#0b0f14"; g.fillRect(8, 8, 48, 36);
+    g.fillStyle = done ? "#1f2a24" : "#1e3a8a"; g.fillRect(10, 10, 44, 32);
+    if (done) {
+      g.strokeStyle = "#4ade80"; g.lineWidth = 4; g.beginPath(); g.moveTo(22, 26); g.lineTo(29, 33); g.lineTo(43, 18); g.stroke();
+    } else {
+      g.fillStyle = "#f8fafc"; g.fillRect(18, 16, 28, 19);
+      g.strokeStyle = "#1e3a8a"; g.lineWidth = 2; g.beginPath(); g.moveTo(18, 16); g.lineTo(32, 27); g.lineTo(46, 16); g.stroke();
+      circle(g, 46, 16, 5, "#ef4444"); g.fillStyle = "#fff"; g.font = "bold 8px sans-serif"; g.fillText("!", 44.5, 19);
+    }
+    g.fillStyle = "#2b3340"; g.fillRect(12, 48, 40, 10);
+    g.fillStyle = done ? "#4b5566" : "#60a5fa"; g.font = "bold 7px monospace"; g.fillText(done ? " DONE" : " MAIL", 18, 56);
+    bevel(g, "#465163", "#0b0e12");
+  };
+}
 function texFloor(base, line, dot) {
   return g => {
     g.fillStyle = base; g.fillRect(0, 0, 64, 64);
@@ -428,11 +494,11 @@ function texCeil(base, light) {
   };
 }
 
-const WALL_CHARS = "#123DRBYX";
+const WALL_CHARS = "#123DRBYXMN";
 const WALL_TEX = [
   texFrom(texCircuit, 11), texFrom(texRack, 22), texFrom(texFirewall, 33), texFrom(texCode, 44),
   texFrom(texDoor(null)), texFrom(texDoor("#e04a4a")), texFrom(texDoor("#3b82f6")), texFrom(texDoor("#facc15")),
-  texFrom(texExit)
+  texFrom(texExit), texFrom(texMail(false)), texFrom(texMail(true))
 ];
 const LEVEL_LOOK = [   // floor and ceiling per sector
   { floor: texFrom(texFloor("#1c2430", "#2a3544", "#45d0e0")), ceil: texFrom(texCeil("#141920", "#8aa4c2")), fog: 1 },
@@ -922,6 +988,14 @@ let state = "menu", showMap = false, messages = [], screenFlash = { color: "", t
 let progress = load(PROGRESS_KEY, { unlocked: 1, best: {} });
 let intel = new Set(load(INTEL_KEY, []));
 let removed = new Set(load(REMOVED_KEY, []));
+const identified = new Set();            // kinds scanned this session: the scanner knows their signature
+let scan = { e: null, t: 0 }, mail = null, quiz = null;
+const SCAN_TIME = 0.9;
+let mailDeck = [];
+function nextEmail() {
+  if (!mailDeck.length) mailDeck = FW_EMAILS.map((m, i) => i).sort(() => Math.random() - 0.5);
+  return FW_EMAILS[mailDeck.pop()];
+}
 const shownThisSession = new Set();
 
 function defaultLoadout(i) {
@@ -956,7 +1030,9 @@ function loadLevel(i, loadout) {
     }
   }
   player.a = facingOpen(player.x, player.y);
-  stats = { kills: 0, total: enemies.length, items: 0, itemTotal: items.length, time: 0 };
+  stats = { kills: 0, total: enemies.length, items: 0, itemTotal: items.length, time: 0,
+            phishOk: 0, phishTotal: map.reduce((n, r) => n + r.filter(c => c === "M").length, 0), quizOk: 0, quizTotal: 0 };
+  scan = { e: null, t: 0 };
   flow = null; flowTile = -1;
 }
 function facingOpen(x, y) {           // start the player looking down the longest corridor
@@ -1058,6 +1134,7 @@ function use() {
   const hit = castRay(player.x, player.y, dx, dy);
   if (hit.dist > 1.6) return;
   if (isDoor(hit.c)) tryOpen(door(hit.mx, hit.my));
+  else if (hit.c === "M") openMail(hit.mx, hit.my);
   else if (hit.c === "X") {
     if (enemies.some(e => e.def.boss && !e.dead)) { say(T("exitLocked")); Sound.play("denied"); return; }
     finishLevel();
@@ -1178,7 +1255,7 @@ function hitscan(a, dmg) {
   }
   const d = best ? bestAlong - 0.1 : wall - 0.05;
   puffs.push({ x: p.x + dx * d, y: p.y + dy * d, t: 0.18, spr: best ? SPR.bits : SPR.spark, z: best ? best.def.z + 0.25 : 0.3 });
-  if (best) hurtEnemy(best, dmg);
+  if (best) hurtEnemy(best, player.cur === 0 && identified.has(best.def.key) ? dmg * 1.5 : dmg);
 }
 function alertNearby(x, y) {
   for (const e of enemies) {
@@ -1187,11 +1264,31 @@ function alertNearby(x, y) {
     if (d < 5 || (d < 12 && lineOfSight(e.x, e.y, x, y))) wake(e);
   }
 }
-function wake(e) {
-  if (e.awake) return;
-  e.awake = true;
-  if (e.disguised) return;
-  meetThreat(e.def.key, e);
+function wake(e) { e.awake = true; }
+/* the monster under the crosshair, if any, within scanning range */
+function crosshairTarget() {
+  const p = player, dx = Math.cos(p.a), dy = Math.sin(p.a);
+  const wall = castRay(p.x, p.y, dx, dy).dist;
+  let best = null, bestAlong = Math.min(wall, 14);
+  for (const e of enemies) {
+    if (e.dead || e.disguised) continue;
+    const vx = e.x - p.x, vy = e.y - p.y, along = vx * dx + vy * dy;
+    if (along > 0 && along < bestAlong && Math.abs(vx * dy - vy * dx) < e.def.radius) { best = e; bestAlong = along; }
+  }
+  return best;
+}
+function updateScan(dt) {
+  const e = crosshairTarget();
+  if (!e || identified.has(e.def.key)) { scan = { e: null, t: 0 }; return; }
+  if (scan.e !== e) scan = { e, t: 0 };
+  scan.t += dt;
+  if (scan.t >= SCAN_TIME) {
+    identified.add(e.def.key);
+    scan = { e: null, t: 0 };
+    say(T("identified", { n: THREATS[e.def.key][lang][0] }));
+    Sound.play("key");
+    meetThreat(e.def.key, e);
+  }
 }
 function hurtEnemy(e, dmg) {
   if (e.def.swarm) for (const o of enemies) if (o.def.swarm && !o.dead && Math.hypot(o.x - e.x, o.y - e.y) < 10) wake(o);
@@ -1210,7 +1307,6 @@ function hurtEnemy(e, dmg) {
 function reveal(e) {
   e.disguised = false; e.awake = true; e.cd = 0.6;
   say(T("reveal")); Sound.play("reveal");
-  meetThreat("trojan", e);
 }
 function hurtPlayer(amount, src) {
   const p = player;
@@ -1378,6 +1474,7 @@ function update(dt) {
   updateDoors(dt);
   updateEnemies(dt);
   updateShots(dt);
+  updateScan(dt);
   for (const m of messages) m.t -= dt;
   messages = messages.filter(m => m.t > 0);
   if (screenFlash.t > 0) screenFlash.t -= dt;
@@ -1604,21 +1701,29 @@ function drawFace(cx, cy) {
 }
 /* name the malware under the crosshair, like a scanner identifying a sample */
 function drawTarget() {
-  const p = player, dx = Math.cos(p.a), dy = Math.sin(p.a);
-  const wall = castRay(p.x, p.y, dx, dy).dist;
-  let best = null, bestAlong = Math.min(wall, 14);
-  for (const e of enemies) {
-    if (e.dead || e.disguised) continue;
-    const vx = e.x - p.x, vy = e.y - p.y, along = vx * dx + vy * dy;
-    if (along > 0 && along < bestAlong && Math.abs(vx * dy - vy * dx) < e.def.radius) { best = e; bestAlong = along; }
-  }
+  const best = crosshairTarget();
   if (!best) return;
-  const label = `${best.hist.name} · ${best.hist.year}`;
+  const known = identified.has(best.def.key);
+  const label = known ? `${best.hist.name} · ${best.hist.year}` : `??? · ${T("scanning")}`;
   sctx.font = "600 14px ui-monospace, Consolas, monospace"; sctx.textAlign = "center";
   const w = sctx.measureText(label).width + 16;
   sctx.fillStyle = "rgba(5,8,12,.7)"; sctx.fillRect(SW / 2 - w / 2, VIEW_H / 2 + 18, w, 22);
   sctx.fillStyle = "#ef4444"; sctx.fillRect(SW / 2 - w / 2, VIEW_H / 2 + 18, 3, 22);
   sctx.fillStyle = "#eaf1fb"; sctx.fillText(label, SW / 2, VIEW_H / 2 + 34);
+  if (!known && scan.e === best) {
+    sctx.fillStyle = "#45d0e0"; sctx.fillRect(SW / 2 - w / 2, VIEW_H / 2 + 40, w * Math.min(1, scan.t / SCAN_TIME), 3);
+  }
+  sctx.textAlign = "left";
+}
+/* a hint when you stand in front of something you can use */
+function drawPrompt() {
+  const hit = castRay(player.x, player.y, Math.cos(player.a), Math.sin(player.a));
+  if (hit.dist > 1.6 || (hit.c !== "M" && hit.c !== "X")) return;
+  const text = T(hit.c === "M" ? "promptMail" : "promptExit");
+  sctx.font = "600 15px ui-sans-serif, system-ui, sans-serif"; sctx.textAlign = "center";
+  const w = sctx.measureText(text).width + 24;
+  sctx.fillStyle = "rgba(5,8,12,.8)"; sctx.fillRect(SW / 2 - w / 2, VIEW_H - 64, w, 28);
+  sctx.fillStyle = "#facc15"; sctx.fillText(text, SW / 2, VIEW_H - 45);
   sctx.textAlign = "left";
 }
 function drawPopup(w) {
@@ -1647,7 +1752,7 @@ function drawMessages() {
 function drawMap() {
   const size = Math.min(300 / mapW, 300 / mapH), ox = SW - mapW * size - 12, oy = 12;
   sctx.fillStyle = "rgba(5,8,12,.8)"; sctx.fillRect(ox - 6, oy - 6, mapW * size + 12, mapH * size + 12);
-  const col = { R: "#e04a4a", B: "#3b82f6", Y: "#facc15", D: "#f5a524", X: "#4ade80" };
+  const col = { R: "#e04a4a", B: "#3b82f6", Y: "#facc15", D: "#f5a524", X: "#4ade80", M: "#60a5fa", N: "#475569" };
   for (let y = 0; y < mapH; y++) {
     for (let x = 0; x < mapW; x++) {
       if (!seen[y * mapW + x]) continue;
@@ -1674,7 +1779,7 @@ function present() {
     sctx.fillRect(SW / 2 - 1, VIEW_H / 2 - 6, 2, 4); sctx.fillRect(SW / 2 - 1, VIEW_H / 2 + 2, 2, 4);
     sctx.fillRect(SW / 2 - 6, VIEW_H / 2 - 1, 4, 2); sctx.fillRect(SW / 2 + 2, VIEW_H / 2 - 1, 4, 2);
   }
-  if (state === "play") drawTarget();
+  if (state === "play") { drawTarget(); drawPrompt(); }
   if (showMap) drawMap();
   drawMessages();
   drawHud();
@@ -1703,18 +1808,114 @@ function fmtTime(s) { s = Math.floor(s); return `${Math.floor(s / 60)}:${String(
 function statsHtml() {
   return `<span>${T("kills")} <b>${stats.kills}/${stats.total}</b></span>` +
          `<span>${T("items")} <b>${stats.items}/${stats.itemTotal}</b></span>` +
+         (stats.phishTotal ? `<span>${T("phishStat")} <b>${stats.phishOk}/${stats.phishTotal}</b></span>` : "") +
+         (stats.quizTotal ? `<span>${T("quizStat")} <b>${stats.quizOk}/${stats.quizTotal}</b></span>` : "") +
          `<span>${T("time")} <b>${fmtTime(stats.time)}</b></span>`;
+}
+/* three stars: finish; remove 75%; judge every email right and pass the quiz */
+function starChecks() {
+  return [
+    true,
+    stats.kills >= Math.ceil(stats.total * 0.75),
+    stats.phishOk === stats.phishTotal && stats.quizOk >= Math.min(2, stats.quizTotal)
+  ];
+}
+function starsHtml() {
+  const checks = starChecks(), n = checks.filter(Boolean).length;
+  return `<p class="stars">${"\u2605".repeat(n)}${"\u2606".repeat(3 - n)}</p><ul class="fw-checks">` +
+    checks.map((ok, i) => `<li class="${ok ? "ok" : ""}">${ok ? "\u2713" : "\u2717"} ${T("star" + (i + 1))}</li>`).join("") + "</ul>";
+}
+
+/* ---- phishing terminals */
+function openMail(mx, my) {
+  mail = { mx, my, m: nextEmail(), answered: false };
+  state = "mail"; keys.clear(); mouseDown = false; touch.fire = false;
+  releasePointer(); showOverlay();
+}
+function judgeMail(saysPhish) {
+  const m = mail.m;
+  mail.answered = true;
+  mail.right = saysPhish === m.phish;
+  mail.opened = !saysPhish;
+  map[mail.my][mail.mx] = "N";
+  if (mail.right) { stats.phishOk++; Sound.play("weapon"); } else Sound.play("denied");
+  state = "verdict"; showOverlay();
+}
+function closeMail() {
+  const m = mail.m;
+  state = "play"; hideOverlay(); grabPointer();
+  if (mail.right) { player.armor = Math.min(200, player.armor + 25); player.grinT = 1.5; say(T("rewardRight")); flash("rgba(74,222,128,.25)", 0.2); }
+  else if (m.phish) {                          // opened a phishing email: a Trojan walks in
+    const spot = freeSpotNear(player.x, player.y);
+    if (spot) { const t = spawnEnemy("t", spot[0], spot[1], true); t.disguised = false; t.awake = true; t.cd = 1; stats.total++; }
+    say(T("phishOpened")); Sound.play("reveal"); flash("rgba(220,30,30,.3)", 0.25);
+  } else say(T("safeReported"));
+  mail = null;
+}
+function mailHtml(m) {
+  const box = document.createElement("div"); box.className = "fw-mail";
+  const head = document.createElement("div"); head.className = "fw-mail-head";
+  const row = (label, value) => { const d = document.createElement("div"); const l = document.createElement("span"); l.textContent = label + ": "; const v = document.createElement("b"); v.textContent = value; d.append(l, v); return d; };
+  const t = m[lang] || m.en;
+  head.append(row(T("mailFrom"), m.from), row(T("mailSubject"), t.subject));
+  const body = document.createElement("p"); body.textContent = t.body;
+  box.append(head, body);
+  if (t.attach) { const a = document.createElement("div"); a.className = "fw-attach"; a.textContent = "\ud83d\udcce " + T("mailAttach") + ": " + t.attach; box.append(a); }
+  return box;
+}
+
+/* ---- the security check after each sector */
+function startQuiz() {
+  const here = [...new Set(enemies.map(e => e.def.key))].sort(() => Math.random() - 0.5);
+  const all = Object.keys(QUIZ);
+  const picks = here.slice(0, 3);
+  for (const k of all.sort(() => Math.random() - 0.5)) if (picks.length < 3 && !picks.includes(k)) picks.push(k);
+  quiz = {
+    i: 0, answered: false,
+    qs: picks.map(k => ({ k, options: [k, ...all.filter(o => o !== k).sort(() => Math.random() - 0.5).slice(0, 2)].sort(() => Math.random() - 0.5) }))
+  };
+  stats.quizOk = 0; stats.quizTotal = quiz.qs.length;
+  state = "quiz"; showOverlay();
+}
+function answerQuiz(choice, buttons, replay = false) {
+  if (quiz.answered && !replay) return;
+  quiz.answered = true; quiz.choice = choice;
+  const q = quiz.qs[quiz.i], right = choice === q.k;
+  if (!replay) { if (right) { stats.quizOk++; Sound.play("pickup"); } else Sound.play("denied"); }
+  for (const b of buttons) {
+    b.disabled = true;
+    if (b.dataset.k === q.k) b.classList.add("right");
+    else if (b.dataset.k === choice) b.classList.add("wrong");
+  }
+  const note = document.createElement("p"); note.className = "fw-quiz-note " + (right ? "ok" : "bad");
+  note.textContent = right ? T("quizRight") : T("quizWrong", { a: THREATS[q.k][lang][0] });
+  $("fw-ov-extra").append(note);
+  const b1 = $("fw-ov-primary");
+  b1.hidden = false; b1.focus();
+  b1.textContent = quiz.i < quiz.qs.length - 1 ? T("quizNext") : T("quizDone");
+  b1.onclick = () => {
+    if (quiz.i < quiz.qs.length - 1) { quiz.i++; quiz.answered = false; showOverlay(); }
+    else finishResults();
+  };
+}
+function finishResults() {
+  const i = levelIndex, n = starChecks().filter(Boolean).length;
+  progress.stars = progress.stars || {};
+  progress.stars[i] = Math.max(progress.stars[i] || 0, n);
+  save(PROGRESS_KEY, progress);
+  quiz = null;
+  state = i === FW_LEVELS.length - 1 ? "win" : "clear";
+  showOverlay();
 }
 function finishLevel() {
   Sound.play("exit");
-  const i = levelIndex, last = i === FW_LEVELS.length - 1;
+  const i = levelIndex;
   progress.unlocked = Math.max(progress.unlocked, Math.min(FW_LEVELS.length, i + 2));
   const prev = progress.best[i];
   if (!prev || stats.time < prev) progress.best[i] = Math.round(stats.time);
   save(PROGRESS_KEY, progress);
-  state = last ? "win" : "clear";
   releasePointer();
-  showOverlay();
+  startQuiz();
 }
 function die() {
   state = "dead";
@@ -1743,7 +1944,7 @@ function showOverlay() {
   const ov = $("fw-overlay"), L = FW_LEVELS[levelIndex];
   const title = $("fw-ov-title"), text = $("fw-ov-text"), st = $("fw-ov-stats"), extra = $("fw-ov-extra");
   const b1 = $("fw-ov-primary"), b2 = $("fw-ov-secondary");
-  st.innerHTML = ""; extra.innerHTML = ""; b2.hidden = false;
+  st.innerHTML = ""; extra.innerHTML = ""; b1.hidden = false; b2.hidden = false;
   if (state === "menu") {
     title.textContent = T("menuTitle");
     text.textContent = T("menuText");
@@ -1751,6 +1952,36 @@ function showOverlay() {
     extra.innerHTML = `<p class="muted">${T("level", { n: i + 1 })} · ${FW_LEVELS[i].name[lang]}</p>`;
     b1.textContent = T("start"); b1.onclick = () => startLevel(i);
     b2.textContent = T("pickLevel"); b2.onclick = openLevels;
+  } else if (state === "mail") {
+    title.textContent = T("mailTitle");
+    text.textContent = T("mailText");
+    extra.append(mailHtml(mail.m));
+    b1.textContent = T("reportBtn"); b1.onclick = () => judgeMail(true);
+    b2.textContent = T("openBtn"); b2.onclick = () => judgeMail(false);
+  } else if (state === "verdict") {
+    title.textContent = mail.right ? T("mailRight") : T("mailWrong");
+    text.textContent = mail.m.phish ? T("wasPhish") : T("wasSafe");
+    const ul = document.createElement("ul"); ul.className = "fw-clues";
+    for (const c of mail.m.clues[lang] || mail.m.clues.en) { const li = document.createElement("li"); li.textContent = c; ul.append(li); }
+    extra.append(mailHtml(mail.m), ul);
+    b1.textContent = T("carryOn"); b1.onclick = closeMail;
+    b2.hidden = true;
+  } else if (state === "quiz") {
+    const q = quiz.qs[quiz.i];
+    title.textContent = T("quizTitle", { n: quiz.i + 1, t: quiz.qs.length });
+    text.textContent = T("quizAsk");
+    const clue = document.createElement("p"); clue.className = "fw-clue"; clue.textContent = QUIZ[q.k][lang] || QUIZ[q.k].en;
+    const opts = document.createElement("div"); opts.className = "fw-options";
+    const buttons = q.options.map(k => {
+      const b = document.createElement("button"); b.className = "btn fw-option"; b.dataset.k = k;
+      b.textContent = THREATS[k][lang][0];
+      b.onclick = () => answerQuiz(k, buttons);
+      return b;
+    });
+    opts.append(...buttons);
+    extra.append(clue, opts);
+    b1.hidden = true; b2.hidden = true;
+    if (quiz.answered) answerQuiz(quiz.choice, buttons, true);   // redrawn after a language switch
   } else if (state === "paused") {
     title.textContent = T("paused");
     text.textContent = T("pausedText");
@@ -1768,6 +1999,7 @@ function showOverlay() {
     title.textContent = `${T("clear")} — ${L.name[lang]}`;
     text.textContent = `${T("level", { n: levelIndex + 2 })}: ${next.name[lang]}. ${next.brief[lang]}`;
     st.innerHTML = statsHtml();
+    extra.innerHTML = starsHtml();
     const carry = snapshot(player);
     b1.textContent = T("next"); b1.onclick = () => startLevel(levelIndex + 1, carry);
     b2.textContent = T("pickLevel"); b2.onclick = openLevels;
@@ -1775,6 +2007,7 @@ function showOverlay() {
     title.textContent = T("win");
     text.textContent = T("winText");
     st.innerHTML = statsHtml();
+    extra.innerHTML = starsHtml();
     b1.textContent = T("intel"); b1.onclick = openIntel;
     b2.textContent = T("playAgain"); b2.onclick = () => startLevel(0);
   }
@@ -1794,7 +2027,9 @@ function openLevels() {
     b.className = "level-card";
     b.disabled = i >= progress.unlocked;
     const best = progress.best[i] != null ? T("best", { t: fmtTime(progress.best[i]) }) : (b.disabled ? T("locked") : "");
-    b.innerHTML = `<span class="n">${T("level", { n: i + 1 })}</span><span class="t">${L.name[lang]}</span><span class="best">${best}</span>`;
+    const got = (progress.stars || {})[i] || 0;
+    const stars = got ? `<span class="stars">${"\u2605".repeat(got)}${"\u2606".repeat(3 - got)}</span>` : "";
+    b.innerHTML = `<span class="n">${T("level", { n: i + 1 })}</span><span class="t">${L.name[lang]}</span>${stars}<span class="best">${best}</span>`;
     b.onclick = () => { $("fw-levels-dialog").close(); startLevel(i); };
     list.appendChild(b);
   });
@@ -1873,7 +2108,8 @@ window.addEventListener("keydown", e => {
   if (document.querySelector("dialog[open]")) return;
   if (e.code === "KeyF" && !e.ctrlKey && !e.metaKey) { toggleFullscreen(); return; }
   if (state !== "play") {
-    if ((e.code === "Enter" || e.code === "Space") && !$("fw-overlay").classList.contains("hidden")) { e.preventDefault(); $("fw-ov-primary").click(); }
+    const choosing = state === "mail" || (state === "quiz" && !quiz.answered);
+    if ((e.code === "Enter" || e.code === "Space") && !choosing && !$("fw-ov-primary").hidden && !$("fw-overlay").classList.contains("hidden")) { e.preventDefault(); $("fw-ov-primary").click(); }
     else if (e.code === "KeyP" && state === "paused") resume();
     return;
   }
@@ -1969,7 +2205,7 @@ function applyText() {
   $("fw-timeline-sub").textContent = T("timelineSub");
   $("fw-source").textContent = T("source");
   $("fw-help-title").textContent = T("help");
-  $("fw-help-body").innerHTML = T("helpHtml") + `<p class="fw-disclaimer"><strong>${T("disclaimerTitle")}</strong> ${T("disclaimer")}</p>`;
+  $("fw-help-body").innerHTML = T("helpHtml") + T("helpMore") + `<p class="fw-disclaimer"><strong>${T("disclaimerTitle")}</strong> ${T("disclaimer")}</p>`;
   for (const b of document.querySelectorAll(".fw-close")) b.textContent = T("close");
   if (state !== "play") showOverlay();
 }

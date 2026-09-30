@@ -3,7 +3,7 @@
  * terminal that picks the keys up in some order before the doors they open. */
 const { FW_LEVELS } = require("../js/firewall-levels.js");
 
-const WALLS = "#123DRBYX";
+const WALLS = "#123DRBYXMN";
 const FLOOR = ".Pvwtsrdlnmxokhfacgpkby".split("").concat(["K", "H"]);
 const KNOWN = new Set(WALLS.split("").concat(FLOOR));
 const LOCKS = { R: "k", B: "b", Y: "y" };
@@ -27,6 +27,8 @@ function check(level) {
       if (edge && "DRBY".includes(c)) problems.push(`door on the edge at ${x},${y}`);
       if (c === "P") { if (start) problems.push("more than one start"); start = [x, y]; }
       if (c === "X") exits++;
+      if (c === "M" && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => ".PK".includes(map[y + dy]?.[x + dx]) || FLOOR.includes(map[y + dy]?.[x + dx])))
+        problems.push(`mail terminal at ${x},${y} cannot be reached from any floor tile`);
     }
   }
   if (!start) problems.push("no start (P)");
@@ -46,7 +48,7 @@ function check(level) {
         const nx = x + dx, ny = y + dy;
         const c = map[ny][nx];
         if (c === "X") { reachedExit = true; continue; }
-        if ("#123".includes(c)) continue;
+        if ("#123MN".includes(c)) continue;
         if (LOCKS[c] && !keys.has(LOCKS[c])) continue;
         const id = nx + "," + ny;
         if (seen.has(id)) continue;
@@ -89,6 +91,20 @@ FW_HISTORY.forEach((h, i) => {
 });
 if (historyProblems.length) { bad++; console.log("FAIL history"); historyProblems.forEach(p => console.log(`      - ${p}`)); }
 else console.log(`ok   history  ${FW_HISTORY.length} entries, ${FW_HISTORY[0].year}\u2013${FW_HISTORY[FW_HISTORY.length - 1].year}`);
+
+// the phishing emails: both languages, and clues that explain the verdict
+const { FW_EMAILS } = require("../js/firewall-phishing.js");
+const mailProblems = [];
+FW_EMAILS.forEach((m, i) => {
+  for (const l of ["en", "zh"]) {
+    if (!m[l] || !m[l].subject || !m[l].body) mailProblems.push(`email ${i + 1}: missing ${l} subject or body`);
+    if (!m.clues || !m.clues[l] || m.clues[l].length < 2) mailProblems.push(`email ${i + 1}: needs at least two ${l} clues`);
+  }
+});
+const phish = FW_EMAILS.filter(m => m.phish).length;
+if (!phish || phish === FW_EMAILS.length) mailProblems.push("the emails need both phishing and genuine examples");
+if (mailProblems.length) { bad++; console.log("FAIL emails"); mailProblems.forEach(p => console.log(`      - ${p}`)); }
+else console.log(`ok   emails   ${FW_EMAILS.length} (${phish} phishing, ${FW_EMAILS.length - phish} genuine)`);
 
 console.log(bad ? `\n${bad} map(s) need attention` : `\nall ${FW_LEVELS.length} Firewall 3D maps can be finished`);
 process.exit(bad ? 1 : 0);

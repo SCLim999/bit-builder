@@ -136,6 +136,22 @@ button lists all 29 specimens from Creeper (1971) to NotPetya (2017) with a
 short note on each, and ticks off the ones you have removed in the game. The
 entries live in `js/firewall-history.js`, in both languages.
 
+**Recognise, then respond.** Four features turn "shoot everything" into a
+security lesson:
+
+- **Scan to identify.** Unknown monsters show as *??? · unknown sample*. Keep
+  one in the crosshair for a moment to identify it; after that the Antivirus
+  Scanner does 50% more damage to that kind, as signature-based antivirus
+  only recognises malware it already has a signature for.
+- **Phishing terminals.** Blue mail screens in the walls show a real-looking
+  email. Report it or open it: judge right and your firewall grows, open a
+  phishing email and a Trojan gets in. The verdict lists the red flags (or
+  why it was genuine). The ten emails live in `js/firewall-phishing.js`.
+- **Security check.** Three questions after each sector about the malware
+  you just met.
+- **Stars.** One for clearing the sector, one for removing 75% of the
+  malware, one for judging every email right and passing the quiz.
+
 Your weapons are defences: the **Antivirus Scanner** (signature matching,
 unlimited), the **Packet Filter** (a firewall-shotgun) and the **Quarantine
 Cannon**. The first time you meet each kind of malware a card says what it
@@ -169,6 +185,7 @@ kind of monster has a real namesake in the timeline.
 | `js/codec.js` | share codes — a level packed into a URL |
 | `js/editor.js` | the editor: painting, part kinds, checking, sharing |
 | `firewall.html`, `js/firewall.js`, `js/firewall-levels.js`, `css/firewall.css` | Firewall 3D, the first-person bonus game, and its maps |
+| `js/firewall-phishing.js` | the emails behind Firewall 3D's phishing terminals, in English and Mandarin |
 | `js/firewall-history.js` | the malware timeline behind Firewall 3D's monster names, in English and Mandarin |
 | `tools/*.js` | Node scripts that check the maps (not shipped to the browser) |
 
