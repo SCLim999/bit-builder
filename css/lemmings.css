@@ -1,5 +1,87 @@
-/* Packet Rush — layered on top of game.css, which supplies the palette,
-   the top bar, buttons, dialogs, the overlay and the dark theme. */
+/* Packet Rush — layered on top of game.css, which supplies the top bar,
+   buttons, dialogs and the overlay. The colours are re-declared here as five
+   themes (body.rush-<name>) so the page chrome follows the same palette the
+   canvas is drawn with in lem-main.js. */
+
+body.rush-bright {
+  --bg: #1b2534; --panel: #222f42; --panel-2: #2b3a51; --line: #3d5171;
+  --text: #eaf1fb; --muted: #b3c4dc;
+  --cyan: #45d0e0; --green: #4ade80; --amber: #f5a524; --red: #f87171;
+  --glow-1: #2b3c55; --glow-2: #24404f; --bar: rgba(9, 14, 22, .75); --stage: #1a2434;
+  --hover: #1b2838; --primary: #12463c; --primary-hover: #15594b; --primary-text: #d9ffe9;
+  --overlay: rgba(12, 18, 28, .86); --backdrop: rgba(4, 7, 12, .72); --logo: linear-gradient(140deg, #1b3a4a, #123047);
+  color-scheme: dark;
+}
+body.rush-dark {
+  --bg: #070b12; --panel: #101823; --panel-2: #16202e; --line: #24334a;
+  --text: #dbe6f3; --muted: #8ea3bd;
+  --cyan: #45d0e0; --green: #4ade80; --amber: #f5a524; --red: #f87171;
+  --glow-1: #142033; --glow-2: #10202b; --bar: rgba(4, 7, 12, .8); --stage: #0a0f18;
+  --hover: #131d2b; --primary: #0f3a31; --primary-hover: #124a3e; --primary-text: #d9ffe9;
+  --overlay: rgba(5, 8, 13, .88); --backdrop: rgba(0, 0, 0, .75); --logo: linear-gradient(140deg, #13303d, #0c2233);
+  color-scheme: dark;
+}
+/* soft: pastel lavender, mint and peach on a pale ground */
+body.rush-soft {
+  --bg: #f3f0fa; --panel: #ffffff; --panel-2: #f1ecf8; --line: #dcd3ec;
+  --text: #3b3552; --muted: #756d8f;
+  --cyan: #6f8fe0; --green: #3fa37b; --amber: #d2803f; --red: #d0677a;
+  --glow-1: #e6ecff; --glow-2: #fde6ee; --bar: rgba(255, 255, 255, .8); --stage: #ffffff;
+  --hover: #ebe6fa; --primary: #dcf3e9; --primary-hover: #cbeedf; --primary-text: #1f5a42;
+  --overlay: rgba(250, 248, 255, .9); --backdrop: rgba(60, 50, 90, .35); --logo: linear-gradient(140deg, #e3e9ff, #fbe3ee);
+  color-scheme: light;
+}
+/* energy: deep teal with lime and hot orange */
+body.rush-energy {
+  --bg: #0c1c28; --panel: #122a3a; --panel-2: #183850; --line: #2a5878;
+  --text: #f2faff; --muted: #a6c6dc;
+  --cyan: #22d3ee; --green: #a3e635; --amber: #ff8f2e; --red: #ff4d6d;
+  --glow-1: #10405a; --glow-2: #3b2a10; --bar: rgba(6, 20, 30, .8); --stage: #0f2433;
+  --hover: #163247; --primary: #3a2508; --primary-hover: #4d3109; --primary-text: #ffe2c2;
+  --overlay: rgba(8, 22, 32, .88); --backdrop: rgba(2, 10, 16, .75); --logo: linear-gradient(140deg, #ff8f2e, #22d3ee);
+  color-scheme: dark;
+}
+/* excited: neon party, magenta and electric yellow on violet */
+body.rush-excited {
+  --bg: #170a2b; --panel: #221040; --panel-2: #2e1656; --line: #5a2a8e;
+  --text: #fff0fb; --muted: #d4b4ea;
+  --cyan: #ff4fd8; --green: #3dfcb4; --amber: #ffe14d; --red: #ff5470;
+  --glow-1: #4a1570; --glow-2: #6b1450; --bar: rgba(20, 6, 38, .8); --stage: #1d0c36;
+  --hover: #3a1a66; --primary: #4a1150; --primary-hover: #5e1666; --primary-text: #ffe0fa;
+  --overlay: rgba(22, 8, 42, .88); --backdrop: rgba(10, 2, 22, .75); --logo: linear-gradient(140deg, #ff4fd8, #ffe14d);
+  color-scheme: dark;
+}
+
+body[class*="rush-"] {
+  background:
+    radial-gradient(1100px 600px at 20% -10%, var(--glow-1) 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, var(--glow-2) 0%, transparent 55%),
+    var(--bg);
+  transition: background-color .3s ease, color .3s ease;
+}
+body[class*="rush-"] .topbar { background: var(--bar); }
+body[class*="rush-"] .logo { background: var(--logo); }
+body[class*="rush-"] .stage { background: var(--stage); }
+body[class*="rush-"] .overlay { background: var(--overlay); }
+body[class*="rush-"] .btn:hover { background: var(--hover); }
+body[class*="rush-"] .btn-primary { background: var(--primary); color: var(--primary-text); }
+body[class*="rush-"] .btn-primary:hover { background: var(--primary-hover); }
+body[class*="rush-"] dialog::backdrop { background: var(--backdrop); }
+body.rush-soft .stage { box-shadow: 0 18px 50px rgba(90, 70, 140, .18); }
+body.rush-excited .logo { color: #170a2b; }
+
+.theme-pick {
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.theme-pick:hover, .theme-pick:focus-visible { border-color: var(--cyan); outline: none; }
+.theme-pick option { background: var(--panel); color: var(--text); }
 
 .rush {
   max-width: 1080px;
@@ -52,7 +134,7 @@
   margin: 0 auto 14px;
   padding: 10px 14px;
   border-left: 3px solid var(--cyan);
-  background: rgba(69, 208, 224, .08);
+  background: color-mix(in srgb, var(--cyan) 10%, transparent);
   border-radius: 4px;
   font-size: 13.5px;
   line-height: 1.55;
@@ -92,14 +174,14 @@
 }
 .skill kbd { position: absolute; top: 3px; left: 5px; font-size: 10px; }
 .skill:hover { border-color: var(--cyan); }
-.skill.selected { border-color: var(--green); background: #12463c; box-shadow: 0 0 0 2px rgba(74, 222, 128, .25); }
+.skill.selected { border-color: var(--green); background: var(--primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 30%, transparent); }
 .skill.empty { opacity: .38; }
 .skill.empty .count { color: var(--muted); }
 
 .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .ctl[aria-pressed="true"] { border-color: var(--amber); color: var(--amber); }
 .nuke:hover { border-color: var(--red); color: var(--red); }
-.nuke.armed { border-color: var(--red); background: #3a1717; color: #ffd4d4; }
+.nuke.armed { border-color: var(--red); background: color-mix(in srgb, var(--red) 22%, var(--panel)); color: var(--text); }
 
 .skill-note {
   margin: 0;
@@ -121,4 +203,9 @@
 @media (max-width: 640px) {
   .skill { width: 64px; font-size: 11px; }
   .hud { font-size: 13px; gap: 6px 12px; }
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }

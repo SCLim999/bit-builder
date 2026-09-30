@@ -116,7 +116,11 @@ silicon can be dug and blown up, shielded steel cannot.
 
 Seven levels, one skill introduced at a time, each with a short computing
 concept on its intro and result cards, in English and Mandarin. It shares the
-language and theme settings with Bit Builder. <kbd>P</kbd> pauses,
+language setting with Bit Builder, and the *Theme* picker offers five colour
+schemes that recolour both the page and the game world: **Bright** and **Dark**
+(the same two as Bit Builder), **Soft** (pastel lavender, mint and peach),
+**Energy** (deep teal, lime and hot orange) and **Excited** (neon magenta and
+electric yellow on violet, with a pulsing grid). <kbd>P</kbd> pauses,
 <kbd>F</kbd> fast-forwards, <kbd>R</kbd> restarts and <kbd>K</kbd> twice
 (*kill -9*) ends the run.
 

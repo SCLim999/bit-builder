@@ -20,7 +20,14 @@
   <div class="topbar-actions">
     <button id="btn-lang" class="btn" title="Language / 语言">中文</button>
     <button id="btn-levels" class="btn" data-t="btn.levels">Levels</button>
-    <button id="btn-theme" class="btn">Theme</button>
+    <label class="sr-only" for="theme-pick" data-t="theme.label">Theme</label>
+    <select id="theme-pick" class="theme-pick" title="Theme">
+      <option value="bright">Bright</option>
+      <option value="dark">Dark</option>
+      <option value="soft">Soft</option>
+      <option value="energy">Energy</option>
+      <option value="excited">Excited</option>
+    </select>
     <button id="btn-help" class="btn" data-t="btn.help">How to play</button>
     <a class="btn" href="index.html" data-t="btn.builder">Bit Builder</a>
   </div>

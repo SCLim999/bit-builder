@@ -11,7 +11,8 @@ const TEXT = {
     "app.title": "Packet Rush",
     "app.tagline": "Packets march blindly across the network. Give them jobs so enough of them reach the server.",
     "btn.levels": "Levels", "btn.help": "How to play", "btn.builder": "Bit Builder", "btn.close": "Close",
-    "btn.theme": "Theme: {state}", "theme.bright": "bright", "theme.dark": "dark",
+    "theme.label": "Theme", "theme.bright": "Theme: Bright", "theme.dark": "Theme: Dark",
+    "theme.soft": "Theme: Soft", "theme.energy": "Theme: Energy", "theme.excited": "Theme: Excited",
     "btn.sound": "Sound: {state}", "state.on": "on", "state.off": "off",
     "hud.level": "Level {n}", "hud.out": "Out", "hud.in": "Delivered", "hud.need": "Need", "hud.lost": "Lost", "hud.ttl": "TTL",
     "ctl.pause": "Pause", "ctl.resume": "Resume", "ctl.fast": "Fast", "ctl.restart": "Restart", "ctl.nuke": "kill -9",
@@ -54,7 +55,8 @@ const TEXT = {
     "app.title": "数据包大冲关",
     "app.tagline": "数据包只会盲目地向前走。给它们分配工作，让足够多的数据包到达服务器。",
     "btn.levels": "关卡", "btn.help": "玩法说明", "btn.builder": "组装大师", "btn.close": "关闭",
-    "btn.theme": "背景：{state}", "theme.bright": "明亮", "theme.dark": "暗色",
+    "theme.label": "配色", "theme.bright": "配色：明亮", "theme.dark": "配色：暗夜",
+    "theme.soft": "配色：柔和", "theme.energy": "配色：活力", "theme.excited": "配色：热烈",
     "btn.sound": "声音：{state}", "state.on": "开", "state.off": "关",
     "hud.level": "第 {n} 关", "hud.out": "已发出", "hud.in": "已送达", "hud.need": "需要", "hud.lost": "丢失", "hud.ttl": "TTL",
     "ctl.pause": "暂停", "ctl.resume": "继续", "ctl.fast": "快进", "ctl.restart": "重来", "ctl.nuke": "kill -9",
@@ -100,7 +102,9 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage disabled */ } }
 };
 let lang = store.get("bitbuilder.lang", (navigator.language || "en").toLowerCase().startsWith("zh") ? "zh" : "en");
-let theme = store.get("bitbuilder.theme", "bright");
+/* Bit Builder only knows bright and dark, so the extra themes live under
+   Packet Rush's own key; bright and dark are still written back to the shared one. */
+let theme = store.get("packetrush.theme", store.get("bitbuilder.theme", "bright"));
 let soundOn = store.get("packetrush.sound", "on") === "on";
 let progress;
 try { progress = JSON.parse(store.get("packetrush.progress", "")) || null; } catch (e) { progress = null; }
@@ -153,11 +157,17 @@ let effects = [];
 let acc = 0, last = 0, frame = 0;
 
 /* -------------------------------------------------------------- colours */
-function palette() {
-  return theme === "dark"
-    ? { sky1: "#05080d", sky2: "#0b1624", grid: "rgba(69,208,224,0.05)", dirt: [22, 92, 60], trace: [201, 162, 58], steel: [96, 108, 124], brick: [214, 139, 38] }
-    : { sky1: "#16233a", sky2: "#23405a", grid: "rgba(160,220,255,0.07)", dirt: [34, 128, 84], trace: [230, 190, 80], steel: [128, 142, 160], brick: [240, 160, 50] };
-}
+/* One palette per theme. sky/grid paint the background, dirt/trace the
+   circuit-board silicon, steel and brick the other two materials, and pulse
+   makes the grid breathe (only the excited theme uses it). */
+const THEMES = {
+  bright:  { sky1: "#16233a", sky2: "#23405a", grid: [160, 220, 255, 0.07], dirt: [34, 128, 84], trace: [230, 190, 80], via: [250, 230, 150], steel: [128, 142, 160], brick: [240, 160, 50] },
+  dark:    { sky1: "#05080d", sky2: "#0b1624", grid: [69, 208, 224, 0.05], dirt: [22, 92, 60], trace: [201, 162, 58], via: [240, 220, 140], steel: [96, 108, 124], brick: [214, 139, 38] },
+  soft:    { sky1: "#e8e6fb", sky2: "#fdebf1", grid: [120, 100, 180, 0.09], dirt: [150, 208, 184], trace: [246, 196, 160], via: [255, 240, 225], steel: [178, 184, 208], brick: [243, 170, 150] },
+  energy:  { sky1: "#0a2a44", sky2: "#0f5a66", grid: [34, 211, 238, 0.10], dirt: [16, 150, 118], trace: [255, 160, 40], via: [255, 236, 160], steel: [92, 126, 156], brick: [255, 118, 54] },
+  excited: { sky1: "#2a0a4a", sky2: "#7a1a72", grid: [255, 79, 216, 0.10], dirt: [118, 42, 176], trace: [255, 225, 77], via: [255, 255, 200], steel: [150, 128, 200], brick: [255, 92, 184], pulse: true }
+};
+function palette() { return THEMES[theme] || THEMES.bright; }
 
 /* The terrain is repainted into an ImageData whenever the engine carves or
    builds. Silicon gets a circuit-board pattern of gold traces and vias, steel
@@ -175,7 +185,7 @@ function paintTerrain() {
         const traceH = y % 12 === 5 && (x + (y >> 3) * 17) % 48 < 30;
         const traceV = x % 16 === 9 && (y + (x >> 4) * 11) % 36 < 20;
         const via = x % 16 === 9 && y % 12 === 5;
-        c = via ? [250, 230, 150] : traceH || traceV ? pal.trace : pal.dirt;
+        c = via ? pal.via : traceH || traceV ? pal.trace : pal.dirt;
         const n = ((x * 73856093) ^ (y * 19349663)) & 7;
         c = [c[0] + n - 3, c[1] + n - 3, c[2] + n - 3];
       } else if (m === M.STEEL) {
@@ -203,7 +213,9 @@ function drawBackground(pal) {
   g.addColorStop(0, pal.sky1); g.addColorStop(1, pal.sky2);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, LW, LH);
-  ctx.strokeStyle = pal.grid;
+  const [r, gg, b, a] = pal.grid;
+  const alpha = pal.pulse ? a * (1 + 0.8 * Math.sin(frame / 12)) : a;
+  ctx.strokeStyle = `rgba(${r},${gg},${b},${alpha.toFixed(3)})`;
   ctx.lineWidth = 0.5;
   ctx.beginPath();
   for (let x = 0; x <= LW; x += 20) { ctx.moveTo(x, 0); ctx.lineTo(x, LH); }
@@ -780,7 +792,8 @@ function applyText() {
   for (const n of document.querySelectorAll("[data-t]")) n.textContent = t(n.dataset.t);
   for (const n of document.querySelectorAll("[data-th]")) n.innerHTML = t(n.dataset.th);
   el("btn-lang").textContent = t("lang.other");
-  el("btn-theme").textContent = t("btn.theme", { state: t("theme." + theme) });
+  for (const o of el("theme-pick").options) o.textContent = t("theme." + o.value);
+  el("theme-pick").title = t("theme.label");
   el("btn-pause").querySelector("span").textContent = t(paused ? "ctl.resume" : "ctl.pause");
   buildHelp();
   if (game) {
@@ -793,13 +806,20 @@ function applyText() {
 }
 
 function applyTheme() {
-  document.body.classList.toggle("theme-dark", theme === "dark");
-  el("btn-theme").textContent = t("btn.theme", { state: t("theme." + theme) });
+  if (!THEMES[theme]) theme = "bright";
+  for (const name of Object.keys(THEMES)) document.body.classList.toggle("rush-" + name, name === theme);
+  el("theme-pick").value = theme;
   if (game) game.dirty = true;
 }
 
 el("btn-lang").onclick = () => { lang = lang === "zh" ? "en" : "zh"; store.set("bitbuilder.lang", lang); applyText(); };
-el("btn-theme").onclick = () => { theme = theme === "dark" ? "bright" : "dark"; store.set("bitbuilder.theme", theme); applyTheme(); };
+el("theme-pick").onchange = ev => {
+  theme = ev.target.value;
+  store.set("packetrush.theme", theme);
+  if (theme === "bright" || theme === "dark") store.set("bitbuilder.theme", theme);
+  applyTheme();
+  ev.target.blur();                      // hand the keyboard back to the game
+};
 el("btn-levels").onclick = openLevels;
 el("btn-help").onclick = () => el("help-dialog").showModal();
 
