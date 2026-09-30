@@ -11,9 +11,91 @@ that short out any packet touching them, `rate` is the number of
 
 const STEEL = 2;
 
+
+/* The OSI reference model, top to bottom as it is usually drawn. Each level
+   below names the layer(s) its concept lives on in `osi`, with `osiWhy`
+   saying why, and the OSI panel lists which levels touch each layer. */
+const OSI_SOURCES = [
+  { title: "The OSI Model Explained — Network Supply",
+    url: "https://www.network-supply.com/blogs/knowledge/the-osi-model-explained" },
+  { title: "TCP/IP protocols — IBM CICS Transaction Server 5.5 documentation",
+    url: "https://www.ibm.com/docs/en/cics-ts/5.5.0?topic=concepts-tcpip-protocols" },
+  { title: "What is the OSI model? — Cloudflare Learning Center",
+    url: "https://www.cloudflare.com/learning/ddos/glossary/open-systems-interconnection-model-osi/" }
+];
+
+/* The four-layer TCP/IP model the Internet actually runs on, with the OSI
+   layers each one covers. */
+const TCPIP_LAYERS = [
+  { name: { en: "Application", zh: "应用层" }, osi: [7, 6, 5],
+    job: { en: "Protocols programs use directly.", zh: "程序直接使用的协议。" }, eg: "HTTP · SMTP · DNS · FTP · Telnet" },
+  { name: { en: "Transport", zh: "传输层" }, osi: [4],
+    job: { en: "Delivery between programs, identified by port numbers.", zh: "程序之间的传输，用端口号区分。" }, eg: "TCP · UDP" },
+  { name: { en: "Internet", zh: "网际层" }, osi: [3],
+    job: { en: "IP addressing and routing packets across networks.", zh: "IP 寻址，并在网络之间路由数据包。" }, eg: "IP · ICMP" },
+  { name: { en: "Link (network access)", zh: "链路层（网络接入层）" }, osi: [2, 1],
+    job: { en: "Getting frames onto the local wire or radio.", zh: "把数据帧送上本地线路或无线信道。" }, eg: "Ethernet · Wi-Fi" }
+];
+
+const OSI_LAYERS = [
+  { n: 7, name: { en: "Application", zh: "应用层" }, pdu: { en: "Data", zh: "数据" },
+    job: { en: "Where network services meet the programs people use: web pages, email, name lookups.", zh: "网络服务与人们使用的程序相接的地方：网页、电子邮件、域名解析。" },
+    eg: "HTTP · HTTPS · SMTP · DNS · FTP" },
+  { n: 6, name: { en: "Presentation", zh: "表示层" }, pdu: { en: "Data", zh: "数据" },
+    job: { en: "Translates data into a format both ends understand, and handles encryption and compression.", zh: "把数据转换成双方都能理解的格式，并负责加密和压缩。" },
+    eg: "TLS/SSL · UTF-8 · JPEG · MPEG" },
+  { n: 5, name: { en: "Session", zh: "会话层" }, pdu: { en: "Data", zh: "数据" },
+    job: { en: "Opens, keeps track of and closes the conversation between two applications.", zh: "建立、维持并关闭两个应用程序之间的会话。" },
+    eg: "RPC · NetBIOS · PPTP" },
+  { n: 4, name: { en: "Transport", zh: "传输层" }, pdu: { en: "Segment / datagram", zh: "段 / 数据报" },
+    job: { en: "End-to-end delivery between programs: splits data into segments, numbers them with ports, and handles error recovery and flow control.", zh: "程序之间的端到端传输：把数据切分成段，用端口标识，并负责差错恢复和流量控制。" },
+    eg: "TCP · UDP" },
+  { n: 3, name: { en: "Network", zh: "网络层" }, pdu: { en: "Packet", zh: "数据包（分组）" },
+    job: { en: "Logical addresses and routing: gets each packet from one network to another, hop by hop.", zh: "逻辑地址与路由：让每个数据包一跳一跳地从一个网络到达另一个网络。" },
+    eg: "IP · ICMP · IPsec · routers" },
+  { n: 2, name: { en: "Data Link", zh: "数据链路层" }, pdu: { en: "Frame", zh: "帧" },
+    job: { en: "Moves frames between neighbouring devices on the same link, using MAC addresses, and detects transmission errors.", zh: "用 MAC 地址在同一链路上的相邻设备之间传送数据帧，并检测传输错误。" },
+    eg: "Ethernet · Wi-Fi (802.11) · switches · bridges" },
+  { n: 1, name: { en: "Physical", zh: "物理层" }, pdu: { en: "Bits", zh: "比特" },
+    job: { en: "Turns bits into signals — voltage on copper, light in fibre, radio waves — and back again.", zh: "把比特变成信号 —— 铜线上的电压、光纤中的光、无线电波 —— 再还原回来。" },
+    eg: "cables · connectors · hubs · repeaters" }
+];
+
+const OSI_EXTRA = {
+  encap: {
+    en: "<b>Encapsulation.</b> On the way out, data travels <b>down</b> the stack and each layer wraps it with its own header: the transport layer makes a segment, the network layer a packet, the data link layer a frame, and the physical layer sends bits. The receiver travels back <b>up</b>, each layer unwrapping its own header.",
+    zh: "<b>封装。</b>发送时，数据沿协议栈<b>向下</b>传递，每一层加上自己的首部：传输层形成段，网络层形成数据包，数据链路层形成帧，物理层把比特发出去。接收方则<b>向上</b>逐层拆掉对应的首部。"
+  },
+  attacks: {
+    en: "<b>Attacks by layer.</b> Knowing the layer tells you where to defend. A SYN flood exhausts connections at the Transport layer (4); an HTTP flood swamps a web server with requests at the Application layer (7); volumetric floods simply fill the link at layers 3 and 4.",
+    zh: "<b>按层看攻击。</b>知道攻击发生在哪一层，就知道该在哪里防御。SYN 洪水在传输层（第 4 层）耗尽连接；HTTP 洪水在应用层（第 7 层）用大量请求压垮网页服务器；流量型洪水则在第 3、4 层直接塞满链路。"
+  },
+  mnemonic: {
+    en: "<b>Remember it.</b> Layers 1 → 7: <i>Please Do Not Throw Sausage Pizza Away</i> — Physical, Data Link, Network, Transport, Session, Presentation, Application.",
+    zh: "<b>记忆口诀。</b>从第 1 层到第 7 层：<i>Please Do Not Throw Sausage Pizza Away</i> —— 物理、数据链路、网络、传输、会话、表示、应用。"
+  },
+  tcpip: {
+    en: "<b>OSI and TCP/IP.</b> OSI is a teaching and troubleshooting model. The Internet actually runs on the four-layer TCP/IP model, which folds OSI layers 5–7 into one Application layer and layers 1–2 into one Link layer.",
+    zh: "<b>OSI 与 TCP/IP。</b>OSI 是用于教学和排错的参考模型。互联网实际运行的是四层的 TCP/IP 模型，它把 OSI 第 5–7 层合并为应用层，把第 1–2 层合并为链路层。"
+  },
+  tcpudp: {
+    en: "<b>TCP or UDP.</b> TCP is <b>connection-oriented</b>: it sets up a connection first, numbers every byte, resends anything lost and delivers it in order — right for web pages and email. UDP is <b>connectionless</b>: it sends datagrams with no set-up and no guarantee of arrival or order — lighter and faster, right for video calls, games and DNS lookups.",
+    zh: "<b>TCP 还是 UDP。</b>TCP 是<b>面向连接</b>的：先建立连接，为每个字节编号，丢失就重传，并按顺序交付 —— 适合网页和电子邮件。UDP 是<b>无连接</b>的：不建立连接就直接发送数据报，不保证送达也不保证顺序 —— 更轻、更快，适合视频通话、游戏和 DNS 查询。"
+  },
+  sockets: {
+    en: "<b>Ports and sockets.</b> An IP address finds the computer; a <b>port</b> number finds the program on it (80 for HTTP, 443 for HTTPS, 25 for SMTP). An IP address plus a port is a <b>socket</b>, and a TCP connection is a pair of sockets, one at each end.",
+    zh: "<b>端口与套接字。</b>IP 地址找到计算机，<b>端口</b>号找到其上的程序（HTTP 用 80，HTTPS 用 443，SMTP 用 25）。IP 地址加端口号就是一个<b>套接字</b>，一条 TCP 连接由两端各一个套接字组成。"
+  }
+};
+
 const PACKET_LEVELS = [
   {
     id: "drop",
+    osi: [3],
+    osiWhy: {
+      en: "A <b>packet</b> is the unit of data at the Network layer: it carries the source and destination IP addresses that routers read.",
+      zh: "<b>数据包</b>是网络层的数据单位：它携带源 IP 地址和目的 IP 地址，路由器正是根据这些地址转发它。"
+    },
     name: { en: "Packet Drop", zh: "数据包下沉" },
     count: 10, need: 6, rate: 40, ttl: 150,
     hatch: { x: 120, y: 60 },
@@ -36,6 +118,11 @@ const PACKET_LEVELS = [
   },
   {
     id: "firewall",
+    osi: [3, 4],
+    osiWhy: {
+      en: "A basic packet-filtering firewall decides using the Network layer (IP addresses) and the Transport layer (TCP/UDP ports).",
+      zh: "基础的包过滤防火墙依据网络层（IP 地址）和传输层（TCP/UDP 端口）来决定放行还是拦截。"
+    },
     name: { en: "Firewall", zh: "防火墙" },
     count: 10, need: 8, rate: 36, ttl: 120,
     hatch: { x: 230, y: 100 },
@@ -56,6 +143,11 @@ const PACKET_LEVELS = [
   },
   {
     id: "bridge",
+    osi: [2],
+    osiWhy: {
+      en: "Bridges and switches work at the Data Link layer: they forward <b>frames</b> by MAC address and never look at IP addresses.",
+      zh: "网桥和交换机工作在数据链路层：它们按 MAC 地址转发<b>帧</b>，并不关心 IP 地址。"
+    },
     name: { en: "Bridge the Gap", zh: "搭建网桥" },
     count: 10, need: 7, rate: 80, ttl: 150,
     hatch: { x: 60, y: 85 },
@@ -76,6 +168,11 @@ const PACKET_LEVELS = [
   },
   {
     id: "tunnel",
+    osi: [3, 6],
+    osiWhy: {
+      en: "An IPsec VPN tunnels whole packets inside other packets at the Network layer; the encryption itself is a Presentation-layer job in OSI terms.",
+      zh: "IPsec VPN 在网络层把整个数据包封装进另一个数据包里；而加密本身在 OSI 模型中属于表示层的职责。"
+    },
     name: { en: "Tunnel Vision", zh: "隧道穿越" },
     count: 10, need: 8, rate: 40, ttl: 150,
     hatch: { x: 70, y: 95 },
@@ -97,6 +194,11 @@ const PACKET_LEVELS = [
   },
   {
     id: "uplink",
+    osi: [4],
+    osiWhy: {
+      en: "Buffering and <b>flow control</b> belong to the Transport layer: TCP keeps a receive buffer and tells the sender how much more it can take.",
+      zh: "缓冲和<b>流量控制</b>属于传输层：TCP 维护一个接收缓冲区，并告诉发送方它还能接收多少数据。"
+    },
     name: { en: "Uplink", zh: "上行链路" },
     count: 6, need: 5, rate: 50, ttl: 150,
     hatch: { x: 50, y: 120 },
@@ -118,6 +220,11 @@ const PACKET_LEVELS = [
   },
   {
     id: "overflow",
+    osi: [7],
+    osiWhy: {
+      en: "Buffer overflows are bugs in program code, so attacks on them usually arrive through the Application layer — a crafted request to a web or mail server.",
+      zh: "缓冲区溢出是程序代码中的缺陷，所以针对它的攻击通常经由应用层到来 —— 例如发给网页或邮件服务器的恶意请求。"
+    },
     name: { en: "Stack Overflow", zh: "栈溢出" },
     count: 10, need: 7, rate: 36, ttl: 180,
     hatch: { x: 240, y: 95 },
@@ -140,6 +247,11 @@ const PACKET_LEVELS = [
   },
   {
     id: "stack",
+    osi: [1, 2, 3, 4, 5, 6, 7],
+    osiWhy: {
+      en: "This level uses the whole stack: every one of the seven OSI layers has to do its job for a single web page to load.",
+      zh: "这一关用到了整个协议栈：打开一个网页，OSI 的七层每一层都必须完成自己的工作。"
+    },
     name: { en: "Full Stack", zh: "全栈" },
     count: 12, need: 8, rate: 70, ttl: 240,
     hatch: { x: 40, y: 50 },
@@ -159,10 +271,10 @@ const PACKET_LEVELS = [
       zh: "综合运用：先搭桥越过缺口，再挖隧道穿墙，最后用管道向下挖到下方的服务器。"
     },
     note: {
-      en: "Networks are built as a <b>stack of layers</b>: the physical wire, the link between neighbours, routing across networks, reliable delivery, and finally the application. Each layer does one job and trusts the one below it — just like each packet here does one job.",
-      zh: "网络是按<b>分层协议栈</b>构建的：物理线路、相邻设备之间的链路、跨网络的路由、可靠传输，最后才是应用程序。每一层只做一件事，并信任下面那一层 —— 就像这里每个数据包只负责一项工作。"
+      en: "The <b>OSI model</b> splits networking into seven layers: Physical, Data Link, Network, Transport, Session, Presentation and Application. Sending data wraps it layer by layer on the way down, and receiving unwraps it on the way up. Each layer does one job and relies on the one below it — just like each packet here does one job.",
+      zh: "<b>OSI 模型</b>把网络通信分成七层：物理层、数据链路层、网络层、传输层、会话层、表示层和应用层。发送时数据自上而下逐层封装，接收时自下而上逐层拆封。每一层只做一件事，并依赖下面那一层 —— 就像这里每个数据包只负责一项工作。"
     }
   }
 ];
 
-if (typeof module !== "undefined") module.exports = { PACKET_LEVELS };
+if (typeof module !== "undefined") module.exports = { PACKET_LEVELS, OSI_LAYERS, OSI_SOURCES, OSI_EXTRA, TCPIP_LAYERS };

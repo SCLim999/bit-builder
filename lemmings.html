@@ -28,6 +28,7 @@
       <option value="energy">Energy</option>
       <option value="excited">Excited</option>
     </select>
+    <button id="btn-osi" class="btn" data-t="btn.osi">OSI model</button>
     <button id="btn-help" class="btn" data-t="btn.help">How to play</button>
     <a class="btn" href="index.html" data-t="btn.builder">Bit Builder</a>
   </div>
@@ -55,6 +56,7 @@
         <h2 id="ov-title"></h2>
         <p id="ov-goal"></p>
         <div id="ov-note" class="ov-note"></div>
+        <div id="ov-osi" class="ov-osi"></div>
         <div id="ov-stats" class="ov-stats"></div>
         <div class="overlay-buttons">
           <button id="ov-primary" class="btn btn-primary"></button>
@@ -82,6 +84,18 @@
   <h2 data-t="levels.title">Levels</h2>
   <p class="muted" data-t="levels.sub">Deliver enough packets to unlock the next network.</p>
   <div id="level-list" class="level-list"></div>
+  <form method="dialog"><button class="btn" data-t="btn.close">Close</button></form>
+</dialog>
+
+<dialog id="osi-dialog" class="osi-dialog">
+  <h2 data-t="osi.title">The OSI model</h2>
+  <p class="muted" data-t="osi.sub">Seven layers, each with one job. Data travels down the stack to be sent and back up to be received.</p>
+  <ol id="osi-stack" class="osi-stack"></ol>
+  <div id="osi-extra" class="osi-extra"></div>
+  <h3 class="osi-h3" data-t="tcpip.title">The TCP/IP model</h3>
+  <div class="tcpip-wrap"><table id="tcpip-table" class="tcpip-table"></table></div>
+  <div id="tcpip-extra" class="osi-extra"></div>
+  <div class="osi-source"><span data-t="osi.source">Background reading:</span><ul id="osi-links"></ul></div>
   <form method="dialog"><button class="btn" data-t="btn.close">Close</button></form>
 </dialog>
 

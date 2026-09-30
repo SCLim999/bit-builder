@@ -204,6 +204,65 @@ body.view-3d #world { visibility: hidden; }
 }
 .skill-note b { color: var(--text); }
 
+.ov-osi { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: -4px auto 14px; max-width: 560px; }
+.ov-osi:empty { display: none; }
+.osi-chip {
+  font: inherit; font-size: 12px; cursor: pointer;
+  color: var(--text);
+  background: color-mix(in srgb, var(--layer) 22%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--layer) 70%, transparent);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.osi-chip:hover, .osi-chip:focus-visible { background: color-mix(in srgb, var(--layer) 38%, var(--panel)); outline: none; }
+.ov-osi-why { flex-basis: 100%; margin: 4px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+.osi-dialog { max-width: 720px; }
+.osi-stack { list-style: none; margin: 14px 0; padding: 0; display: grid; gap: 6px; }
+.osi-layer {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--layer) 14%, var(--panel-2));
+  border: 1px solid color-mix(in srgb, var(--layer) 45%, transparent);
+  border-left: 4px solid var(--layer);
+}
+.osi-layer.focus { box-shadow: 0 0 0 2px var(--layer); }
+.osi-num {
+  display: grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 8px;
+  font-weight: 700; font-size: 17px; font-variant-numeric: tabular-nums;
+  background: var(--layer); color: #0b1020;
+}
+.osi-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.osi-head strong { font-size: 15px; }
+.osi-pdu { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.osi-job { margin: 3px 0 2px; font-size: 13.5px; color: var(--text); line-height: 1.45; }
+.osi-eg { font-size: 12px; color: var(--muted); font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; }
+.osi-levels { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px; }
+.osi-levels span { font-size: 11.5px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.osi-extra { display: grid; gap: 8px; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+.osi-extra p { margin: 0; }
+.osi-extra b { color: var(--text); }
+.osi-h3 { margin: 18px 0 8px; font-size: 16px; }
+.tcpip-wrap { overflow-x: auto; margin-bottom: 10px; }
+.tcpip-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tcpip-table th, .tcpip-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tcpip-table th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.tcpip-table td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+.tcpip-table td { color: var(--muted); }
+.tcpip-table .osi-dots { display: flex; gap: 3px; }
+.tcpip-table .osi-dots span {
+  display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px;
+  font-size: 11px; font-weight: 700; color: #0b1020; background: var(--layer);
+}
+.osi-source { font-size: 13px; margin-top: 14px; color: var(--muted); }
+.osi-source ul { margin: 4px 0 0; padding-left: 18px; }
+.osi-source a { color: var(--cyan); word-break: break-word; }
+
 .help-skills { display: grid; gap: 8px; margin: 10px 0 16px; }
 .help-skill { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; font-size: 13.5px; color: var(--muted); }
 .help-skill canvas { width: 30px; height: 30px; image-rendering: pixelated; }

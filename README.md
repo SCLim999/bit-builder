@@ -122,6 +122,18 @@ glowing silhouettes. <kbd>V</kbd> (or the *View* button) switches to the flat
 2D view, which is also what browsers without WebGL2 get. The renderer is
 hand-written, with no library, so the page still has no dependencies.
 
+The **OSI model** button opens a reference panel: the seven OSI layers with
+what each one does, its data unit (bits, frame, packet, segment, data),
+example protocols and devices, and which levels touch it; then encapsulation,
+attacks by layer, a mnemonic, the four-layer TCP/IP model mapped onto OSI,
+TCP versus UDP, and ports and sockets. Every level card carries a chip naming
+the OSI layer its concept belongs to, with a sentence on why. Background
+reading linked from the panel:
+
+- [The OSI Model Explained — Network Supply](https://www.network-supply.com/blogs/knowledge/the-osi-model-explained)
+- [TCP/IP protocols — IBM CICS TS 5.5 documentation](https://www.ibm.com/docs/en/cics-ts/5.5.0?topic=concepts-tcpip-protocols)
+- [What is the OSI model? — Cloudflare Learning Center](https://www.cloudflare.com/learning/ddos/glossary/open-systems-interconnection-model-osi/)
+
 Seven levels, one skill introduced at a time, each with a short computing
 concept on its intro and result cards, in English and Mandarin. It shares the
 language setting with Bit Builder, and the *Theme* picker offers five colour
@@ -136,7 +148,7 @@ electric yellow on violet, with a pulsing grid). <kbd>P</kbd> pauses,
 |---|---|
 | `lemmings.html`, `css/lemmings.css` | the page (reuses `css/game.css` for the chrome) |
 | `js/lem-engine.js` | deterministic tick-based simulation: terrain, packets, skills |
-| `js/lem-levels.js` | the levels — rectangles of silicon and steel, hazards, skill budgets, concept notes |
+| `js/lem-levels.js` | the levels — rectangles of silicon and steel, hazards, skill budgets, concept notes, OSI tags — plus the OSI and TCP/IP reference text |
 | `js/lem-main.js` | 2D rendering, input, overlays, progress, interface text |
 | `js/lem-3d.js` | the 3D view — a WebGL2 renderer built from one instanced cube, plus camera and picking |
 | `tools/lem-check.js` | replays a scripted solution for every level and checks that doing nothing loses |

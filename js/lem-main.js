@@ -10,6 +10,11 @@ const TEXT = {
     "lang.other": "中文",
     "app.title": "Packet Rush",
     "app.tagline": "Packets march blindly across the network. Give them jobs so enough of them reach the server.",
+    "btn.osi": "OSI model",
+    "osi.title": "The OSI model", "osi.sub": "Seven layers, each with one job. Data travels down the stack to be sent and back up to be received.",
+    "osi.source": "Background reading:", "osi.layer": "Layer {n}", "osi.pdu": "unit: {pdu}", "osi.inGame": "In Packet Rush:",
+    "osi.chip": "OSI layer {n} · {name}", "osi.chipAll": "All seven OSI layers",
+    "tcpip.title": "The TCP/IP model", "tcpip.layer": "TCP/IP layer", "tcpip.osi": "OSI layers", "tcpip.job": "What it does", "tcpip.eg": "Examples",
     "btn.levels": "Levels", "btn.help": "How to play", "btn.builder": "Bit Builder", "btn.close": "Close",
     "theme.label": "Theme", "theme.bright": "Theme: Bright", "theme.dark": "Theme: Dark",
     "theme.soft": "Theme: Soft", "theme.energy": "Theme: Energy", "theme.excited": "Theme: Excited",
@@ -56,6 +61,11 @@ const TEXT = {
     "lang.other": "EN",
     "app.title": "数据包大冲关",
     "app.tagline": "数据包只会盲目地向前走。给它们分配工作，让足够多的数据包到达服务器。",
+    "btn.osi": "OSI 模型",
+    "osi.title": "OSI 七层模型", "osi.sub": "七层结构，每层只负责一件事。发送时数据沿协议栈向下传递，接收时再向上传回。",
+    "osi.source": "背景阅读：", "osi.layer": "第 {n} 层", "osi.pdu": "数据单位：{pdu}", "osi.inGame": "对应关卡：",
+    "osi.chip": "OSI 第 {n} 层 · {name}", "osi.chipAll": "OSI 全部七层",
+    "tcpip.title": "TCP/IP 四层模型", "tcpip.layer": "TCP/IP 层", "tcpip.osi": "对应 OSI 层", "tcpip.job": "作用", "tcpip.eg": "示例",
     "btn.levels": "关卡", "btn.help": "玩法说明", "btn.builder": "组装大师", "btn.close": "关闭",
     "theme.label": "配色", "theme.bright": "配色：明亮", "theme.dark": "配色：暗夜",
     "theme.soft": "配色：柔和", "theme.energy": "配色：活力", "theme.excited": "配色：热烈",
@@ -652,6 +662,7 @@ function overlay({ title, goal, note, stats, primary, secondary }) {
   el("ov-title").textContent = title;
   el("ov-goal").innerHTML = goal || "";
   el("ov-note").innerHTML = note ? `<h4>${t("ov.concept")}</h4>${note}` : "";
+  renderOsiChips(note ? game.level : null);
   el("ov-stats").innerHTML = stats || "";
   const btn = (node, spec) => {
     node.style.display = spec ? "" : "none";
@@ -664,6 +675,64 @@ function overlay({ title, goal, note, stats, primary, secondary }) {
   setTimeout(() => el("ov-primary").focus(), 0);
 }
 function hideOverlay() { el("overlay").classList.add("hidden"); running = true; last = performance.now(); acc = 0; }
+
+/* ------------------------------------------------------------ OSI model */
+const OSI_COLORS = { 7: "#f472b6", 6: "#c084fc", 5: "#818cf8", 4: "#38bdf8", 3: "#34d399", 2: "#facc15", 1: "#fb923c" };
+
+function renderOsiChips(lv) {
+  const box = el("ov-osi");
+  box.innerHTML = "";
+  if (!lv || !lv.osi) return;
+  const layers = lv.osi.length === 7 ? [null] : lv.osi.slice().sort((a, b) => b - a);
+  for (const n of layers) {
+    const b = document.createElement("button");
+    b.className = "osi-chip";
+    const layer = n && OSI_LAYERS.find(l => l.n === n);
+    b.style.setProperty("--layer", n ? OSI_COLORS[n] : "#34d399");
+    b.textContent = n ? t("osi.chip", { n, name: L(layer.name) }) : t("osi.chipAll");
+    b.onclick = () => openOsi(n);
+    box.append(b);
+  }
+  if (lv.osiWhy) {
+    const why = document.createElement("p");
+    why.className = "ov-osi-why";
+    why.innerHTML = L(lv.osiWhy);
+    box.append(why);
+  }
+}
+
+function openOsi(focus) {
+  const list = el("osi-stack");
+  list.innerHTML = "";
+  for (const layer of OSI_LAYERS) {
+    const li = document.createElement("li");
+    li.className = "osi-layer" + (focus === layer.n ? " focus" : "");
+    li.style.setProperty("--layer", OSI_COLORS[layer.n]);
+    const levels = PACKET_LEVELS
+      .map((lv, i) => (lv.osi || []).includes(layer.n) ? `<span>${i + 1} · ${L(lv.name)}</span>` : "")
+      .join("");
+    li.innerHTML = `<span class="osi-num" aria-label="${t("osi.layer", { n: layer.n })}">${layer.n}</span>
+      <div>
+        <div class="osi-head"><strong>${L(layer.name)}</strong><span class="osi-pdu">${t("osi.pdu", { pdu: L(layer.pdu) })}</span></div>
+        <p class="osi-job">${L(layer.job)}</p>
+        <div class="osi-eg">${layer.eg}</div>
+        ${levels ? `<div class="osi-levels" title="${t("osi.inGame")}">${levels}</div>` : ""}
+      </div>`;
+    list.append(li);
+  }
+  el("osi-extra").innerHTML = ["encap", "attacks", "mnemonic"].map(k => `<p>${L(OSI_EXTRA[k])}</p>`).join("");
+  el("tcpip-table").innerHTML =
+    `<thead><tr><th>${t("tcpip.layer")}</th><th>${t("tcpip.osi")}</th><th>${t("tcpip.job")}</th><th>${t("tcpip.eg")}</th></tr></thead><tbody>`
+    + TCPIP_LAYERS.map(l => `<tr><td>${L(l.name)}</td><td><div class="osi-dots">${l.osi.map(n => `<span style="--layer:${OSI_COLORS[n]}">${n}</span>`).join("")}</div></td><td>${L(l.job)}</td><td class="osi-eg">${l.eg}</td></tr>`).join("")
+    + "</tbody>";
+  el("tcpip-extra").innerHTML = ["tcpip", "tcpudp", "sockets"].map(k => `<p>${L(OSI_EXTRA[k])}</p>`).join("");
+  el("osi-links").innerHTML = OSI_SOURCES
+    .map(s => `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.title}</a></li>`).join("");
+  const d = el("osi-dialog");
+  if (!d.open) d.showModal();
+  const hit = list.querySelector(".focus");
+  if (hit) hit.scrollIntoView({ block: "nearest" });
+}
 
 function showIntro() {
   const lv = game.level;
@@ -962,6 +1031,7 @@ el("theme-pick").onchange = ev => {
 };
 el("btn-levels").onclick = openLevels;
 el("btn-help").onclick = () => el("help-dialog").showModal();
+el("btn-osi").onclick = () => openOsi(null);
 
 /* ---------------------------------------------------------------- boot */
 applyTheme();
