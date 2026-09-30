@@ -95,6 +95,43 @@ languages side by side.
 | Trojan | hunts you down |
 | Packet | flies straight and bounces |
 
+## Packet Rush — the Lemmings-style companion
+
+**[`lemmings.html`](lemmings.html)** (the *Packet Rush* button in the game) is a
+second game in the same repository: *Lemmings*, but the lemmings are network
+packets. They drop out of a router and march blindly forward; you hand out
+jobs so that enough of them reach the server before their **TTL** (time to
+live) runs out. The terrain is a destructible pixel bitmap — circuit-board
+silicon can be dug and blown up, shielded steel cannot.
+
+| Skill | Key | What it does | The idea behind it |
+|---|---|---|---|
+| Uplink | <kbd>1</kbd> | climbs any wall (permanent) | an uplink carries traffic up to the next network |
+| Buffer | <kbd>2</kbd> | survives any fall (permanent) | a buffer absorbs a burst that would otherwise be lost |
+| Overflow | <kbd>3</kbd> | freezes, then blows a hole five seconds later | a buffer overflow spills into neighbouring memory |
+| Firewall | <kbd>4</kbd> | stands still and turns traffic back | a firewall filters packets between networks |
+| Bridge | <kbd>5</kbd> | builds a twelve-step staircase | a bridge joins two network segments |
+| Tunnel | <kbd>6</kbd> | digs sideways through silicon | a VPN tunnel carries traffic through a network that would block it |
+| Pipe | <kbd>7</kbd> | digs straight down | a pipe passes one program's output down to the next |
+
+Seven levels, one skill introduced at a time, each with a short computing
+concept on its intro and result cards, in English and Mandarin. It shares the
+language and theme settings with Bit Builder. <kbd>P</kbd> pauses,
+<kbd>F</kbd> fast-forwards, <kbd>R</kbd> restarts and <kbd>K</kbd> twice
+(*kill -9*) ends the run.
+
+| File | Purpose |
+|---|---|
+| `lemmings.html`, `css/lemmings.css` | the page (reuses `css/game.css` for the chrome) |
+| `js/lem-engine.js` | deterministic tick-based simulation: terrain, packets, skills |
+| `js/lem-levels.js` | the levels — rectangles of silicon and steel, hazards, skill budgets, concept notes |
+| `js/lem-main.js` | rendering, input, overlays, progress, interface text |
+| `tools/lem-check.js` | replays a scripted solution for every level and checks that doing nothing loses |
+
+`node tools/lem-check.js` runs in CI next to the Bit Builder checks, so a
+terrain change that makes a Packet Rush level unwinnable — or trivially
+winnable — fails the build.
+
 ## Files
 
 | File | Purpose |

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Packet Rush — guide the packets to the server</title>
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/lemmings.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">&#10033;</span>
+    <div>
+      <h1 data-t="app.title">Packet Rush</h1>
+      <p data-t="app.tagline">Packets march blindly across the network. Give them jobs so enough of them reach the server.</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button id="btn-lang" class="btn" title="Language / 语言">中文</button>
+    <button id="btn-levels" class="btn" data-t="btn.levels">Levels</button>
+    <button id="btn-theme" class="btn">Theme</button>
+    <button id="btn-help" class="btn" data-t="btn.help">How to play</button>
+    <a class="btn" href="index.html" data-t="btn.builder">Bit Builder</a>
+  </div>
+</header>
+
+<main class="rush">
+  <div class="hud">
+    <span id="hud-level" class="pill">Level 1</span>
+    <strong id="hud-name" class="hud-name"></strong>
+    <span class="hud-stat"><span data-t="hud.out">Out</span> <b id="hud-out">0</b></span>
+    <span class="hud-stat"><span data-t="hud.in">Delivered</span> <b id="hud-in">0</b></span>
+    <span class="hud-stat"><span data-t="hud.need">Need</span> <b id="hud-need">0</b></span>
+    <span class="hud-stat"><span data-t="hud.lost">Lost</span> <b id="hud-lost">0</b></span>
+    <span class="hud-stat"><span data-t="hud.ttl">TTL</span> <b id="hud-ttl">0:00</b></span>
+  </div>
+
+  <section class="stage rush-stage">
+    <canvas id="world" width="800" height="400" aria-label="game world"></canvas>
+    <div id="overlay" class="overlay hidden">
+      <div class="overlay-card">
+        <h2 id="ov-title"></h2>
+        <p id="ov-goal"></p>
+        <div id="ov-note" class="ov-note"></div>
+        <div id="ov-stats" class="ov-stats"></div>
+        <div class="overlay-buttons">
+          <button id="ov-primary" class="btn btn-primary"></button>
+          <button id="ov-secondary" class="btn"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div id="skills" class="skills"></div>
+    <div class="controls">
+      <button id="btn-pause" class="btn ctl"><span data-t="ctl.pause">Pause</span> <kbd>P</kbd></button>
+      <button id="btn-fast" class="btn ctl" aria-pressed="false"><span data-t="ctl.fast">Fast</span> <kbd>F</kbd></button>
+      <button id="btn-restart" class="btn ctl"><span data-t="ctl.restart">Restart</span> <kbd>R</kbd></button>
+      <button id="btn-nuke" class="btn ctl nuke"><span data-t="ctl.nuke">kill -9</span> <kbd>K</kbd></button>
+    </div>
+  </div>
+
+  <p id="skill-note" class="skill-note"></p>
+</main>
+
+<dialog id="levels-dialog">
+  <h2 data-t="levels.title">Levels</h2>
+  <p class="muted" data-t="levels.sub">Deliver enough packets to unlock the next network.</p>
+  <div id="level-list" class="level-list"></div>
+  <form method="dialog"><button class="btn" data-t="btn.close">Close</button></form>
+</dialog>
+
+<dialog id="help-dialog">
+  <h2 data-t="help.title">How to play</h2>
+  <p data-th="help.p1"></p>
+  <p data-th="help.p2"></p>
+  <p data-th="help.p3"></p>
+  <div id="help-skills" class="help-skills"></div>
+  <form method="dialog"><button class="btn" data-t="btn.close">Close</button></form>
+</dialog>
+
+<footer class="foot" data-t="foot.text">
+  A Lemmings-style companion to Bit Builder. Mouse, keyboard or touch &mdash; no install, no plugins.
+</footer>
+
+<script src="js/lem-engine.js"></script>
+<script src="js/lem-levels.js"></script>
+<script src="js/lem-main.js"></script>
+</body>
+</html>
