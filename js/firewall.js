@@ -19,6 +19,11 @@ const STR = {
     help: "How to play", close: "Close",
     keys: "Click the view to aim with the mouse · WASD / arrows move · Shift run · click, Space or Ctrl fire · E open / use · 1–3 or Q switch weapon · M map · P / Esc pause",
     foot: "Part of Bit Builder — built for PPS2114. Keyboard and mouse, or touch.",
+    disclaimerTitle: "Disclaimer.",
+    disclaimer: "Firewall 3D is an educational game. It contains no real malware and no harmful code: every \u201cvirus\u201d in it is a drawing. " +
+      "The malware names and notes describe real historical incidents, summarised for teaching from public sources such as Wikipedia\u2019s \u201cTimeline of computer viruses and worms\u201d, and may simplify events. " +
+      "Product and company names mentioned (such as Microsoft Word, Apple II, Sony BMG and Siemens) are trademarks of their owners; this project is not affiliated with or endorsed by them. " +
+      "Provided as is, without warranty. Never download or run real malware.",
     menuTitle: "Firewall 3D",
     menuText: "Malware has breached the network. You are the security software. Scan it, filter it, quarantine it — and reach the reboot terminal.",
     start: "Start mission", resume: "Resume", restart: "Restart level", next: "Next sector", retry: "Try again",
@@ -78,6 +83,11 @@ const STR = {
     soundOn: "声音：开", soundOff: "声音：关", full: "全屏", exitFull: "退出全屏",
     help: "玩法说明", close: "关闭",
     keys: "点击画面后用鼠标瞄准 · WASD / 方向键移动 · Shift 奔跑 · 点击、空格或 Ctrl 射击 · E 开门 / 使用 · 1–3 或 Q 切换武器 · M 地图 · P / Esc 暂停",
+    disclaimerTitle: "免责声明：",
+    disclaimer: "《防火墙 3D》是一款教育游戏。它不包含任何真实的恶意软件或有害代码：游戏里的每一个“病毒”都只是一幅画。" +
+      "游戏中的恶意软件名称和说明描述的是真实的历史事件，根据维基百科《Timeline of computer viruses and worms》等公开资料整理用于教学，可能对事件有所简化。" +
+      "文中提到的产品和公司名称（如 Microsoft Word、Apple II、Sony BMG 和西门子）是其各自所有者的商标；本项目与它们没有任何关联，也未获得它们的认可。" +
+      "本软件按“现状”提供，不作任何保证。切勿下载或运行真实的恶意软件。",
     foot: "属于 Bit Builder —— 为 PPS2114 制作。支持键盘鼠标或触屏。",
     menuTitle: "防火墙 3D",
     menuText: "恶意软件已经入侵网络。你就是安全软件：扫描、过滤、隔离它们，然后抵达重启终端。",
@@ -1794,6 +1804,7 @@ function applyText() {
   $("fw-help").textContent = T("help");
   $("fw-keys").textContent = T("keys");
   $("fw-foot").textContent = T("foot");
+  $("fw-disclaimer").innerHTML = `<strong>${T("disclaimerTitle")}</strong> ${T("disclaimer")}`;
   $("fw-levels-title").textContent = T("levels");
   $("fw-intel-title").textContent = T("intel");
   $("fw-intel-sub").textContent = T("intelSub");
@@ -1802,7 +1813,7 @@ function applyText() {
   $("fw-timeline-sub").textContent = T("timelineSub");
   $("fw-source").textContent = T("source");
   $("fw-help-title").textContent = T("help");
-  $("fw-help-body").innerHTML = T("helpHtml");
+  $("fw-help-body").innerHTML = T("helpHtml") + `<p class="fw-disclaimer"><strong>${T("disclaimerTitle")}</strong> ${T("disclaimer")}</p>`;
   for (const b of document.querySelectorAll(".fw-close")) b.textContent = T("close");
   if (state !== "play") showOverlay();
 }
