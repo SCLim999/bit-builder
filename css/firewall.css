@@ -106,3 +106,21 @@ body.fs .topbar, body.fs .foot, body.fs .fw-keys { display: none; }
 body.fs .fw-shell { padding: 0; height: 100vh; place-items: center; }
 body.fs .fw-stage { width: min(100vw, calc(100vh * 4 / 3)); border: 0; border-radius: 0; padding: 0; }
 body.fs .fw-stage .overlay { inset: 0; }
+
+/* malware timeline, in the threat database */
+.fw-timeline-title { margin-top: 22px; scroll-margin-top: 12px; }
+.fw-count { color: var(--green); font-weight: 600; white-space: nowrap; }
+.fw-timeline { list-style: none; margin: 10px 0 8px; padding: 0 0 0 4px; display: grid; gap: 0; }
+.fw-timeline li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 8px 0 10px; border-left: 2px solid var(--line); position: relative; padding-left: 14px; }
+.fw-timeline li::before { content: ""; position: absolute; left: -6px; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--line); }
+.fw-timeline li.got::before { background: var(--green); border-color: var(--green); }
+.fw-timeline .yr { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--cyan); padding-top: 1px; }
+.fw-timeline b { color: var(--text); font-size: 14px; }
+.fw-timeline p { margin: 3px 0 0; font-size: 13px; line-height: 1.45; color: var(--muted); max-width: 70ch; }
+.fw-timeline .kind { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 99px; padding: 1px 7px; vertical-align: 2px; }
+.fw-timeline .tick { font-size: 11px; color: var(--green); font-weight: 600; }
+.k-virus { color: #4ade80; } .k-worm { color: #c084fc; } .k-trojan { color: #d4a373; }
+.k-spyware { color: #45d0e0; } .k-ransomware { color: #f87171; } .k-rootkit { color: #facc15; }
+.fw-source { font-size: 12.5px; }
+.fw-source a { color: var(--cyan); }
+#fw-intel-dialog { max-width: min(760px, 94vw); }

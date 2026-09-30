@@ -22,6 +22,7 @@
     <button id="fw-lang" class="btn" title="Language / 语言">中文</button>
     <button id="fw-levels" class="btn"></button>
     <button id="fw-intel" class="btn"></button>
+    <button id="fw-timeline-btn" class="btn"></button>
     <button id="fw-sound" class="btn" aria-pressed="true"></button>
     <button id="fw-full" class="btn"></button>
     <button id="fw-help" class="btn"></button>
@@ -77,6 +78,10 @@
   <h2 id="fw-intel-title"></h2>
   <p id="fw-intel-sub" class="muted"></p>
   <div id="fw-intel-list" class="legend fw-intel-list"></div>
+  <h2 id="fw-timeline-title" class="fw-timeline-title"></h2>
+  <p class="muted"><span id="fw-timeline-sub"></span> <b id="fw-timeline-count" class="fw-count"></b></p>
+  <ol id="fw-timeline" class="fw-timeline"></ol>
+  <p class="fw-source"><a id="fw-source" href="https://en.wikipedia.org/wiki/Timeline_of_computer_viruses_and_worms" target="_blank" rel="noopener"></a></p>
   <form method="dialog"><button class="btn fw-close"></button></form>
 </dialog>
 
@@ -89,6 +94,7 @@
 <footer class="foot" id="fw-foot"></footer>
 
 <script src="js/firewall-levels.js"></script>
+<script src="js/firewall-history.js"></script>
 <script src="js/firewall.js"></script>
 </body>
 </html>

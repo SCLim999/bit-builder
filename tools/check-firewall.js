@@ -77,5 +77,18 @@ FW_LEVELS.forEach((level, i) => {
     console.log(`ok   ${label}  ${level.map[0].length}x${level.map.length}`);
   }
 });
+// every kind of monster needs at least one real namesake in the history file
+const { FW_HISTORY } = require("../js/firewall-history.js");
+const KINDS = ["virus", "worm", "trojan", "spyware", "ransomware", "rootkit"];
+const historyProblems = [];
+for (const k of KINDS) if (!FW_HISTORY.some(h => h.kind === k)) historyProblems.push(`no ${k} in the history`);
+FW_HISTORY.forEach((h, i) => {
+  if (!KINDS.includes(h.kind)) historyProblems.push(`${h.name}: unknown kind "${h.kind}"`);
+  if (!h.en || !h.zh) historyProblems.push(`${h.name}: needs both an English and a Mandarin note`);
+  if (i && h.year < FW_HISTORY[i - 1].year) historyProblems.push(`${h.name}: out of date order`);
+});
+if (historyProblems.length) { bad++; console.log("FAIL history"); historyProblems.forEach(p => console.log(`      - ${p}`)); }
+else console.log(`ok   history  ${FW_HISTORY.length} entries, ${FW_HISTORY[0].year}\u2013${FW_HISTORY[FW_HISTORY.length - 1].year}`);
+
 console.log(bad ? `\n${bad} map(s) need attention` : `\nall ${FW_LEVELS.length} Firewall 3D maps can be finished`);
 process.exit(bad ? 1 : 0);

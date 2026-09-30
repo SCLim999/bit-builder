@@ -114,6 +114,14 @@ code and rendered by a raycaster on a 320×200 buffer.
 | Ransomware | its hits **encrypt some of your ammo** |
 | Rootkit | the boss of the last sector, with admin rights; the exit stays locked until it is gone |
 
+Every monster is a real piece of malware from history, after Wikipedia's
+[Timeline of computer viruses and worms](https://en.wikipedia.org/wiki/Timeline_of_computer_viruses_and_worms):
+aim at a worm and the scanner names it (*Morris worm · 1988*, *ILOVEYOU ·
+2000*, *WannaCry · 2017*…), and the rootkit boss is Stuxnet. The *Timeline*
+button lists all 24 specimens from Creeper (1971) to NotPetya (2017) with a
+short note on each, and ticks off the ones you have removed in the game. The
+entries live in `js/firewall-history.js`, in both languages.
+
 Your weapons are defences: the **Antivirus Scanner** (signature matching,
 unlimited), the **Packet Filter** (a firewall-shotgun) and the **Quarantine
 Cannon**. The first time you meet each kind of malware a card says what it
@@ -127,7 +135,8 @@ devices get a stick and fire / use buttons.
 
 The maps are ASCII art in `js/firewall-levels.js` (legend at the top), and
 `node tools/check-firewall.js` proves each one can be finished — the keys can
-be collected in an order that opens the way to the terminal.
+be collected in an order that opens the way to the terminal — and that every
+kind of monster has a real namesake in the timeline.
 
 ## Files
 
@@ -146,6 +155,7 @@ be collected in an order that opens the way to the terminal.
 | `js/codec.js` | share codes — a level packed into a URL |
 | `js/editor.js` | the editor: painting, part kinds, checking, sharing |
 | `firewall.html`, `js/firewall.js`, `js/firewall-levels.js`, `css/firewall.css` | Firewall 3D, the first-person bonus game, and its maps |
+| `js/firewall-history.js` | the malware timeline behind Firewall 3D's monster names, in English and Mandarin |
 | `tools/*.js` | Node scripts that check the maps (not shipped to the browser) |
 
 ## Making your own levels

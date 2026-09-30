@@ -47,6 +47,11 @@ const STR = {
     intelSub: "Every kind of malware you have met. The ones you have not met yet stay hidden.",
     unknown: "Not encountered yet",
     cardWeapon: "Defence",
+    timeline: "Timeline", timelineTitle: "Malware timeline",
+    timelineSub: "Every monster in the game is named after real malware. Removing one in the game ticks it off here.",
+    source: "Source: Wikipedia, “Timeline of computer viruses and worms”",
+    removedMark: "removed", removedMsg: "Removed {n} ({y})", examples: "Real examples: {list}",
+    removedCount: "{n} of {t} removed",
     helpHtml:
       "<p>You are the security software on an infected network. Each sector is a maze of server rooms. " +
       "Remove the malware, pick up <strong>encryption keys</strong> to open locked ports, and press <strong>E</strong> at the " +
@@ -102,6 +107,11 @@ const STR = {
     intelSub: "你遇到过的每一种恶意软件。还没遇到的会保持隐藏。",
     unknown: "尚未遇到",
     cardWeapon: "防御",
+    timeline: "时间线", timelineTitle: "恶意软件时间线",
+    timelineSub: "游戏里的每个怪物都以真实的恶意软件命名。在游戏中清除一个，这里就会打钩。",
+    source: "来源：维基百科《Timeline of computer viruses and worms》",
+    removedMark: "已清除", removedMsg: "已清除 {n}（{y}）", examples: "真实案例：{list}",
+    removedCount: "已清除 {n} / {t}",
     helpHtml:
       "<p>你是一个被感染网络中的安全软件。每个区域都是由机房组成的迷宫。" +
       "清除恶意软件，拾取<strong>加密密钥</strong>打开上锁的端口，然后在" +
@@ -154,6 +164,7 @@ const THREATS = {
 
 const LANG_KEY = "bitbuilder.lang", THEME_KEY = "bitbuilder.theme";
 const PROGRESS_KEY = "firewall3d.progress", INTEL_KEY = "firewall3d.intel", SOUND_KEY = "firewall3d.sound";
+const REMOVED_KEY = "firewall3d.removed";
 
 let lang = (() => {
   try { const s = localStorage.getItem(LANG_KEY); if (s) return s; } catch (e) { /* storage disabled */ }
@@ -632,6 +643,7 @@ let player = null, levelStart = null, stats = null, flow = null, flowTimer = 0, 
 let state = "menu", showMap = false, messages = [], screenFlash = { color: "", t: 0 };
 let progress = load(PROGRESS_KEY, { unlocked: 1, best: {} });
 let intel = new Set(load(INTEL_KEY, []));
+let removed = new Set(load(REMOVED_KEY, []));
 const shownThisSession = new Set();
 
 function defaultLoadout(i) {
@@ -677,9 +689,16 @@ function facingOpen(x, y) {           // start the player looking down the longe
   }
   return best;
 }
+/* each monster is a real piece of malware from FW_HISTORY of the same kind;
+   the boss is always the most notorious rootkit on the list */
+function pickSpecimen(def) {
+  const pool = FW_HISTORY.filter(h => h.kind === def.key);
+  if (def.boss) return pool[pool.length - 1];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 function spawnEnemy(ch, x, y, child = false) {
   const def = ENEMY[ch];
-  const e = { ch, def, x, y, hp: def.hp, awake: false, cd: rand(0.5, 1.5), t: 0, attackT: 0, pain: 0, flash: 0, dead: false, child, replicated: false, summonT: 6, disguised: ch === "t" };
+  const e = { ch, def, x, y, hp: def.hp, hist: pickSpecimen(def), awake: false, cd: rand(0.5, 1.5), t: 0, attackT: 0, pain: 0, flash: 0, dead: false, child, replicated: false, summonT: 6, disguised: ch === "t" };
   enemies.push(e);
   return e;
 }
@@ -902,6 +921,8 @@ function hurtEnemy(e, dmg) {
   if (!e.def.boss && Math.random() < 0.35) e.pain = 0.22;
   if (e.hp <= 0) {
     e.dead = true; stats.kills++;
+    say(T("removedMsg", { n: e.hist.name, y: e.hist.year }));
+    if (!removed.has(e.hist.name)) { removed.add(e.hist.name); save(REMOVED_KEY, [...removed]); }
     if (e.def.boss) { Sound.play("bossDie"); say(T("bossDown")); flash("rgba(255,255,255,.5)", 0.5); }
     else Sound.play("die");
   }
@@ -1281,6 +1302,25 @@ function drawFace(cx, cy) {
   g.stroke();
   if (p.hp <= 30 && p.hp > 0) { g.fillStyle = "#45d0e0"; g.fillRect(cx + 18, cy - 16, 3, 6); }   // sweat
 }
+/* name the malware under the crosshair, like a scanner identifying a sample */
+function drawTarget() {
+  const p = player, dx = Math.cos(p.a), dy = Math.sin(p.a);
+  const wall = castRay(p.x, p.y, dx, dy).dist;
+  let best = null, bestAlong = Math.min(wall, 14);
+  for (const e of enemies) {
+    if (e.dead || e.disguised) continue;
+    const vx = e.x - p.x, vy = e.y - p.y, along = vx * dx + vy * dy;
+    if (along > 0 && along < bestAlong && Math.abs(vx * dy - vy * dx) < e.def.radius) { best = e; bestAlong = along; }
+  }
+  if (!best) return;
+  const label = `${best.hist.name} · ${best.hist.year}`;
+  sctx.font = "600 14px ui-monospace, Consolas, monospace"; sctx.textAlign = "center";
+  const w = sctx.measureText(label).width + 16;
+  sctx.fillStyle = "rgba(5,8,12,.7)"; sctx.fillRect(SW / 2 - w / 2, VIEW_H / 2 + 18, w, 22);
+  sctx.fillStyle = "#ef4444"; sctx.fillRect(SW / 2 - w / 2, VIEW_H / 2 + 18, 3, 22);
+  sctx.fillStyle = "#eaf1fb"; sctx.fillText(label, SW / 2, VIEW_H / 2 + 34);
+  sctx.textAlign = "left";
+}
 function drawMessages() {
   sctx.font = "600 15px ui-sans-serif, system-ui, sans-serif"; sctx.textAlign = "left";
   messages.forEach((m, i) => {
@@ -1319,6 +1359,7 @@ function present() {
     sctx.fillRect(SW / 2 - 1, VIEW_H / 2 - 6, 2, 4); sctx.fillRect(SW / 2 - 1, VIEW_H / 2 + 2, 2, 4);
     sctx.fillRect(SW / 2 - 6, VIEW_H / 2 - 1, 4, 2); sctx.fillRect(SW / 2 + 2, VIEW_H / 2 - 1, 4, 2);
   }
+  if (state === "play") drawTarget();
   if (showMap) drawMap();
   drawMessages();
   drawHud();
@@ -1333,7 +1374,8 @@ function meetThreat(key) {
   const [name, text] = THREATS[key][lang];
   $("fw-card-kicker").textContent = T("newThreat");
   $("fw-card-name").textContent = name;
-  $("fw-card-text").textContent = text;
+  const names = FW_HISTORY.filter(h => h.kind === key).map(h => `${h.name} (${h.year})`).join(", ");
+  $("fw-card-text").textContent = `${text} ${T("examples", { list: names })}`;
   const art = $("fw-card-art").getContext("2d"), ch = Object.keys(ENEMY).find(c => ENEMY[c].key === key);
   art.clearRect(0, 0, 64, 64); art.drawImage(SPR.enemy[ch][0].canvas, 0, 0);
   $("fw-card").classList.remove("hidden");
@@ -1458,7 +1500,25 @@ function openIntel() {
     row.append(c, span);
     list.appendChild(row);
   }
+  buildTimeline();
   $("fw-intel-dialog").showModal();
+}
+function buildTimeline() {
+  $("fw-timeline-count").textContent = T("removedCount", { n: FW_HISTORY.filter(h => removed.has(h.name)).length, t: FW_HISTORY.length });
+  const list = $("fw-timeline"); list.innerHTML = "";
+  for (const h of FW_HISTORY) {
+    const li = document.createElement("li"), got = removed.has(h.name);
+    if (got) li.className = "got";
+    const year = document.createElement("span"); year.className = "yr"; year.textContent = h.year;
+    const head = document.createElement("b"); head.textContent = h.name;
+    const kind = document.createElement("span"); kind.className = "kind k-" + h.kind; kind.textContent = THREATS[h.kind][lang][0];
+    head.append(" ", kind);
+    if (got) { const tick = document.createElement("span"); tick.className = "tick"; tick.textContent = "✓ " + T("removedMark"); head.append(" ", tick); }
+    const text = document.createElement("p"); text.textContent = h[lang] || h.en;
+    const body = document.createElement("div"); body.append(head, text);
+    li.append(year, body);
+    list.appendChild(li);
+  }
 }
 
 /* ================================================================== input */
@@ -1585,6 +1645,10 @@ function applyText() {
   $("fw-levels-title").textContent = T("levels");
   $("fw-intel-title").textContent = T("intel");
   $("fw-intel-sub").textContent = T("intelSub");
+  $("fw-timeline-btn").textContent = T("timeline");
+  $("fw-timeline-title").textContent = T("timelineTitle");
+  $("fw-timeline-sub").textContent = T("timelineSub");
+  $("fw-source").textContent = T("source");
   $("fw-help-title").textContent = T("help");
   $("fw-help-body").innerHTML = T("helpHtml");
   for (const b of document.querySelectorAll(".fw-close")) b.textContent = T("close");
@@ -1599,6 +1663,7 @@ $("fw-sound").onclick = () => { Sound.on = !Sound.on; save(SOUND_KEY, Sound.on);
 $("fw-full").onclick = toggleFullscreen;
 $("fw-levels").onclick = () => { pause(); openLevels(); };
 $("fw-intel").onclick = () => { pause(); openIntel(); };
+$("fw-timeline-btn").onclick = () => { pause(); openIntel(); $("fw-timeline-title").scrollIntoView(); };
 $("fw-help").onclick = () => { pause(); $("fw-help-dialog").showModal(); };
 document.addEventListener("click", () => Sound.ensure(), { once: true });
 try { if (localStorage.getItem(THEME_KEY) === "dark") document.body.classList.add("theme-dark"); } catch (e) { /* storage disabled */ }
