@@ -29,6 +29,7 @@ serve the folder anywhere static.
 | Pause | <kbd>P</kbd> |
 | Full screen | <kbd>F</kbd>, or the *Full screen* button — the board scales up to fill the display |
 | Language | the *中文 / EN* button — the whole interface, including the editor |
+| 3D view | <kbd>V</kbd>, or the *3D* button — raised walls, doors and crates on a tilted board (default), or the flat top-down board |
 | Brightness | the *Theme* button — a brighter slate board (default) or the original night palette |
 | Practice (clock stopped) | the *Practice* button — a practice run records no time, stars or best |
 | Confirm on an overlay | <kbd>Enter</kbd> / <kbd>Space</kbd> |

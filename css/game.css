@@ -120,7 +120,17 @@ body.theme-dark #board { background: #05080d; }
   border-radius: 6px;
   background: #1a2434;
   touch-action: none;
+  transition: transform .35s ease, box-shadow .35s ease;
 }
+/* 3D view: tip the board back like a table top seen from a chair. The walls
+   and crates are already drawn standing up; this adds the perspective. */
+body.view-3d .stage { perspective: 1100px; }
+body.view-3d #board {
+  transform: rotateX(16deg);
+  transform-origin: 50% 100%;
+  box-shadow: 0 26px 30px -14px rgba(0, 0, 0, .7);
+}
+@media (prefers-reduced-motion: reduce) { #board { transition: none; } }
 
 .overlay {
   position: absolute;

@@ -52,6 +52,25 @@ function useTheme(name) {
   if (game) updateHUD();
 }
 
+/* ---------------------------------------------------------------- 3D view */
+/* On by default: walls, doors and crates stand up off the floor and the board
+   is tilted away from you. Off gives the original flat top-down board. */
+const VIEW3D_KEY = "bitbuilder.view3d";
+const HEIGHT = 0.34;          // how tall a raised block is, in tiles
+const LEAN = 0.16;            // how far block tops lean at the board's edge, in tiles
+let view3d = true;
+function loadView3d() {
+  try { return localStorage.getItem(VIEW3D_KEY) !== "off"; } catch (e) { return true; }
+}
+function useView3d(on) {
+  view3d = on;
+  try { localStorage.setItem(VIEW3D_KEY, on ? "on" : "off"); } catch (e) { /* storage disabled */ }
+  document.body.classList.toggle("view-3d", on);
+  const b = el("btn-3d");
+  b.textContent = t("btn.view3d", { state: t(on ? "state.on" : "state.off") });
+  b.setAttribute("aria-pressed", String(on));
+}
+
 /* --------------------------------------------------------------- language */
 const LANG_KEY = "bitbuilder.lang";
 function loadLang() {
@@ -74,6 +93,7 @@ function applyLanguage(lang) {
   el("btn-practice").textContent = t("btn.practice", { state: t(practice ? "state.on" : "state.off") });
   el("btn-fullscreen").textContent = t(fullscreenOn() ? "btn.exitFullscreen" : "btn.fullscreen");
   el("btn-theme").textContent = t("btn.theme", { state: t("theme." + currentTheme()) });
+  el("btn-3d").textContent = t("btn.view3d", { state: t(view3d ? "state.on" : "state.off") });
   buildLevelList();
   buildLegend();
   buildKnowledge();
@@ -150,7 +170,8 @@ const Sound = {
    size it ended up, so the board stays crisp full screen and on retina. */
 function setupCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const css = Math.max(200, Math.round(canvas.getBoundingClientRect().width) || BOARD);
+  // clientWidth ignores the 3D tilt transform; the bounding box would not
+  const css = Math.max(200, Math.round(canvas.clientWidth || canvas.getBoundingClientRect().width) || BOARD);
   BOARD = css;
   TILE = BOARD / VIEW;
   canvas.width = Math.round(css * dpr);
@@ -201,6 +222,34 @@ function drawItem(ch, sx, sy, gx, gy) {
   if (ch === "x" || ch === "z") Sprites.incompatible(ctx, sx, sy, TILE);
 }
 
+/* Tiles that stand up off the floor in the 3D view, and the colour of their
+   sides. Everything else is painted flat on the floor. */
+function raisedColor(ch) {
+  switch (ch) {
+    case T.WALL: return C.wallFace;
+    case T.TOGGLE_SHUT: return "#0f766e";
+    case "R": case "B": case "Y": case "G": return CARD_COLOR[ch.toLowerCase()];
+    default: return null;
+  }
+}
+function raisedAt(gx, gy) {
+  return !game.inBounds(gx, gy) || raisedColor(game.grid[gy][gx]) !== null;
+}
+
+/* How far a block's top leans sideways: away from the middle of the board, as
+   if the camera hung above the centre of the room. */
+function leanFor(sx) {
+  return ((sx + TILE / 2) - BOARD / 2) / (BOARD / 2) * TILE * LEAN;
+}
+
+function drawShadow(sx, sy, w, depth) {
+  const g = ctx.createLinearGradient(0, sy, 0, sy + depth);
+  g.addColorStop(0, "rgba(0,0,0,0.38)");
+  g.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(sx, sy, w, depth);
+}
+
 function render(alpha) {
   const p = game.player;
   const px = lerp(p.prevX, p.x, alpha);
@@ -211,25 +260,81 @@ function render(alpha) {
   ctx.fillRect(0, 0, BOARD, BOARD);
 
   const x0 = Math.floor(ox) - 1, y0 = Math.floor(oy) - 1;
-  for (let gy = y0; gy <= y0 + VIEW + 1; gy++) {
-    for (let gx = x0; gx <= x0 + VIEW + 1; gx++) {
+  const x1 = x0 + VIEW + 2, y1 = y0 + VIEW + 2;
+  const H = view3d ? TILE * HEIGHT : 0;
+
+  /* Pass 1: everything that lies on the floor, then the shadows the raised
+     blocks throw onto it. */
+  for (let gy = y0; gy <= y1; gy++) {
+    for (let gx = x0; gx <= x1; gx++) {
       if (!game.inBounds(gx, gy)) continue;
-      const sx = (gx - ox) * TILE, sy = (gy - oy) * TILE;
-      drawTerrain(game.grid[gy][gx], sx, sy, gx, gy);
-      const item = game.items[gy][gx];
-      if (item) drawItem(item, sx, sy, gx, gy);
+      const ch = game.grid[gy][gx];
+      if (view3d && raisedColor(ch) !== null) continue;
+      drawTerrain(ch, (gx - ox) * TILE, (gy - oy) * TILE, gx, gy);
+    }
+  }
+  if (view3d) {
+    for (let gy = y0; gy <= y1; gy++) {
+      for (let gx = x0; gx <= x1; gx++) {
+        if (!game.inBounds(gx, gy) || !raisedAt(gx, gy) || raisedAt(gx, gy + 1)) continue;
+        drawShadow((gx - ox) * TILE, (gy + 1 - oy) * TILE, TILE, TILE * 0.22);
+      }
+    }
+    for (const b of game.blocks) {
+      drawShadow((lerp(b.prevX, b.x, alpha) - ox) * TILE + TILE * 0.06,
+        (lerp(b.prevY, b.y, alpha) + 0.94 - oy) * TILE, TILE * 0.88, TILE * 0.18);
     }
   }
 
-  for (const b of game.blocks) {
-    Sprites.crate(ctx, (lerp(b.prevX, b.x, alpha) - ox) * TILE, (lerp(b.prevY, b.y, alpha) - oy) * TILE, TILE);
+  /* Pass 2, back row to front row: raised blocks, then what stands in that
+     row, so a wall nearer the camera hides the feet of whoever is behind it. */
+  const movers = [];
+  for (const b of game.blocks) movers.push({ kind: "crate", o: b });
+  for (const m of game.monsters) if (m.alive) movers.push({ kind: "monster", o: m });
+  if (game.state !== "dead") movers.push({ kind: "player", o: p });
+  const rowOf = o => Math.round(lerp(o.prevY, o.y, alpha));
+
+  for (let gy = y0; gy <= y1; gy++) {
+    if (view3d) {
+      for (let gx = x0; gx <= x1; gx++) {
+        if (!game.inBounds(gx, gy)) continue;
+        const ch = game.grid[gy][gx];
+        const color = raisedColor(ch);
+        if (color === null) continue;
+        const sx = (gx - ox) * TILE, sy = (gy - oy) * TILE;
+        const show = { front: !raisedAt(gx, gy + 1), left: !raisedAt(gx - 1, gy), right: !raisedAt(gx + 1, gy) };
+        raisedBlock(ctx, sx, sy, TILE, H, leanFor(sx), color, show,
+          (dx, dy) => drawTerrain(ch, sx + dx, sy + dy, gx, gy));
+      }
+    }
+    for (let gx = x0; gx <= x1; gx++) {
+      if (!game.inBounds(gx, gy)) continue;
+      const item = game.items[gy][gx];
+      if (!item) continue;
+      const sx = (gx - ox) * TILE, sy = (gy - oy) * TILE;
+      if (view3d) {
+        ctx.fillStyle = "rgba(0,0,0,0.28)";
+        ctx.beginPath();
+        ctx.ellipse(sx + TILE * 0.5, sy + TILE * 0.84, TILE * 0.24, TILE * 0.07, 0, 0, 7);
+        ctx.fill();
+      }
+      drawItem(item, sx, view3d ? sy - TILE * 0.1 : sy, gx, gy);
+    }
+    for (const { kind, o } of movers) {
+      if (rowOf(o) !== gy) continue;
+      const sx = (lerp(o.prevX, o.x, alpha) - ox) * TILE, sy = (lerp(o.prevY, o.y, alpha) - oy) * TILE;
+      if (kind === "crate") {
+        if (!view3d) { Sprites.crate(ctx, sx, sy, TILE); continue; }
+        const inset = TILE * 0.06;
+        raisedBlock(ctx, sx + inset, sy + inset, TILE - inset * 2, H * 0.85, leanFor(sx) * 0.85, "#3f3f46",
+          { front: true, left: true, right: true }, (dx, dy) => Sprites.crate(ctx, sx + dx, sy + dy, TILE));
+      } else if (kind === "monster") {
+        Sprites.monster(ctx, sx, sy, TILE, o.type, o.dir, animT);
+      } else {
+        Sprites.player(ctx, sx, sy, TILE, o.dir, animT);
+      }
+    }
   }
-  for (const m of game.monsters) {
-    if (!m.alive) continue;
-    Sprites.monster(ctx, (lerp(m.prevX, m.x, alpha) - ox) * TILE, (lerp(m.prevY, m.y, alpha) - oy) * TILE,
-      TILE, m.type, m.dir, animT);
-  }
-  if (game.state !== "dead") Sprites.player(ctx, (px - ox) * TILE, (py - oy) * TILE, TILE, p.dir, animT);
 
   const vig = ctx.createRadialGradient(BOARD / 2, BOARD / 2, BOARD * 0.3, BOARD / 2, BOARD / 2, BOARD * 0.75);
   vig.addColorStop(0, "rgba(0,0,0,0)");
@@ -633,6 +738,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "z" || e.key === "Z") { if (mode === "playing" || mode === "dead") rewind(); return; }
   if (e.key === "f" || e.key === "F") { toggleFullscreen(); return; }
   if (e.key === "p" || e.key === "P") { togglePause(); return; }
+  if (e.key === "v" || e.key === "V") { useView3d(!view3d); return; }
   if (e.key === "Enter" || e.key === " ") {
     if (!el("overlay").classList.contains("hidden")) {
       e.preventDefault();
@@ -896,6 +1002,7 @@ el("btn-practice").onclick = e => {
   updateHUD();
 };
 el("btn-theme").onclick = () => useTheme(currentTheme() === "bright" ? "dark" : "bright");
+el("btn-3d").onclick = () => useView3d(!view3d);
 el("btn-knowledge").onclick = () => el("knowledge-dialog").showModal();
 el("btn-lang").onclick = () => applyLanguage(currentLang() === "zh" ? "en" : "zh");
 el("btn-sound").onclick = e => {
@@ -908,6 +1015,7 @@ el("btn-sound").onclick = e => {
 setupCanvas();
 window.addEventListener("resize", setupCanvas);
 useTheme(loadTheme());
+useView3d(loadView3d());
 applyLanguage(loadLang());
 startFromHash();
 requestAnimationFrame(frame);
