@@ -50,47 +50,6 @@ function rr(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function quad(ctx, pts) {
-  ctx.beginPath();
-  ctx.moveTo(pts[0], pts[1]);
-  for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]);
-  ctx.closePath();
-}
-
-/* 3D view: a raised block standing on the box (x, y, w). Its top face is
-   lifted by h and leaned sideways by dx (away from the middle of the board),
-   and the faces between the top and the floor are filled in underneath it.
-   `show` says which faces a neighbouring block is not already hiding.
-   drawTop(ox, oy) paints the ordinary flat sprite shifted by (ox, oy). */
-function raisedBlock(ctx, x, y, w, h, dx, color, show, drawTop) {
-  const tx = x + dx, ty = y - h;
-  const front = show.front, side = dx > 0 ? show.left : dx < 0 ? show.right : false;
-  if (side) {
-    const ex = dx > 0 ? x : x + w, tex = dx > 0 ? tx : tx + w;
-    quad(ctx, [ex, y, ex, y + w, tex, ty + w, tex, ty]);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.fillStyle = "rgba(0,0,0,0.38)";
-    ctx.fill();
-  }
-  if (front) {
-    quad(ctx, [x, y + w, x + w, y + w, tx + w, ty + w, tx, ty + w]);
-    ctx.fillStyle = color;
-    ctx.fill();
-    const g = ctx.createLinearGradient(0, ty + w, 0, y + w);
-    g.addColorStop(0, "rgba(0,0,0,0.25)");
-    g.addColorStop(1, "rgba(0,0,0,0.62)");
-    ctx.fillStyle = g;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";   // lit edge under the top
-    ctx.lineWidth = Math.max(1, w * 0.02);
-    ctx.beginPath();
-    ctx.moveTo(tx, ty + w); ctx.lineTo(tx + w, ty + w);
-    ctx.stroke();
-  }
-  drawTop(dx, -h);
-}
-
 const Sprites = {
   /* ------------------------------------------------------------- terrain */
   floor(ctx, px, py, S, gx, gy) {

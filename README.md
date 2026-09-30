@@ -12,8 +12,11 @@ machine. Fetch the right ones, walk through the **assembly socket** (it only
 opens once the spec is complete), and reach the **power button** to boot the
 machine before the clock runs out.
 
-Pure static HTML/CSS/JS. No build step, no dependencies, no image assets —
-every sprite is drawn with canvas paths. Clone it and open `index.html`, or
+Pure static HTML/CSS/JS. No build step, no install, no image assets —
+every sprite is drawn with canvas paths. The 3D view uses
+[three.js](https://threejs.org/) r128 (MIT), bundled in `js/vendor/` so the
+game still runs offline; the 3D scene reuses the same sprites as textures.
+Where WebGL is not available the game falls back to the flat board. Clone it and open `index.html`, or
 serve the folder anywhere static.
 
 **Play it:** https://sclim999.github.io/bit-builder/ (enable GitHub Pages under
@@ -29,7 +32,7 @@ serve the folder anywhere static.
 | Pause | <kbd>P</kbd> |
 | Full screen | <kbd>F</kbd>, or the *Full screen* button — the board scales up to fill the display |
 | Language | the *中文 / EN* button — the whole interface, including the editor |
-| 3D view | <kbd>V</kbd>, or the *3D* button — raised walls, doors and crates on a tilted board (default), or the flat top-down board |
+| 3D view | <kbd>V</kbd>, or the *3D* button — a real 3D room with a following camera, lights and shadows (default), or the flat top-down board |
 | Brightness | the *Theme* button — a brighter slate board (default) or the original night palette |
 | Practice (clock stopped) | the *Practice* button — a practice run records no time, stars or best |
 | Confirm on an overlay | <kbd>Enter</kbd> / <kbd>Space</kbd> |
