@@ -182,11 +182,11 @@ let acc = 0, last = 0, frame = 0;
    circuit-board silicon, steel and brick the other two materials, and pulse
    makes the grid breathe (only the excited theme uses it). */
 const THEMES = {
-  bright:  { sky1: "#16233a", sky2: "#23405a", grid: [160, 220, 255, 0.07], dirt: [34, 128, 84], trace: [230, 190, 80], via: [250, 230, 150], steel: [128, 142, 160], brick: [240, 160, 50] },
-  dark:    { sky1: "#05080d", sky2: "#0b1624", grid: [69, 208, 224, 0.05], dirt: [22, 92, 60], trace: [201, 162, 58], via: [240, 220, 140], steel: [96, 108, 124], brick: [214, 139, 38] },
-  soft:    { sky1: "#e8e6fb", sky2: "#fdebf1", grid: [120, 100, 180, 0.09], dirt: [150, 208, 184], trace: [246, 196, 160], via: [255, 240, 225], steel: [178, 184, 208], brick: [243, 170, 150] },
-  energy:  { sky1: "#0a2a44", sky2: "#0f5a66", grid: [34, 211, 238, 0.10], dirt: [16, 150, 118], trace: [255, 160, 40], via: [255, 236, 160], steel: [92, 126, 156], brick: [255, 118, 54] },
-  excited: { sky1: "#2a0a4a", sky2: "#7a1a72", grid: [255, 79, 216, 0.10], dirt: [118, 42, 176], trace: [255, 225, 77], via: [255, 255, 200], steel: [150, 128, 200], brick: [255, 92, 184], pulse: true }
+  bright:  { sky1: "#16233a", sky2: "#23405a", grid: [160, 220, 255, 0.07], dirt: [34, 128, 84], trace: [230, 190, 80], via: [250, 230, 150], steel: [128, 142, 160], brick: [240, 160, 50], rack: "#1a2a40", rackLine: "#2c4262", leds: ["#4ade80", "#45d0e0", "#f5a524"], pulse: "#7fe7f2", light: [150, 210, 255], floor: "#131f31" },
+  dark:    { sky1: "#05080d", sky2: "#0b1624", grid: [69, 208, 224, 0.05], dirt: [22, 92, 60], trace: [201, 162, 58], via: [240, 220, 140], steel: [96, 108, 124], brick: [214, 139, 38], rack: "#0b1320", rackLine: "#18263a", leds: ["#4ade80", "#45d0e0", "#f5a524"], pulse: "#45d0e0", light: [90, 170, 220], floor: "#070c14" },
+  soft:    { sky1: "#e8e6fb", sky2: "#fdebf1", grid: [120, 100, 180, 0.09], dirt: [150, 208, 184], trace: [246, 196, 160], via: [255, 240, 225], steel: [178, 184, 208], brick: [243, 170, 150], rack: "#dcd6f0", rackLine: "#c6bee3", leds: ["#6cc59f", "#8fa8ee", "#f0a878"], pulse: "#8fa8ee", light: [255, 255, 255], floor: "#e2dcf2" },
+  energy:  { sky1: "#0a2a44", sky2: "#0f5a66", grid: [34, 211, 238, 0.10], dirt: [16, 150, 118], trace: [255, 160, 40], via: [255, 236, 160], steel: [92, 126, 156], brick: [255, 118, 54], rack: "#0b3149", rackLine: "#15506f", leds: ["#a3e635", "#22d3ee", "#ff8f2e"], pulse: "#ffb35c", light: [120, 230, 255], floor: "#082233" },
+  excited: { sky1: "#2a0a4a", sky2: "#7a1a72", grid: [255, 79, 216, 0.10], dirt: [118, 42, 176], trace: [255, 225, 77], via: [255, 255, 200], steel: [150, 128, 200], brick: [255, 92, 184], pulse: true, rack: "#3b1060", rackLine: "#5a1d88", leds: ["#ff4fd8", "#ffe14d", "#3dfcb4"], pulse: "#ff7ae3", light: [255, 120, 230], floor: "#240940" }
 };
 function palette() { return THEMES[theme] || THEMES.bright; }
 
@@ -229,19 +229,134 @@ function paintTerrain() {
 /* ----------------------------------------------------------- rendering */
 const STATE_COLOR = { block: "#f87171", build: "#f5a524", bash: "#c084fc", dig: "#60a5fa", crash: "#fb7185" };
 
-function drawBackground(pal) {
-  const g = ctx.createLinearGradient(0, 0, 0, LH);
+/* The data centre behind the play area (layout in lem-backdrop.js). The still
+   parts are drawn once per theme into a cached layer at screen resolution;
+   status lights, data pulses and drifting bits are drawn live on top. */
+const reduceMotion = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } })();
+const backdropCanvas = document.createElement("canvas");
+backdropCanvas.width = LW * SCALE; backdropCanvas.height = LH * SCALE;
+let backdropFor = null;
+
+const rgba = (hex, a) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
+};
+
+function paintBackdrop(pal) {
+  const b = backdropCanvas.getContext("2d");
+  b.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  const light = pal.sky1.startsWith("#e") || pal.sky1.startsWith("#f");
+
+  const g = b.createLinearGradient(0, 0, 0, LH);
   g.addColorStop(0, pal.sky1); g.addColorStop(1, pal.sky2);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, LW, LH);
-  const [r, gg, b, a] = pal.grid;
-  const alpha = pal.pulse ? a * (1 + 0.8 * Math.sin(frame / 12)) : a;
-  ctx.strokeStyle = `rgba(${r},${gg},${b},${alpha.toFixed(3)})`;
-  ctx.lineWidth = 0.5;
-  ctx.beginPath();
-  for (let x = 0; x <= LW; x += 20) { ctx.moveTo(x, 0); ctx.lineTo(x, LH); }
-  for (let y = 0; y <= LH; y += 20) { ctx.moveTo(0, y); ctx.lineTo(LW, y); }
-  ctx.stroke();
+  b.fillStyle = g;
+  b.fillRect(0, 0, LW, LH);
+
+  /* ceiling lights wash the top of the room */
+  const [lr, lg, lb] = pal.light;
+  for (const x of BACKDROP.lights) {
+    const r = b.createRadialGradient(x, 0, 2, x, 0, 120);
+    r.addColorStop(0, `rgba(${lr},${lg},${lb},${light ? 0.55 : 0.16})`);
+    r.addColorStop(1, `rgba(${lr},${lg},${lb},0)`);
+    b.fillStyle = r;
+    b.fillRect(x - 120, 0, 240, 120);
+    b.fillStyle = `rgba(${lr},${lg},${lb},${light ? 0.9 : 0.5})`;
+    b.fillRect(x - 14, 0, 28, 2);
+  }
+
+  /* faint wall grid */
+  const [gr, gg, gb, ga] = pal.grid;
+  b.strokeStyle = `rgba(${gr},${gg},${gb},${ga * 0.7})`;
+  b.lineWidth = 0.5;
+  b.beginPath();
+  for (let x = 0; x <= LW; x += 20) { b.moveTo(x, 0); b.lineTo(x, LH); }
+  for (let y = 0; y <= LH; y += 20) { b.moveTo(0, y); b.lineTo(LW, y); }
+  b.stroke();
+
+  /* two rows of racks: the far row fainter, so the room has depth */
+  for (const r of BACKDROP.racks) {
+    const far = r.depth === "far";
+    b.globalAlpha = far ? (light ? 0.45 : 0.5) : (light ? 0.75 : 0.85);
+    b.fillStyle = pal.rack;
+    b.fillRect(r.x, r.y, r.w, r.h);
+    b.fillStyle = pal.rackLine;
+    b.fillRect(r.x, r.y, r.w, 2);                        // top cap
+    b.fillRect(r.x, r.y, 1, r.h);                        // posts
+    b.fillRect(r.x + r.w - 1, r.y, 1, r.h);
+    b.globalAlpha *= 0.55;
+    for (let y = r.y + 4; y < LH; y += r.slot) {         // one line per unit
+      b.fillRect(r.x + 2, y, r.w - 4, 0.6);
+    }
+    for (let y = r.y + 6; y < LH; y += r.slot * 4) {     // vent dots
+      for (let x = r.x + 4; x < r.x + r.w - 9; x += 2.5) b.fillRect(x, y + 1.2, 1, 1);
+    }
+    b.globalAlpha = 1;
+  }
+
+  /* cable tray, hangers and drooping cables */
+  const t = BACKDROP.tray;
+  b.fillStyle = pal.rackLine;
+  for (const x of BACKDROP.hangers) b.fillRect(x, 0, 1, t.y);
+  b.fillRect(0, t.y, LW, t.h);
+  b.fillStyle = pal.rack;
+  b.fillRect(0, t.y + 1, LW, t.h - 2);
+  b.lineWidth = 0.8;
+  pal.leds.forEach((c, i) => {
+    b.strokeStyle = rgba(c, light ? 0.45 : 0.35);
+    b.beginPath();
+    for (let k = 0; k < BACKDROP.hangers.length - 1; k++) {
+      const x0 = BACKDROP.hangers[k] + i * 6, x1 = BACKDROP.hangers[k + 1] + i * 6;
+      b.moveTo(x0, t.y + t.h);
+      b.quadraticCurveTo((x0 + x1) / 2, t.y + t.h + 7 + i * 2, x1, t.y + t.h);
+    }
+    b.stroke();
+  });
+  b.strokeStyle = rgba(pal.pulse, light ? 0.35 : 0.22);
+  b.lineWidth = 0.6;
+  b.beginPath();
+  for (const y of BACKDROP.fibres) { b.moveTo(0, y); b.lineTo(LW, y); }
+  b.stroke();
+
+  /* vignette */
+  const v = b.createRadialGradient(LW / 2, LH / 2, LH * 0.35, LW / 2, LH / 2, LW * 0.62);
+  v.addColorStop(0, "rgba(0,0,0,0)");
+  v.addColorStop(1, light ? "rgba(90,70,140,0.12)" : "rgba(0,0,0,0.38)");
+  b.fillStyle = v;
+  b.fillRect(0, 0, LW, LH);
+  backdropFor = pal;
+}
+
+function drawBackground(pal) {
+  if (backdropFor !== pal) paintBackdrop(pal);
+  ctx.drawImage(backdropCanvas, 0, 0, LW, LH);
+  const light = pal.sky1.startsWith("#e") || pal.sky1.startsWith("#f");
+  const f = reduceMotion ? 0 : frame;
+
+  for (const l of BACKDROP.leds) {
+    if (!reduceMotion && !BACKDROP.ledOn(l, f)) continue;
+    ctx.fillStyle = rgba(pal.leds[l.color], l.depth === "far" ? 0.55 : 0.9);
+    ctx.fillRect(l.x, l.y, 1.4, 1);
+  }
+  if (!reduceMotion) {
+    for (const p of BACKDROP.pulses) {
+      const { x, y } = BACKDROP.pulseAt(p, f);
+      const tail = x - p.dir * p.len;
+      const g = ctx.createLinearGradient(tail, 0, x, 0);
+      g.addColorStop(0, rgba(pal.pulse, 0));
+      g.addColorStop(1, rgba(pal.pulse, light ? 0.8 : 0.9));
+      ctx.fillStyle = g;
+      ctx.fillRect(Math.min(x, tail), y - 0.6, p.len, 1.2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(x - 0.6, y - 0.6, 1.2, 1.2);
+    }
+    ctx.textAlign = "center";
+    for (const bit of BACKDROP.bits) {
+      const { x, y } = BACKDROP.bitAt(bit, f);
+      ctx.fillStyle = rgba(pal.pulse, light ? 0.22 : 0.16);
+      ctx.font = `${bit.size}px ui-monospace, monospace`;
+      ctx.fillText(bit.ch, x, y);
+    }
+  }
 }
 
 function drawRouter(h) {

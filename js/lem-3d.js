@@ -43,7 +43,7 @@ function createRenderer3D(canvas) {
     vec3 v = normalize(uEye - vWorld);
     lit += vColor * pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.25;   // soft rim
     vec3 c = mix(lit, vColor * 1.25, clamp(vGlow, 0.0, 1.0));
-    float fog = clamp((length(uEye - vWorld) - 380.0) / 420.0, 0.0, 0.55);
+    float fog = clamp((length(uEye - vWorld) - 360.0) / 300.0, 0.0, 0.6);
     outColor = vec4(mix(c, uFog, fog), 1.0);
   }`;
 
@@ -166,12 +166,64 @@ function createRenderer3D(canvas) {
     /* the back wall of the diorama, with the same grid the 2D view draws */
     const g = pal.grid, gc = [g[0] / 255, g[1] / 255, g[2] / 255];
     const wall = rgb(pal.sky2);
-    push(terrain, LW / 2, -LH / 2, -60, LW + 1400, LH + 1000, 1, shade(wall, 0.9));
+    push(terrain, LW / 2, -LH / 2, -80, LW + 1400, LH + 1000, 1, shade(wall, 0.9));
     const line = wall.map((v, i) => v * (1 - g[3] * 3) + gc[i] * g[3] * 3);
-    for (let x = -700; x <= LW + 700; x += 20) push(terrain, x, -LH / 2, -59.3, 0.6, LH + 1000, 0.4, line);
-    for (let y = -500; y <= LH + 500; y += 20) push(terrain, LW / 2, -y, -59.3, LW + 1400, 0.6, 0.4, line);
+    for (let x = -700; x <= LW + 700; x += 20) push(terrain, x, -LH / 2, -79.3, 0.6, LH + 1000, 0.4, line);
+    for (let y = -500; y <= LH + 500; y += 20) push(terrain, LW / 2, -y, -79.3, LW + 1400, 0.6, 0.4, line);
+    buildRoom(pal);
     upload(terrain);
   }
+
+  /* ------------------------------------------------------------ the room */
+  /* The data centre from lem-backdrop.js, built behind and under the
+     terrain: racks stand at the back, the cable tray hangs above them and
+     the whole diorama sits on a raised floor of perforated tiles. */
+  const RACK_Z = { far: -64, near: -46 }, RACK_D = { far: 12, near: 14 };
+  const TRAY_Z = -36;
+  function buildRoom(pal) {
+    const rack = rgb(pal.rack), edge = rgb(pal.rackLine);
+    for (const r of BACKDROP.racks) {
+      const z = RACK_Z[r.depth], d = RACK_D[r.depth];
+      const body = r.depth === "far" ? shade(rack, 0.8) : rack;
+      box(terrain, r.x, r.y, r.w, r.h + 12, z, d, body);
+      box(terrain, r.x, r.y - 1, r.w, 2, z, d + 0.4, edge);
+      for (let y = r.y + 4; y < LH; y += r.slot * 2) box(terrain, r.x + 2, y, r.w - 4, 0.6, z + d / 2 + 0.1, 0.3, edge);
+    }
+    const t = BACKDROP.tray;
+    box(terrain, -200, t.y, LW + 400, t.h, TRAY_Z, 10, edge);
+    for (const x of BACKDROP.hangers) box(terrain, x, -40, 1, t.y + 40, TRAY_Z, 1, edge);
+    for (const y of BACKDROP.fibres) box(terrain, -200, y, LW + 400, 0.6, TRAY_Z + 3, 0.6, shade(rgb(pal.pulse), 0.6));
+    for (const x of BACKDROP.lights) box(terrain, x - 20, -24, 40, 2, -10, 16, rgb(pal.light), 0.9);
+
+    /* raised floor: tiles in a checker of two tones, every third one perforated */
+    const floor = rgb(pal.floor), alt = shade(floor, 1.18), vent = shade(floor, 0.7);
+    for (let x = -160; x < LW + 160; x += 20) {
+      for (let z = -80; z < 60; z += 20) {
+        const k = ((x / 20) + (z / 20)) & 1, perforated = ((x / 20) * 7 + (z / 20) * 3) % 3 === 0;
+        box(terrain, x + 0.5, LH + 2, 19, 6, z + 10, 19, k ? alt : floor);
+        if (perforated) box(terrain, x + 4, LH + 1.7, 11, 0.4, z + 10, 11, vent);
+      }
+    }
+  }
+
+  function roomLights(pal, frame) {
+    const b = objects;
+    const f = reduceMotion3d ? 0 : frame;
+    for (const l of BACKDROP.leds) {
+      if (!reduceMotion3d && !BACKDROP.ledOn(l, f)) continue;
+      const z = RACK_Z[l.depth] + RACK_D[l.depth] / 2 + 0.3;
+      box(b, l.x, l.y, 1.4, 1, z, 0.5, rgb(pal.leds[l.color]), 1);
+    }
+    if (reduceMotion3d) return;
+    for (const p of BACKDROP.pulses) {
+      const { x, y } = BACKDROP.pulseAt(p, f);
+      const z = p.lane === 0 ? TRAY_Z + 5.2 : TRAY_Z + 3;
+      box(b, x - p.dir * p.len / 2 - p.len / 2, y - 0.7, p.len, 1.4, z, 1, rgb(pal.pulse), 0.6);
+      box(b, x - 1, y - 1, 2, 2, z, 1.4, [1, 1, 1], 1);
+    }
+  }
+  let reduceMotion3d = false;
+  try { reduceMotion3d = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { /* ignore */ }
 
   /* ------------------------------------------------------------ camera */
   const cam = { yaw: -0.16, pitch: 0.24, dist: 318 };
@@ -366,6 +418,7 @@ function createRenderer3D(canvas) {
       if (game.dirty || lastPal !== opt.pal) { buildTerrain(game, opt.pal); lastPal = opt.pal; game.dirty = false; }
 
       objects.n = 0; ghosts.n = 0;
+      roomLights(opt.pal, opt.frame);
       scenery(game, opt.frame);
       for (const p of game.packets) {
         if (!p.alive) continue;

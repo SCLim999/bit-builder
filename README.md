@@ -122,6 +122,13 @@ glowing silhouettes. <kbd>V</kbd> (or the *View* button) switches to the flat
 2D view, which is also what browsers without WebGL2 get. The renderer is
 hand-written, with no library, so the page still has no dependencies.
 
+The play area sits in a small **data centre**: two rows of server racks with
+blinking status lights, an overhead cable tray and fibre runs with data pulses
+travelling along them, ceiling lights, drifting 0s and 1s in the flat view and
+a raised floor of perforated tiles under the 3D diorama. Every theme has its
+own version, it is kept low in contrast so packets stay easy to see, and the
+motion stops when the system asks for reduced motion.
+
 The **OSI model** button opens a reference panel: the seven OSI layers with
 what each one does, its data unit (bits, frame, packet, segment, data),
 example protocols and devices, and which levels touch it; then encapsulation,
@@ -150,6 +157,7 @@ electric yellow on violet, with a pulsing grid). <kbd>P</kbd> pauses,
 | `js/lem-engine.js` | deterministic tick-based simulation: terrain, packets, skills |
 | `js/lem-levels.js` | the levels — rectangles of silicon and steel, hazards, skill budgets, concept notes, OSI tags — plus the OSI and TCP/IP reference text |
 | `js/lem-main.js` | 2D rendering, input, overlays, progress, interface text |
+| `js/lem-backdrop.js` | the data centre behind the play area — racks, status lights, cable tray, data pulses — shared by both views |
 | `js/lem-3d.js` | the 3D view — a WebGL2 renderer built from one instanced cube, plus camera and picking |
 | `tools/lem-check.js` | replays a scripted solution for every level and checks that doing nothing loses |
 
