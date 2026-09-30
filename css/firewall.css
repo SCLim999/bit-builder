@@ -121,6 +121,8 @@ body.fs .fw-stage .overlay { inset: 0; }
 .fw-timeline .tick { font-size: 11px; color: var(--green); font-weight: 600; }
 .k-virus { color: #4ade80; } .k-worm { color: #c084fc; } .k-trojan { color: #d4a373; }
 .k-spyware { color: #45d0e0; } .k-ransomware { color: #f87171; } .k-rootkit { color: #facc15; }
+.k-adware { color: #fb7185; } .k-keylogger { color: #cbd5e1; } .k-bot { color: #94a3b8; }
+.k-fileless { color: #a78bfa; } .k-wiper { color: #fca5a5; } .k-mobile { color: #38bdf8; }
 .fw-source { font-size: 12.5px; }
 .fw-source a { color: var(--cyan); }
 #fw-intel-dialog { max-width: min(760px, 94vw); }

@@ -44,6 +44,9 @@ const STR = {
     exitLocked: "The rootkit still holds kernel access — remove it first",
     reveal: "That “free gift” was a Trojan!",
     ransom: "Ransomware encrypted some of your ammo!",
+    reported: "A keylogger reported your position!", wiped: "A wiper erased your firewall!",
+    popups: ["YOU WON!!! Claim your prize", "FREE RAM \u2014 click here", "Your PC is SLOW! Fix it now", "Congratulations, visitor #1,000,000", "HOT DEALS \u2014 90% OFF"],
+    popupClose: "closes in {s}s",
     wormCopy: "A worm copied itself",
     summon: "The rootkit spawned hidden processes",
     bossDown: "Rootkit removed — the reboot terminal is unlocked",
@@ -109,6 +112,9 @@ const STR = {
     exitLocked: "Rootkit 仍然控制着内核 —— 先清除它",
     reveal: "那个“免费礼物”是木马！",
     ransom: "勒索软件加密了你的部分弹药！",
+    reported: "键盘记录器报告了你的位置！", wiped: "擦除器清空了你的防火墙！",
+    popups: ["恭喜中奖！！！立即领取", "免费内存 —— 点击这里", "你的电脑太慢了！马上修复", "恭喜你成为第 1,000,000 位访客", "限时特价 —— 一折起"],
+    popupClose: "{s} 秒后关闭",
     wormCopy: "一只蠕虫复制了自己",
     summon: "Rootkit 生成了隐藏进程",
     bossDown: "Rootkit 已清除 —— 重启终端已解锁",
@@ -165,6 +171,30 @@ const THREATS = {
   ransomware: {
     en: ["Ransomware", "Encrypts your files and demands payment for the key. Paying is no guarantee; an offline backup is the real defence. Its shots here encrypt your ammo."],
     zh: ["勒索软件", "加密你的文件并索要赎金换取密钥。付钱也不一定能恢复，离线备份才是真正的防御。在这里，它的攻击会加密你的弹药。"]
+  },
+  adware: {
+    en: ["Adware", "Software that floods you with unwanted adverts, often bundled with free programs. Its maker earns money from every view or click; it slows the computer and may track your browsing. Its hits here cover your screen with pop-ups."],
+    zh: ["广告软件", "向你狂推不想要的广告的软件，常常捆绑在免费程序里。每一次展示或点击都在为它的作者赚钱；它会拖慢电脑，还可能跟踪你的浏览记录。在这里，它的攻击会让弹窗盖住你的屏幕。"]
+  },
+  keylogger: {
+    en: ["Keylogger", "A kind of spyware that records every key you press, capturing passwords, card numbers and messages. Some are small hardware plugs between the keyboard and the computer. While this one can see you, it reports your position to other malware."],
+    zh: ["键盘记录器", "一种记录你每一次按键的间谍软件，可以窃取密码、卡号和聊天内容。有些是插在键盘和电脑之间的小硬件。在这里，只要它能看到你，就会把你的位置报告给其他恶意软件。"]
+  },
+  bot: {
+    en: ["Bot / botnet", "A bot is an infected device that quietly takes orders from an attacker. Thousands of them form a botnet, used to send spam, steal data or flood websites in denial-of-service attacks. Bots here come in swarms and act together."],
+    zh: ["僵尸程序 / 僵尸网络", "僵尸程序是被感染后悄悄听命于攻击者的设备。成千上万台组成僵尸网络，用来发送垃圾邮件、窃取数据或以拒绝服务攻击淹没网站。在这里，它们成群出现、一起行动。"]
+  },
+  fileless: {
+    en: ["Fileless malware", "Runs in memory using tools already on the computer, such as PowerShell, instead of installing a program file, so antivirus that scans files struggles to see it. Here it is almost invisible until it is close, and leaves nothing behind."],
+    zh: ["无文件恶意软件", "借助电脑上已有的工具（如 PowerShell）在内存中运行，而不是安装程序文件，所以只扫描文件的杀毒软件很难发现它。在这里，它靠近之前几乎看不见，被清除后也不留痕迹。"]
+  },
+  wiper: {
+    en: ["Wiper", "Malware built to destroy data rather than steal it or hold it to ransom: it erases files or the records a disk needs to start. Backups kept offline are the only way back. Its hits here wipe out your firewall."],
+    zh: ["擦除器", "专门用来销毁数据的恶意软件，而不是窃取或勒索：它会删除文件，或破坏磁盘启动所需的记录。只有离线备份才能挽回。在这里，它的攻击会清空你的防火墙。"]
+  },
+  mobile: {
+    en: ["Mobile malware", "Malware for phones and tablets: fake apps, malicious links in texts, and apps that steal data, run up premium-rate charges or spy through the camera and microphone. Install apps only from official stores. It is small and fast here."],
+    zh: ["移动恶意软件", "针对手机和平板的恶意软件：假冒应用、短信里的恶意链接，以及窃取数据、偷偷扣费或通过摄像头和麦克风监视你的应用。只从官方应用商店安装应用。在这里，它又小又快。"]
   },
   rootkit: {
     en: ["Rootkit", "Buries itself deep in the operating system — even the kernel — to keep administrator access and hide other malware from security tools. Often the only sure fix is a clean reinstall."],
@@ -609,6 +639,88 @@ function drawKey(color) {
 }
 ITEM_DRAW.k = drawKey("#e04a4a"); ITEM_DRAW.b = drawKey("#3b82f6"); ITEM_DRAW.y = drawKey("#facc15");
 
+function drawAdware(g, f) {          // a pop-up window that will not close
+  rrect(g, 6, 10, 52, 42, 3, "#f8fafc");
+  g.fillStyle = f === 1 ? "#f59e0b" : "#e11d48"; g.fillRect(6, 10, 52, 9);
+  g.fillStyle = "#fff"; g.fillRect(48, 12, 7, 5);
+  g.strokeStyle = "#e11d48"; g.lineWidth = 1.2; g.beginPath(); g.moveTo(49, 12.5); g.lineTo(54, 16.5); g.moveTo(54, 12.5); g.lineTo(49, 16.5); g.stroke();
+  g.fillStyle = f === 2 ? "#facc15" : f === 1 ? "#e11d48" : "#2563eb"; g.font = "bold 17px sans-serif"; g.fillText(f === 2 ? "WIN!" : "AD", f === 2 ? 11 : 20, 38);
+  g.fillStyle = "#16a34a"; g.fillRect(14, 42, 36, 7);
+  g.fillStyle = "#fff"; g.font = "bold 6px sans-serif"; g.fillText("CLICK HERE", 17, 47.5);
+  g.fillStyle = "#111"; g.beginPath(); g.moveTo(44, 44); g.lineTo(44, 58); g.lineTo(47.5, 54.5); g.lineTo(50.5, 60); g.lineTo(52.5, 59); g.lineTo(49.5, 53.5); g.lineTo(54, 53); g.fill();
+  g.fillStyle = "#fff"; g.beginPath(); g.moveTo(45, 46.5); g.lineTo(45, 55.5); g.lineTo(47.8, 52.8); g.lineTo(50.8, 58.3); g.lineTo(51.4, 58); g.lineTo(48.5, 52.5); g.lineTo(51.7, 52.2); g.fill();
+}
+function drawKeylogger(g, f) {       // a keyboard that watches you type
+  g.strokeStyle = "#475569"; g.lineWidth = 3; g.beginPath(); g.moveTo(32, 26); g.bezierCurveTo(34, 12, 50, 18, 56, 6); g.stroke();
+  rrect(g, 6, 26, 52, 28, 4, "#374151");
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) {
+    const hot = f === 2 || (f === 1 && (r * 9 + c) % 7 === 3);
+    g.fillStyle = hot ? "#f87171" : "#e5e7eb";
+    g.fillRect(9 + c * 5.4 + (r % 2) * 1.5, 29 + r * 6, 4, 4);
+  }
+  rrect(g, 20, 14, 24, 13, 5, "#64748b");
+  circle(g, 27, 20, 3.5, "#fff"); circle(g, 37, 20, 3.5, "#fff");
+  circle(g, 27 + (f === 1 ? 1 : 0), 20.5, 2, f === 2 ? "#ef4444" : "#0f172a"); circle(g, 37 + (f === 1 ? 1 : 0), 20.5, 2, f === 2 ? "#ef4444" : "#0f172a");
+  g.fillStyle = "#374151"; g.fillRect(f === 1 ? 10 : 12, 54, 5, 9); g.fillRect(f === 1 ? 49 : 47, 54, 5, 9);
+}
+function drawBot(g, f) {             // one small drone in a botnet
+  g.strokeStyle = "#94a3b8"; g.lineWidth = 2; g.beginPath(); g.moveTo(32, 22); g.lineTo(32, 10); g.stroke();
+  circle(g, 32, 9, 3, f === 1 ? "#ef4444" : "#7f1d1d");
+  g.strokeStyle = "#cbd5e1"; g.lineWidth = 3; g.beginPath();
+  g.moveTo(f === 1 ? 14 : 18, 12); g.lineTo(f === 1 ? 50 : 46, 12); g.stroke();
+  circle(g, 32, 36, 15, "#64748b");
+  circle(g, 28, 32, 5, "rgba(255,255,255,.18)");
+  rrect(g, 18, 31, 28, 9, 4, "#0f172a");
+  const ex = f === 1 ? 5 : -3;
+  circle(g, 32 + ex, 35.5, f === 2 ? 4.5 : 3.5, f === 2 ? "#ff3b3b" : "#ef4444");
+  g.fillStyle = "#475569"; g.fillRect(24, 50, 4, 8); g.fillRect(36, 50, 4, 8);
+  g.fillStyle = "#e2e8f0"; g.font = "bold 5px monospace"; g.fillText("BOT", 27, 47);
+}
+function drawFileless(g, f) {        // a ghost that lives only in memory
+  const grad = g.createLinearGradient(0, 8, 0, 60);
+  grad.addColorStop(0, "#c4b5fd"); grad.addColorStop(1, "rgba(139,92,246,.75)");
+  g.fillStyle = grad; g.beginPath();
+  g.moveTo(12, 58); g.lineTo(12, 30); g.arc(32, 30, 20, Math.PI, 0); g.lineTo(52, 58);
+  const w = f === 1 ? 1 : 0;
+  for (let i = 0; i < 4; i++) { const x = 52 - i * 10; g.lineTo(x - 5, w ^ (i & 1) ? 52 : 60); g.lineTo(x - 10, 58); }
+  g.fill();
+  circle(g, 25, 28, 5, "#fff"); circle(g, 39, 28, 5, "#fff");
+  circle(g, 26, 29, 2.5, f === 2 ? "#ef4444" : "#1e1b4b"); circle(g, 40, 29, 2.5, f === 2 ? "#ef4444" : "#1e1b4b");
+  g.fillStyle = "#15803d"; g.fillRect(12, 38, 40, 10);                       // a RAM stick for a belt
+  g.fillStyle = "#111"; for (let i = 0; i < 4; i++) g.fillRect(15 + i * 9, 39.5, 6, 6);
+  g.fillStyle = "#d8b24a"; for (let i = 0; i < 12; i++) g.fillRect(13 + i * 3.3, 46, 2, 2);
+}
+function drawWiper(g, f) {           // a hard disk that erases itself and you
+  rrect(g, 8, 10, 48, 50, 4, "#9ca3af");
+  g.fillStyle = "#6b7280"; g.fillRect(8, 10, 48, 5);
+  circle(g, 31, 36, 18, "#e2e8f0");
+  g.strokeStyle = "#94a3b8"; g.lineWidth = 1;
+  for (const r of [7, 11, 15]) { g.beginPath(); g.arc(31, 36, r, 0, TAU); g.stroke(); }
+  circle(g, 31, 36, 3, "#475569");
+  const a = f === 1 ? -2.2 : -2.6;                                          // the read/write arm, sweeping
+  g.strokeStyle = "#dc2626"; g.lineWidth = 3; g.lineCap = "round";
+  g.beginPath(); g.moveTo(50, 54); g.lineTo(50 + Math.cos(a) * 26, 54 + Math.sin(a) * 26); g.stroke();
+  circle(g, 50, 54, 4, "#7f1d1d");
+  if (f === 2) for (let i = 0; i < 6; i++) { g.fillStyle = "#fde047"; g.fillRect(20 + i * 4, 30 + (i % 2) * 8, 2, 2); }
+  g.fillStyle = "#b91c1c";
+  g.beginPath(); g.moveTo(16, 18); g.lineTo(26, 21); g.lineTo(16, 24); g.fill();
+  g.beginPath(); g.moveTo(46, 18); g.lineTo(36, 21); g.lineTo(46, 24); g.fill();
+  g.fillStyle = "#111"; g.font = "bold 6px monospace"; g.fillText("ERASE", 12, 58);
+}
+function drawMobile(g, f) {          // a phone with a bad app
+  g.fillStyle = "#111827"; g.fillRect(f === 1 ? 21 : 23, 54, 4, 9); g.fillRect(f === 1 ? 39 : 37, 54, 4, 9);
+  rrect(g, 18, 6, 28, 50, 5, "#111827");
+  g.fillStyle = f === 2 ? "#7f1d1d" : "#0ea5e9"; g.fillRect(21, 12, 22, 38);
+  g.fillStyle = "#1f2937"; g.fillRect(28, 8, 8, 2);
+  circle(g, 32, 26, 7, "#f8fafc");
+  g.fillStyle = "#f8fafc"; g.fillRect(28, 30, 8, 5);
+  circle(g, 29.5, 26, 2, "#111827"); circle(g, 34.5, 26, 2, "#111827");
+  g.fillStyle = "#111827"; for (let i = 0; i < 3; i++) g.fillRect(29 + i * 2.5, 32, 1, 3);
+  g.strokeStyle = "rgba(255,255,255,.8)"; g.lineWidth = 1;                  // cracked screen
+  g.beginPath(); g.moveTo(22, 40); g.lineTo(30, 44); g.lineTo(27, 49); g.moveTo(30, 44); g.lineTo(41, 41); g.stroke();
+  g.fillStyle = "#f8fafc"; g.font = "bold 5px sans-serif"; g.fillText("APP", 28, 20);
+}
+
 /* Monsters. hp and dmg are per shot; keep is how close a shooter likes to get. */
 const ENEMY = {
   v: { key: "virus", draw: drawVirus, hp: 30, speed: 1.5, radius: 0.3, scale: 0.62, z: 0, dmg: [5, 10], cool: 1.8, range: 12, keep: 3.5, shot: "green", shotSpeed: 6, corpse: ["#34c35e", "#8dff9f", "#0b5e2b"] },
@@ -616,6 +728,12 @@ const ENEMY = {
   t: { key: "trojan", draw: drawTrojan, hp: 90, speed: 1.8, radius: 0.36, scale: 0.8, z: 0, dmg: [14, 22], cool: 1.1, range: 1.05, melee: true, corpse: ["#9c6b3c", "#5a3a20", "#ff3030"] },
   s: { key: "spyware", draw: drawSpyware, hp: 18, speed: 2.3, radius: 0.26, scale: 0.45, z: 0.3, dmg: [3, 6], cool: 1.0, range: 10, keep: 4, shot: "cyan", shotSpeed: 9, corpse: ["#2b2f3a", "#26c6da", "#f2f5f9"] },
   r: { key: "ransomware", draw: drawRansom, hp: 100, speed: 1.1, radius: 0.36, scale: 0.72, z: 0, dmg: [10, 16], cool: 2.2, range: 12, keep: 4, shot: "red", shotSpeed: 7, steals: true, corpse: ["#c62828", "#ffd23f", "#aab4c3"] },
+  d: { key: "adware", draw: drawAdware, hp: 40, speed: 1.2, radius: 0.32, scale: 0.6, z: 0.15, dmg: [3, 6], cool: 1.6, range: 11, keep: 4, shot: "pink", shotSpeed: 6, popups: true, corpse: ["#f8fafc", "#e11d48", "#2563eb"] },
+  l: { key: "keylogger", draw: drawKeylogger, hp: 25, speed: 2.0, radius: 0.3, scale: 0.5, z: 0, dmg: [2, 4], cool: 1.5, range: 9, keep: 6, shot: "cyan", shotSpeed: 8, reports: true, corpse: ["#374151", "#e5e7eb", "#f87171"] },
+  n: { key: "bot", draw: drawBot, hp: 12, speed: 2.6, radius: 0.2, scale: 0.36, z: 0.25, dmg: [2, 4], cool: 0.9, range: 9, keep: 2.5, shot: "red", shotSpeed: 8, swarm: true, corpse: ["#64748b", "#ef4444", "#0f172a"] },
+  m: { key: "fileless", draw: drawFileless, hp: 45, speed: 1.9, radius: 0.3, scale: 0.6, z: 0.1, dmg: [6, 10], cool: 1.4, range: 10, keep: 3, shot: "purple", shotSpeed: 7, fileless: true, corpse: ["#c4b5fd"] },
+  x: { key: "wiper", draw: drawWiper, hp: 130, speed: 1.0, radius: 0.38, scale: 0.78, z: 0, dmg: [12, 18], cool: 2.4, range: 11, keep: 3.5, shot: "void", shotSpeed: 6, wipes: true, corpse: ["#9ca3af", "#e2e8f0", "#dc2626"] },
+  o: { key: "mobile", draw: drawMobile, hp: 24, speed: 3.0, radius: 0.26, scale: 0.48, z: 0, dmg: [5, 9], cool: 0.8, range: 1.0, melee: true, corpse: ["#111827", "#0ea5e9", "#f8fafc"] },
   K: { key: "rootkit", draw: drawRootkit, hp: 1400, speed: 0.9, radius: 0.6, scale: 1.35, z: 0, dmg: [7, 11], cool: 1.7, range: 20, keep: 5, shot: "purple", shotSpeed: 7, spread: 5, boss: true, corpse: ["#17171f", "#d9d9d9", "#ff2d2d"] }
 };
 const SPR = { item: {}, shot: {}, enemy: {} };
@@ -771,6 +889,7 @@ const VARIANTS = {
   "CIH (Chernobyl)": { draw: drawCIH,          shot: "lime",   corpse: ["#facc15", "#111318", "#bef264"] },
   "Melissa":         { draw: drawMelissa,      shot: "mail",   corpse: ["#f8fafc", "#2b579a", "#94a3b8"] }
 };
+SPR.shot.void = spriteFrom(drawOrb("#e5e7eb", "rgba(30,41,59,0)"));
 SPR.shot.pink = spriteFrom(drawOrb("#ff9cc8", "rgba(220,60,140,0)"));
 SPR.shot.paint = spriteFrom(drawOrb("#ffd166", "rgba(230,57,70,0)"));
 SPR.shot.lime = spriteFrom(drawOrb("#d9f99d", "rgba(132,204,22,0)"));
@@ -799,7 +918,7 @@ const zbuf = new Float32Array(W);
 let levelIndex = 0, map = [], mapW = 0, mapH = 0, doors = new Map(), seen = null;
 let enemies = [], items = [], shots = [], puffs = [];
 let player = null, levelStart = null, stats = null, flow = null, flowTimer = 0, flowTile = -1;
-let state = "menu", showMap = false, messages = [], screenFlash = { color: "", t: 0 };
+let state = "menu", showMap = false, messages = [], screenFlash = { color: "", t: 0 }, popups = [];
 let progress = load(PROGRESS_KEY, { unlocked: 1, best: {} });
 let intel = new Set(load(INTEL_KEY, []));
 let removed = new Set(load(REMOVED_KEY, []));
@@ -822,7 +941,7 @@ function loadLevel(i, loadout) {
   const L = FW_LEVELS[i];
   map = L.map.map(r => r.split(""));
   mapH = map.length; mapW = map[0].length;
-  doors = new Map(); enemies = []; items = []; shots = []; puffs = []; messages = [];
+  doors = new Map(); enemies = []; items = []; shots = []; puffs = []; messages = []; popups = [];
   seen = new Uint8Array(mapW * mapH);
   levelStart = snapshot(loadout);
   player = Object.assign({ x: 1.5, y: 1.5, a: 0, keys: {}, cool: 0, fireT: 0, bob: 0, hurtT: 0, grinT: 0, look: 0, lookT: 0, moving: false }, snapshot(loadout));
@@ -831,6 +950,7 @@ function loadLevel(i, loadout) {
       const c = map[y][x];
       if ("DRBY".includes(c)) doors.set(y * mapW + x, { x, y, open: 0, state: 0, timer: 0, lock: c === "D" ? null : c });
       else if (c === "P") { player.x = x + 0.5; player.y = y + 0.5; map[y][x] = "."; }
+      else if (c === "n") { for (const [ox, oy] of [[0, -0.25], [-0.25, 0.2], [0.25, 0.2]]) spawnEnemy(c, x + 0.5 + ox, y + 0.5 + oy); map[y][x] = "."; }
       else if (ENEMY[c]) { spawnEnemy(c, x + 0.5, y + 0.5); map[y][x] = "."; }
       else if (ITEM_DRAW[c]) { items.push({ ch: c, x: x + 0.5, y: y + 0.5, taken: false }); map[y][x] = "."; }
     }
@@ -1074,6 +1194,7 @@ function wake(e) {
   meetThreat(e.def.key, e);
 }
 function hurtEnemy(e, dmg) {
+  if (e.def.swarm) for (const o of enemies) if (o.def.swarm && !o.dead && Math.hypot(o.x - e.x, o.y - e.y) < 10) wake(o);
   e.hp -= dmg; e.flash = 0.1;
   if (e.disguised) reveal(e);
   wake(e);
@@ -1103,6 +1224,11 @@ function hurtPlayer(amount, src) {
     const taken = Math.min(p.ammo.sig, 4) + Math.min(p.ammo.cells, 15);
     p.ammo.sig = Math.max(0, p.ammo.sig - 4); p.ammo.cells = Math.max(0, p.ammo.cells - 15);
     if (taken) say(T("ransom"));
+  }
+  if (src && src.def.wipes && p.armor > 0) { p.armor = 0; say(T("wiped")); }
+  if (src && src.def.popups && popups.length < 4) {
+    const lines = T("popups");
+    popups.push({ x: rand(40, SW - 300), y: rand(30, VIEW_H - 170), text: lines[Math.floor(Math.random() * lines.length)], t: 4, hue: Math.floor(rand(0, 360)) });
   }
   if (p.hp <= 0) { p.hp = 0; die(); }
 }
@@ -1140,6 +1266,17 @@ function updateEnemies(dt) {
     if (e.disguised) { if (d < 3 || (e.awake && d < 5)) reveal(e); else continue; }
     if (!e.awake) { if (los && d < 14) { wake(e); Sound.play("wake"); } else continue; }
     if (e.pain > 0) continue;
+
+    // a keylogger that can see you tells everything nearby where you are
+    if (def.reports && los) {
+      e.reportT = (e.reportT ?? 0.5) - dt;
+      if (e.reportT <= 0) {
+        e.reportT = 3;
+        let told = 0;
+        for (const o of enemies) if (o !== e && !o.dead && !o.awake && Math.hypot(o.x - e.x, o.y - e.y) < 14) { wake(o); told++; }
+        if (told) { say(T("reported")); Sound.play("wake"); }
+      }
+    }
 
     // attack
     if (def.melee) {
@@ -1244,6 +1381,8 @@ function update(dt) {
   for (const m of messages) m.t -= dt;
   messages = messages.filter(m => m.t > 0);
   if (screenFlash.t > 0) screenFlash.t -= dt;
+  for (const w of popups) w.t -= dt;
+  popups = popups.filter(w => w.t > 0);
 }
 
 /* =============================================================== renderer */
@@ -1314,10 +1453,12 @@ function render() {
   const list = [];
   for (const it of items) if (!it.taken) list.push({ x: it.x, y: it.y, spr: SPR.item[it.ch], scale: 0.42, z: 0 });
   for (const e of enemies) {
+    if (e.dead && e.def.fileless) continue;
     if (e.dead) { list.push({ x: e.x, y: e.y, spr: spritesFor(e).corpse, scale: e.def.boss ? 1 : 0.55, z: 0 }); continue; }
     if (e.disguised) { list.push({ x: e.x, y: e.y, spr: SPR.gift, scale: 0.5, z: 0 }); continue; }
     const fr = e.attackT > 0 ? 2 : (e.awake && Math.floor(e.t * 4) % 2 ? 1 : 0);
-    list.push({ x: e.x, y: e.y, spr: spritesFor(e)[fr], scale: e.def.scale, z: e.def.z + (e.ch === "s" ? Math.sin(e.t * 3) * 0.05 : 0), flash: e.flash > 0, ghost: e.ch === "s" });
+    list.push({ x: e.x, y: e.y, spr: spritesFor(e)[fr], scale: e.def.scale, z: e.def.z + (e.ch === "s" ? Math.sin(e.t * 3) * 0.05 : 0), flash: e.flash > 0,
+      ghost: e.ch === "s" ? 1 : e.def.fileless && e.attackT <= 0 && e.flash <= 0 && Math.hypot(e.x - p.x, e.y - p.y) > 3 ? 2 : 0 });
   }
   for (const s of shots) list.push({ x: s.x, y: s.y, spr: s.spr, scale: 0.28, z: s.z ?? 0.3, bright: true });
   for (const pf of puffs) list.push({ x: pf.x, y: pf.y, spr: pf.spr, scale: 0.3, z: pf.z, bright: true });
@@ -1342,7 +1483,7 @@ function drawSprite(s, inv, dirX, dirY, planeX, planeY, fog) {
     if (ty >= zbuf[x]) continue;
     const u = Math.min(63, ((x - left) * k) | 0);
     for (let y = y0; y <= y1; y++) {
-      if (s.ghost && ((x + y) & 1)) continue;            // spyware is half there
+      if (s.ghost === 1 ? (x + y) & 1 : s.ghost === 2 ? (x | y) & 1 : 0) continue;   // spyware is half there, fileless a quarter
       const v = Math.min(63, ((y - top) * k) | 0);
       const c = data[v * 64 + u];
       if ((c >>> 24) < 128) continue;
@@ -1480,6 +1621,20 @@ function drawTarget() {
   sctx.fillStyle = "#eaf1fb"; sctx.fillText(label, SW / 2, VIEW_H / 2 + 34);
   sctx.textAlign = "left";
 }
+function drawPopup(w) {
+  const x = w.x, y = w.y, pw = 260, ph = 140;
+  sctx.fillStyle = "rgba(0,0,0,.35)"; sctx.fillRect(x + 5, y + 5, pw, ph);
+  sctx.fillStyle = "#f8fafc"; sctx.fillRect(x, y, pw, ph);
+  sctx.fillStyle = `hsl(${w.hue}, 80%, 45%)`; sctx.fillRect(x, y, pw, 22);
+  sctx.fillStyle = "#fff"; sctx.fillRect(x + pw - 20, y + 4, 15, 14);
+  sctx.fillStyle = "#b91c1c"; sctx.font = "bold 12px sans-serif"; sctx.textAlign = "center"; sctx.fillText("\u00d7", x + pw - 12.5, y + 15.5);
+  sctx.fillStyle = `hsl(${(w.hue + 180) % 360}, 85%, 40%)`; sctx.font = "bold 17px ui-sans-serif, system-ui, sans-serif";
+  sctx.fillText(w.text, x + pw / 2, y + 66, pw - 20);
+  sctx.fillStyle = "#16a34a"; sctx.fillRect(x + pw / 2 - 60, y + 84, 120, 28);
+  sctx.fillStyle = "#fff"; sctx.font = "bold 14px sans-serif"; sctx.fillText("OK!!!", x + pw / 2, y + 103);
+  sctx.fillStyle = "#64748b"; sctx.font = "11px sans-serif"; sctx.fillText(T("popupClose", { s: Math.ceil(w.t) }), x + pw / 2, y + ph - 8);
+  sctx.textAlign = "left";
+}
 function drawMessages() {
   sctx.font = "600 15px ui-sans-serif, system-ui, sans-serif"; sctx.textAlign = "left";
   messages.forEach((m, i) => {
@@ -1513,6 +1668,7 @@ function present() {
   sctx.imageSmoothingEnabled = false;
   sctx.drawImage(view, 0, 0, SW, VIEW_H);
   if (screenFlash.t > 0) { sctx.fillStyle = screenFlash.color; sctx.fillRect(0, 0, SW, VIEW_H); }
+  for (const w of popups) drawPopup(w);
   if (state === "play") {
     sctx.fillStyle = "rgba(255,255,255,.7)";
     sctx.fillRect(SW / 2 - 1, VIEW_H / 2 - 6, 2, 4); sctx.fillRect(SW / 2 - 1, VIEW_H / 2 + 2, 2, 4);

@@ -4,7 +4,7 @@
 const { FW_LEVELS } = require("../js/firewall-levels.js");
 
 const WALLS = "#123DRBYX";
-const FLOOR = ".Pvwtsrkhfacgpkby".split("").concat(["K", "H"]);
+const FLOOR = ".Pvwtsrdlnmxokhfacgpkby".split("").concat(["K", "H"]);
 const KNOWN = new Set(WALLS.split("").concat(FLOOR));
 const LOCKS = { R: "k", B: "b", Y: "y" };
 
@@ -79,7 +79,7 @@ FW_LEVELS.forEach((level, i) => {
 });
 // every kind of monster needs at least one real namesake in the history file
 const { FW_HISTORY } = require("../js/firewall-history.js");
-const KINDS = ["virus", "worm", "trojan", "spyware", "ransomware", "rootkit"];
+const KINDS = ["virus", "worm", "trojan", "spyware", "ransomware", "rootkit", "adware", "keylogger", "bot", "fileless", "wiper", "mobile"];
 const historyProblems = [];
 for (const k of KINDS) if (!FW_HISTORY.some(h => h.kind === k)) historyProblems.push(`no ${k} in the history`);
 FW_HISTORY.forEach((h, i) => {
