@@ -320,29 +320,6 @@ const LEVELS = [
       "###   #     #   0 #",
       "###################"
     ]
-  },
-
-  {
-    name: "Keen 1: Invasion of the Vorticons",
-    hint: "Commander Keen's ship parts, rebuilt as a computer: Battery = PSU, Vacuum Cleaner = fan, Joystick = driver, Everclear = OS. The cans are your hardware. Dodge the Vorticon.",
-    time: 150,
-    par: 41,
-    kinds: {
-      c: ["mobo", "cpu", "ram", "ram", "psu", "fan", "gpu", "ssd"],
-      s: ["driver", "os"]
-    },
-    map: [
-      "###############",
-      "#P     s      #",
-      "#  #########  #",
-      "#  #  c    #  #",
-      "#     #    #  #",
-      "# c ###  ###  #",
-      "# cc    @  c  #",
-      "#ccc  ##   s  #",
-      "# #   ##      #",
-      "#SX############"
-    ]
   }
 ];
 

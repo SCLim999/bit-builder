@@ -95,6 +95,12 @@ languages side by side.
 | Trojan | hunts you down |
 | Packet | flies straight and bounces |
 
+## Keen 1 — a spin-off level
+
+The *Keen 1* button opens **[Keen 1: Invasion of the Vorticons](https://sclim999.github.io/Keen-Vorticons/)**,
+a one-level puzzle that rebuilds Commander Keen's ship parts as a computer. It
+lives in its own repository: **[SCLim999/Keen-Vorticons](https://github.com/SCLim999/Keen-Vorticons)**.
+
 ## Packet Rush — the sister game
 
 The *Packet Rush* button opens **[Packet Rush](https://sclim999.github.io/Packet-Rush/)**,
