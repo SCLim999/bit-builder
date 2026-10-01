@@ -33,8 +33,6 @@ jobs:
       - name: Hand routes through the crate levels
         run: node tools/replay.js
 
-      - name: Packet Rush levels win with their scripted solutions
-        run: node tools/lem-check.js
 
       - name: Solve a sample of levels through the engine
         run: |

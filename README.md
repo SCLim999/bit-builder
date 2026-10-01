@@ -95,75 +95,16 @@ languages side by side.
 | Trojan | hunts you down |
 | Packet | flies straight and bounces |
 
-## Packet Rush — the Lemmings-style companion
+## Packet Rush — the sister game
 
-**[`lemmings.html`](lemmings.html)** (the *Packet Rush* button in the game) is a
-second game in the same repository: *Lemmings*, but the lemmings are network
-packets. They drop out of a router and march blindly forward; you hand out
-jobs so that enough of them reach the server before their **TTL** (time to
-live) runs out. The terrain is a destructible pixel bitmap — circuit-board
-silicon can be dug and blown up, shielded steel cannot.
-
-| Skill | Key | What it does | The idea behind it |
-|---|---|---|---|
-| Uplink | <kbd>1</kbd> | climbs any wall (permanent) | an uplink carries traffic up to the next network |
-| Buffer | <kbd>2</kbd> | survives any fall (permanent) | a buffer absorbs a burst that would otherwise be lost |
-| Overflow | <kbd>3</kbd> | freezes, then blows a hole five seconds later | a buffer overflow spills into neighbouring memory |
-| Firewall | <kbd>4</kbd> | stands still and turns traffic back | a firewall filters packets between networks |
-| Bridge | <kbd>5</kbd> | builds a twelve-step staircase | a bridge joins two network segments |
-| Tunnel | <kbd>6</kbd> | digs sideways through silicon | a VPN tunnel carries traffic through a network that would block it |
-| Pipe | <kbd>7</kbd> | digs straight down | a pipe passes one program's output down to the next |
-
-It opens in a **3D view**: the same simulation drawn as a diorama in WebGL2,
-with extruded circuit-board silicon, steel blocks and packets modelled as
-little envelopes on legs. Drag empty space to tilt the camera, scroll to zoom,
-double-click to reset; packets hidden inside a tunnel or shaft show through as
-glowing silhouettes. <kbd>V</kbd> (or the *View* button) switches to the flat
-2D view, which is also what browsers without WebGL2 get. The renderer is
-hand-written, with no library, so the page still has no dependencies.
-
-The play area sits in a small **data centre**: two rows of server racks with
-blinking status lights, an overhead cable tray and fibre runs with data pulses
-travelling along them, ceiling lights, drifting 0s and 1s in the flat view and
-a raised floor of perforated tiles under the 3D diorama. Every theme has its
-own version, it is kept low in contrast so packets stay easy to see, and the
-motion stops when the system asks for reduced motion.
-
-The **OSI model** button opens a reference panel: the seven OSI layers with
-what each one does, its data unit (bits, frame, packet, segment, data),
-example protocols and devices, and which levels touch it; then encapsulation,
-attacks by layer, a mnemonic, the four-layer TCP/IP model mapped onto OSI,
-TCP versus UDP, and ports and sockets. Every level card carries a chip naming
-the OSI layer its concept belongs to, with a sentence on why. Background
-reading linked from the panel:
-
-- [The OSI Model Explained — Network Supply](https://www.network-supply.com/blogs/knowledge/the-osi-model-explained)
-- [TCP/IP protocols — IBM CICS TS 5.5 documentation](https://www.ibm.com/docs/en/cics-ts/5.5.0?topic=concepts-tcpip-protocols)
-- [What is the OSI model? — Cloudflare Learning Center](https://www.cloudflare.com/learning/ddos/glossary/open-systems-interconnection-model-osi/)
-
-Seven levels, one skill introduced at a time, each with a short computing
-concept on its intro and result cards, in English and Mandarin. It shares the
-language setting with Bit Builder, and the *Theme* picker offers five colour
-schemes that recolour both the page and the game world: **Bright** and **Dark**
-(the same two as Bit Builder), **Soft** (pastel lavender, mint and peach),
-**Energy** (deep teal, lime and hot orange) and **Excited** (neon magenta and
-electric yellow on violet, with a pulsing grid). <kbd>P</kbd> pauses,
-<kbd>F</kbd> fast-forwards, <kbd>V</kbd> switches 3D / 2D, <kbd>R</kbd> restarts and <kbd>K</kbd> twice
-(*kill -9*) ends the run.
-
-| File | Purpose |
-|---|---|
-| `lemmings.html`, `css/lemmings.css` | the page (reuses `css/game.css` for the chrome) |
-| `js/lem-engine.js` | deterministic tick-based simulation: terrain, packets, skills |
-| `js/lem-levels.js` | the levels — rectangles of silicon and steel, hazards, skill budgets, concept notes, OSI tags — plus the OSI and TCP/IP reference text |
-| `js/lem-main.js` | 2D rendering, input, overlays, progress, interface text |
-| `js/lem-backdrop.js` | the data centre behind the play area — racks, status lights, cable tray, data pulses — shared by both views |
-| `js/lem-3d.js` | the 3D view — a WebGL2 renderer built from one instanced cube, plus camera and picking |
-| `tools/lem-check.js` | replays a scripted solution for every level and checks that doing nothing loses |
-
-`node tools/lem-check.js` runs in CI next to the Bit Builder checks, so a
-terrain change that makes a Packet Rush level unwinnable — or trivially
-winnable — fails the build.
+The *Packet Rush* button opens **[Packet Rush](https://sclim999.github.io/Packet-Rush/)**,
+a Lemmings-style networking puzzle that started in this repository and now has
+its own: **[SCLim999/Packet-Rush](https://github.com/SCLim999/Packet-Rush)**.
+Network packets march blindly across a pixel map, and you give them jobs —
+firewall, bridge, tunnel, pipe and more — to reach the server; its levels are
+built around the OSI layers, with TCP and UDP traffic, a botnet, a man in the
+middle, a classroom mode and a level editor. The two games share the language
+setting and the bright / dark theme when both are served from GitHub Pages.
 
 ## Files
 
