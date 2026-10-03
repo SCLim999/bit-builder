@@ -187,6 +187,26 @@ The maps are ASCII art in `js/firewall-levels.js` (legend at the top), and
 be collected in an order that opens the way to the terminal — and that every
 kind of monster has a real namesake in the timeline.
 
+## Game master (GM) mode
+
+For teachers demonstrating the game: open the **Game master** link at the bottom
+of the page (or type `gmlogin` anywhere, or add `#gm` to the address) and enter
+the GM password. In GM mode you are **invincible** — no damage, no stolen ammo,
+no wiped firewall, no pop-ups or ransom notes — and a gold *GM · INVINCIBLE*
+badge shows on screen. Stars, best times and endless-mode records are **not
+saved** while it is on, so class scores stay fair; levels still unlock, so you
+can preview the later sectors. Log out from the same link.
+
+The default password is `firewall-gm`. To change it, run
+
+```bash
+node -e 'console.log(require("crypto").createHash("sha256").update("YOUR NEW PASSWORD").digest("hex"))'
+```
+
+and paste the result into `GM_HASH` at the top of `js/firewall.js`. Only the
+hash is stored, but the whole game runs in the browser, so this keeps students
+out of GM mode rather than stopping a determined programmer.
+
 ## Files
 
 | File | Purpose |

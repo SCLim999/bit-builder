@@ -92,9 +92,23 @@
   <form method="dialog"><button class="btn fw-close"></button></form>
 </dialog>
 
+<dialog id="fw-gm-dialog">
+  <form id="fw-gm-form" class="fw-gm-form">
+    <h2 id="fw-gm-title"></h2>
+    <p id="fw-gm-text" class="muted"></p>
+    <input id="fw-gm-pass" type="password" autocomplete="off">
+    <p id="fw-gm-error" class="fw-gm-error" role="alert"></p>
+    <div class="overlay-buttons">
+      <button id="fw-gm-ok" class="btn btn-primary" type="submit"></button>
+      <button id="fw-gm-cancel" class="btn" type="button"></button>
+    </div>
+  </form>
+</dialog>
+
 <footer class="foot">
   <p id="fw-foot"></p>
   <p id="fw-disclaimer" class="fw-disclaimer"></p>
+  <p><button id="fw-gm" class="fw-gm-link" type="button"></button></p>
 </footer>
 
 <script src="js/firewall-levels.js"></script>

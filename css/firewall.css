@@ -161,3 +161,13 @@ body.fs .fw-stage .overlay { inset: 0; }
 .fw-upgrades .fw-option span { font-size: 12.5px; color: var(--muted); }
 .fw-survival-pitch { margin: 18px auto 0; padding-top: 14px; border-top: 1px solid var(--line); max-width: 52ch; }
 .fw-survival-pitch p { margin: 0 0 10px !important; }
+
+/* game master: a quiet footer link and its login dialog */
+.fw-gm-link { margin-top: 10px; font: inherit; font-size: 11px; color: var(--muted); background: none; border: 0; padding: 2px 6px; cursor: pointer; opacity: .6; }
+.fw-gm-link:hover, .fw-gm-link:focus-visible { opacity: 1; text-decoration: underline; }
+.fw-gm-link.on { color: var(--amber); opacity: 1; }
+.fw-gm-form { display: grid; gap: 10px; min-width: min(360px, 80vw); }
+.fw-gm-form input { font: inherit; font-size: 15px; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; }
+.fw-gm-form input:focus { outline: none; border-color: var(--amber); }
+.fw-gm-error { color: var(--red) !important; min-height: 1.2em; margin: 0 !important; font-size: 13px !important; }
+.fw-gm-note { color: var(--amber) !important; font-weight: 600; }

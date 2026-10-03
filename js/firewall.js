@@ -60,6 +60,13 @@ const STR = {
     up_sig: "Signature update|+25% damage with every weapon.", up_clock: "Overclock|Fire 15% faster.",
     up_ammo: "Ammo cache|+20 signatures and +80 cells.", up_backup: "Backup drive|Ransomware and wipers can\u2019t touch your files.",
     musicOn: "Music: on", musicOff: "Music: off",
+    gmFooter: "Game master", gmTitle: "Game master login",
+    gmText: "Enter the game master password. In GM mode you are invincible, and stars, best times and endless-mode records are not saved.",
+    gmPass: "Password", gmLogin: "Log in", gmCancel: "Cancel", gmWrong: "Wrong password.",
+    gmInsecure: "The password check needs the page opened over https or from localhost.",
+    gmOnTitle: "Game master mode is on", gmOnText: "You are invincible. Stars, best times and endless-mode records are not saved until you log out.",
+    gmLogout: "Log out", gmBadge: "GM \u00b7 INVINCIBLE", gmOnMsg: "Game master mode on \u2014 you are invincible",
+    gmOffMsg: "Game master mode off", gmNoRecord: "Game master mode: this run is not recorded.",
     identified: "Signature identified: {n}", scanning: "unknown sample \u00b7 scanning",
     mailTitle: "Incoming email \u2014 is it safe?", mailText: "Read it carefully. Report it if it is phishing; open it if it is genuine.",
     mailFrom: "From", mailSubject: "Subject", mailAttach: "Attachment",
@@ -160,6 +167,13 @@ const STR = {
     up_sig: "特征码更新|所有武器伤害 +25%。", up_clock: "超频|射速提高 15%。",
     up_ammo: "弹药补给|特征码 +20，能量电池 +80。", up_backup: "备份硬盘|勒索软件和擦除器碰不到你的文件。",
     musicOn: "音乐：开", musicOff: "音乐：关",
+    gmFooter: "游戏管理员", gmTitle: "游戏管理员（GM）登录",
+    gmText: "请输入 GM 密码。GM 模式下你无敌，不会受伤；星级、最佳时间和无尽模式纪录都不会保存。",
+    gmPass: "密码", gmLogin: "登录", gmCancel: "取消", gmWrong: "密码错误。",
+    gmInsecure: "密码校验需要通过 https 或 localhost 打开页面。",
+    gmOnTitle: "GM 模式已开启", gmOnText: "你现在无敌。在退出登录之前，星级、最佳时间和无尽模式纪录都不会保存。",
+    gmLogout: "退出登录", gmBadge: "GM · 无敌", gmOnMsg: "GM 模式已开启 —— 你现在无敌",
+    gmOffMsg: "GM 模式已关闭", gmNoRecord: "GM 模式：本局成绩不记录。",
     identified: "已识别特征码：{n}", scanning: "未知样本 · 扫描中",
     mailTitle: "新邮件 —— 它安全吗？", mailText: "仔细阅读。如果是钓鱼邮件就举报；如果是正常邮件就打开。",
     mailFrom: "发件人", mailSubject: "主题", mailAttach: "附件",
@@ -282,6 +296,14 @@ const QUIZ = {
   wiper:      { en: "Destroys data on purpose \u2014 there is no ransom and no way to pay.", zh: "故意销毁数据——没有赎金，也无从付款。" },
   mobile:     { en: "Targets phones and tablets, often hidden in fake apps.", zh: "以手机和平板为目标，常藏在假冒应用里。" }
 };
+
+/* Game master: a teacher's account that is invincible. Only the SHA-256 of the
+   password lives here. To change the password, run
+     node -e 'console.log(require("crypto").createHash("sha256").update("NEW PASSWORD").digest("hex"))'
+   and paste the result below. Everything runs in the viewer's browser, so this
+   keeps students out of GM mode, not a determined programmer. */
+const GM_HASH = "93d9adf3e87842626156d1149b604ebc2c795dcb57805e4c0082d40877f98232";
+const GM_KEY = "firewall3d.gm";
 
 const LANG_KEY = "bitbuilder.lang", THEME_KEY = "bitbuilder.theme";
 const PROGRESS_KEY = "firewall3d.progress", INTEL_KEY = "firewall3d.intel", SOUND_KEY = "firewall3d.sound";
@@ -1132,6 +1154,7 @@ let state = "menu", showMap = false, messages = [], screenFlash = { color: "", t
 let progress = load(PROGRESS_KEY, { unlocked: 1, best: {} });
 let intel = new Set(load(INTEL_KEY, []));
 let removed = new Set(load(REMOVED_KEY, []));
+let gm = load(GM_KEY, false) === true;
 const identified = new Set();            // kinds scanned this session: the scanner knows their signature
 let scan = { e: null, t: 0 }, mail = null, quiz = null;
 const SCAN_TIME = 0.9;
@@ -1498,6 +1521,11 @@ function reveal(e) {
 function hurtPlayer(amount, src) {
   const p = player;
   if (p.hp <= 0) return;
+  if (gm) {                                  // game master: nothing gets through
+    if (src && src.x != null) p.hits.push({ a: Math.atan2(src.y - p.y, src.x - p.x), t: 0.5 });
+    flash("rgba(250,204,21,.18)", 0.1);
+    return;
+  }
   amount = Math.round(amount);
   if (p.armor > 0) { const soak = Math.min(p.armor, Math.floor(amount / 2)); p.armor -= soak; amount -= soak; }
   p.hp -= amount; p.hurtT = 0.4;
@@ -1611,7 +1639,7 @@ function updateEnemies(dt) {
       if (e.noteT <= 0) {
         e.noteT = 14;
         if (player.backup) say(T("backupSaved"));
-        else if (!popups.some(w => w.ransom)) { popups.push({ ransom: true, t: 3.5 }); Sound.play("reveal"); }
+        else if (!gm && !popups.some(w => w.ransom)) { popups.push({ ransom: true, t: 3.5 }); Sound.play("reveal"); }
       }
     }
     if (def.summons) {
@@ -1874,7 +1902,7 @@ function drawHud() {
 /* the status-bar face is a CPU: it sweats, winces and grins like the original */
 function drawFace(cx, cy) {
   const p = player, g = sctx;
-  const col = p.hp > 60 ? "#22c55e" : p.hp > 30 ? "#f5a524" : "#ef4444";
+  const col = gm ? "#facc15" : p.hp > 60 ? "#22c55e" : p.hp > 30 ? "#f5a524" : "#ef4444";
   g.fillStyle = "#9aa3ad";
   for (let i = 0; i < 5; i++) {
     g.fillRect(cx - 18 + i * 8, cy - 31, 4, 5); g.fillRect(cx - 18 + i * 8, cy + 26, 4, 5);
@@ -2021,6 +2049,13 @@ function present() {
   if (showMap) drawMap();
   drawMessages();
   drawHud();
+  if (gm) {
+    sctx.font = "bold 12px ui-monospace, Consolas, monospace"; sctx.textAlign = "right";
+    const t = T("gmBadge"), w = sctx.measureText(t).width + 14;
+    sctx.fillStyle = "rgba(5,8,12,.75)"; sctx.fillRect(SW - w - 8, VIEW_H - 26, w, 20);
+    sctx.fillStyle = "#facc15"; sctx.fillText(t, SW - 15, VIEW_H - 11);
+    sctx.textAlign = "left";
+  }
 }
 
 /* ================================================================ threats */
@@ -2201,9 +2236,11 @@ function answerQuiz(choice, buttons, replay = false) {
 }
 function finishResults() {
   const i = levelIndex, n = starChecks().filter(Boolean).length;
-  progress.stars = progress.stars || {};
-  progress.stars[i] = Math.max(progress.stars[i] || 0, n);
-  save(PROGRESS_KEY, progress);
+  if (!gm) {
+    progress.stars = progress.stars || {};
+    progress.stars[i] = Math.max(progress.stars[i] || 0, n);
+    save(PROGRESS_KEY, progress);
+  }
   quiz = null;
   state = i === FW_LEVELS.length - 1 ? "win" : "clear";
   showOverlay();
@@ -2213,14 +2250,14 @@ function finishLevel() {
   const i = levelIndex;
   progress.unlocked = Math.max(progress.unlocked, Math.min(FW_LEVELS.length, i + 2));
   const prev = progress.best[i];
-  if (!prev || stats.time < prev) progress.best[i] = Math.round(stats.time);
+  if (!gm && (!prev || stats.time < prev)) progress.best[i] = Math.round(stats.time);
   save(PROGRESS_KEY, progress);
   releasePointer();
   startQuiz();
 }
 function die() {
   state = "dead";
-  if (mode === "survival") {
+  if (mode === "survival" && !gm) {
     const best = survivalBest();
     survival.best = { wave: Math.max(best.wave, survival.wave), score: Math.max(best.score, survival.score) };
     save("firewall3d.survival", survival.best);
@@ -2349,6 +2386,10 @@ function showOverlay() {
     b2.textContent = T("playAgain"); b2.onclick = () => startLevel(0);
   }
   if (extraAfter) { extra.append(extraAfter); extraAfter = null; }
+  if (gm && (state === "clear" || state === "win" || state === "upgrade")) {
+    const note = document.createElement("p"); note.className = "fw-gm-note"; note.textContent = T("gmNoRecord");
+    extra.append(note);
+  }
   if (state === "menu" || state === "dead" || state === "clear") {
     // the briefing for the level about to be played
     const i = state === "menu" ? Math.min(progress.unlocked, FW_LEVELS.length) - 1 : -1;
@@ -2512,6 +2553,51 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) pause
   }
 })();
 
+/* ============================================================ game master */
+async function sha256(text) {
+  if (!(window.crypto && crypto.subtle)) return null;
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function setGM(on) {
+  gm = on; save(GM_KEY, on);
+  if (player && state !== "menu") say(T(on ? "gmOnMsg" : "gmOffMsg"));
+  if (on) Sound.play("weapon");
+  applyText();
+}
+function openGM() {
+  pause();
+  const d = $("fw-gm-dialog"), err = $("fw-gm-error");
+  err.textContent = "";
+  $("fw-gm-title").textContent = T(gm ? "gmOnTitle" : "gmTitle");
+  $("fw-gm-text").textContent = T(gm ? "gmOnText" : "gmText");
+  $("fw-gm-pass").placeholder = T("gmPass");
+  $("fw-gm-pass").value = "";
+  $("fw-gm-pass").hidden = gm;
+  $("fw-gm-ok").textContent = T(gm ? "gmLogout" : "gmLogin");
+  $("fw-gm-cancel").textContent = T(gm ? "close" : "gmCancel");
+  d.showModal();
+  if (!gm) $("fw-gm-pass").focus();
+}
+$("fw-gm-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (gm) { setGM(false); $("fw-gm-dialog").close(); return; }
+  const hash = await sha256($("fw-gm-pass").value);
+  if (hash === null) { $("fw-gm-error").textContent = T("gmInsecure"); return; }
+  if (hash !== GM_HASH) { $("fw-gm-error").textContent = T("gmWrong"); $("fw-gm-pass").select(); Sound.play("denied"); return; }
+  $("fw-gm-dialog").close();
+  setGM(true);
+});
+$("fw-gm-cancel").onclick = () => $("fw-gm-dialog").close();
+$("fw-gm").onclick = openGM;
+let typed = "";                              // typing "gmlogin" anywhere also opens it
+window.addEventListener("keydown", e => {
+  if (e.target && /input|textarea/i.test(e.target.tagName)) return;
+  if (e.key.length === 1) typed = (typed + e.key.toLowerCase()).slice(-7);
+  if (typed === "gmlogin") { typed = ""; openGM(); }
+});
+if (location.hash === "#gm") setTimeout(openGM, 300);
+
 /* ============================================================ page chrome */
 function fullscreenOn() { return !!(document.fullscreenElement || document.webkitFullscreenElement) || document.body.classList.contains("fs"); }
 function toggleFullscreen() {
@@ -2545,6 +2631,8 @@ function applyText() {
   $("fw-help").textContent = T("help");
   $("fw-keys").textContent = T("keys");
   $("fw-foot").textContent = T("foot");
+  $("fw-gm").textContent = gm ? "GM \u2713" : T("gmFooter");
+  $("fw-gm").classList.toggle("on", gm);
   $("fw-disclaimer").innerHTML = `<strong>${T("disclaimerTitle")}</strong> ${T("disclaimer")}`;
   $("fw-levels-title").textContent = T("levels");
   $("fw-intel-title").textContent = T("intel");
