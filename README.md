@@ -99,6 +99,17 @@ languages side by side.
 | Trojan | hunts you down |
 | Packet | flies straight and bounces |
 
+## Packet Rush — the sister game
+
+The *Packet Rush* button opens **[Packet Rush](https://sclim999.github.io/Packet-Rush/)**,
+a Lemmings-style networking puzzle that started in this repository and now has
+its own: **[SCLim999/Packet-Rush](https://github.com/SCLim999/Packet-Rush)**.
+Network packets march blindly across a pixel map, and you give them jobs —
+firewall, bridge, tunnel, pipe and more — to reach the server; its levels are
+built around the OSI layers, with TCP and UDP traffic, a botnet, a man in the
+middle, a classroom mode and a level editor. The two games share the language
+setting and the bright / dark theme when both are served from GitHub Pages.
+
 ## Files
 
 | File | Purpose |
