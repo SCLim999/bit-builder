@@ -187,6 +187,23 @@ The maps are ASCII art in `js/firewall-levels.js` (legend at the top), and
 be collected in an order that opens the way to the terminal — and that every
 kind of monster has a real namesake in the timeline.
 
+## Phones and tablets (Android)
+
+On a touch screen the game switches to touch controls by itself:
+
+- **Left stick** to move, **drag anywhere on the view** to turn, **✶** to fire
+  (hold for automatic), **E** to open doors and terminals, **↻** to change
+  weapon, **▦** for the map and **❚❚** to pause. Moving and firing work at the
+  same time with two thumbs.
+- Starting a level goes **full screen and asks for landscape**. The stick and
+  buttons then sit in the black bars either side of the view, so nothing
+  covers it. In portrait the controls sit underneath the view, with a hint to
+  turn the phone.
+- Long-press menus, double-tap zoom, pull-to-refresh and page scrolling are
+  switched off over the game, so fast thumbs don't fight the browser.
+
+Tested with Chrome's Pixel 7 emulation in both orientations.
+
 ## Game master (GM) mode
 
 For teachers demonstrating the game: open the **Game master** link at the bottom

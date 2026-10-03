@@ -17,6 +17,8 @@ const STR = {
     back: "← Bit Builder", other: "中文", levels: "Levels", intel: "Threat database",
     soundOn: "Sound: on", soundOff: "Sound: off", full: "Full screen", exitFull: "Exit full screen",
     help: "How to play", close: "Close",
+    touchKeys: "Left stick: move \u00b7 drag the view: turn \u00b7 \u2736 fire \u00b7 E open / use \u00b7 \u21bb weapon \u00b7 \u25a6 map \u00b7 \u275a\u275a pause",
+    rotate: "Turn your phone sideways for a bigger view", pausedTouch: "Tap Resume to carry on.",
     keys: "Click the view to aim with the mouse · WASD / arrows move · Shift run · click, Space or Ctrl fire · E open / use · 1–3 or Q switch weapon · M map · P / Esc pause",
     foot: "Part of Bit Builder — built for PPS2114. Keyboard and mouse, or touch.",
     disclaimerTitle: "Disclaimer.",
@@ -124,6 +126,8 @@ const STR = {
     back: "← 组装大师", other: "EN", levels: "关卡", intel: "威胁数据库",
     soundOn: "声音：开", soundOff: "声音：关", full: "全屏", exitFull: "退出全屏",
     help: "玩法说明", close: "关闭",
+    touchKeys: "左侧摇杆：移动 · 拖动画面：转向 · ✶ 射击 · E 开门 / 使用 · ↻ 切换武器 · ▦ 地图 · ❚❚ 暂停",
+    rotate: "把手机横过来，画面更大", pausedTouch: "点击“继续”接着玩。",
     keys: "点击画面后用鼠标瞄准 · WASD / 方向键移动 · Shift 奔跑 · 点击、空格或 Ctrl 射击 · E 开门 / 使用 · 1–3 或 Q 切换武器 · M 地图 · P / Esc 暂停",
     disclaimerTitle: "免责声明：",
     disclaimer: "《防火墙 3D》是一款教育游戏。它不包含任何真实的恶意软件或有害代码：游戏里的每一个“病毒”都只是一幅画。" +
@@ -2111,6 +2115,7 @@ const UPGRADES = {
 };
 const WAVE_KINDS = ["v", "w", "s", "o", "t", "d", "n", "r", "l", "m", "x"];
 function startSurvival() {
+  phoneFullscreen();
   loadMap(FW_ARENA, LEVEL_LOOK[3], { hp: 100, armor: 50, weapons: [true, true, true], ammo: { sig: 20, cells: 80 }, cur: 1 });
   mode = "survival"; levelIndex = -1;
   survival = { wave: 0, score: 0, choices: [], best: survivalBest() };
@@ -2265,10 +2270,26 @@ function die() {
   releasePointer();
   setTimeout(showOverlay, 700);
 }
+const coarse = matchMedia("(pointer: coarse)");
+/* On a phone, starting a game goes full screen and asks for landscape. Both
+   are optional: a browser that refuses simply keeps the normal page. */
+function phoneFullscreen() {
+  if (!coarse.matches || document.fullscreenElement || document.webkitFullscreenElement) return;
+  const root = document.documentElement, req = root.requestFullscreen || root.webkitRequestFullscreen;
+  if (!req) return;
+  document.body.classList.add("fs");
+  try {
+    const r = req.call(root, { navigationUI: "hide" });
+    const lock = () => { try { const o = window.screen.orientation, l = o && o.lock && o.lock("landscape"); if (l && l.catch) l.catch(() => {}); } catch (e) { /* not supported */ } };
+    if (r && r.then) r.then(lock, () => { document.body.classList.remove("fs"); applyText(); }); else lock();
+  } catch (e) { document.body.classList.remove("fs"); }
+  applyText();
+}
 function restartCurrent() {
   if (mode === "survival") startSurvival(); else startLevel(levelIndex, levelStart);
 }
 function startLevel(i, loadout) {
+  phoneFullscreen();
   loadLevel(i, loadout || defaultLoadout(i));
   state = "play";
   hideOverlay();
@@ -2338,7 +2359,7 @@ function showOverlay() {
     if (quiz.answered) answerQuiz(quiz.choice, buttons, true);   // redrawn after a language switch
   } else if (state === "paused") {
     title.textContent = T("paused");
-    text.textContent = T("pausedText");
+    text.textContent = T(coarse.matches ? "pausedTouch" : "pausedText");
     st.innerHTML = statsHtml();
     b1.textContent = T("resume"); b1.onclick = resume;
     b2.textContent = T("restart"); b2.onclick = restartCurrent;
@@ -2518,7 +2539,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) pause
 /* touch: a stick on the left, drag anywhere else on the view to turn */
 (function touchControls() {
   const stick = $("fw-stick"), knob = stick.querySelector("span");
-  let stickId = null, turnId = null, lastX = 0;
+  let stickId = null, turnId = null, lastX = 0, lastY = 0;
   stick.addEventListener("touchstart", e => { e.preventDefault(); stickId = e.changedTouches[0].identifier; moveStick(e.changedTouches[0]); }, { passive: false });
   stick.addEventListener("touchmove", e => {
     e.preventDefault();
@@ -2535,21 +2556,34 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) pause
     touch.mx = Math.abs(dx) > 0.2 ? dx : 0; touch.my = Math.abs(dy) > 0.2 ? dy : 0;
     knob.style.transform = `translate(${dx * 36}px, ${dy * 36}px)`;
   }
-  screen.addEventListener("touchstart", e => { const t = e.changedTouches[0]; turnId = t.identifier; lastX = t.clientX; }, { passive: true });
-  screen.addEventListener("touchmove", e => {
-    for (const t of e.changedTouches) if (t.identifier === turnId) { touch.turn += (t.clientX - lastX) * 0.008; lastX = t.clientX; }
+  // drag anywhere on the view to turn; the speed is relative to the view's
+  // width, so it feels the same on a small phone and a large tablet
+  screen.addEventListener("touchstart", e => {
+    if (turnId !== null) return;
+    const t = e.changedTouches[0]; turnId = t.identifier; lastX = t.clientX; lastY = t.clientY;
   }, { passive: true });
-  screen.addEventListener("touchend", e => { for (const t of e.changedTouches) if (t.identifier === turnId) turnId = null; });
+  screen.addEventListener("touchmove", e => {
+    if (state === "play") e.preventDefault();            // no page scroll or pull-to-refresh mid-fight
+    const w = screen.getBoundingClientRect().width || 400;
+    for (const t of e.changedTouches) if (t.identifier === turnId) { touch.turn += (t.clientX - lastX) / w * 3.2; lastX = t.clientX; lastY = t.clientY; }
+  }, { passive: false });
+  const endTurn = e => { for (const t of e.changedTouches) if (t.identifier === turnId) turnId = null; };
+  screen.addEventListener("touchend", endTurn); screen.addEventListener("touchcancel", endTurn);
   for (const b of document.querySelectorAll(".fw-touch-buttons button")) {
     const act = b.dataset.act;
     b.addEventListener("touchstart", e => {
       e.preventDefault(); Sound.ensure();
       if (state !== "play") return;
+      b.classList.add("down");
       if (act === "fire") touch.fire = true;
       else if (act === "use") use();
+      else if (act === "map") showMap = !showMap;
+      else if (act === "pause") pause();
       else cycleWeapon(1);
     }, { passive: false });
-    b.addEventListener("touchend", () => { if (act === "fire") touch.fire = false; });
+    const up = () => { b.classList.remove("down"); if (act === "fire") touch.fire = false; };
+    b.addEventListener("touchend", up); b.addEventListener("touchcancel", up);
+    b.addEventListener("contextmenu", e => e.preventDefault());
   }
 })();
 
@@ -2629,7 +2663,8 @@ function applyText() {
   $("fw-music").setAttribute("aria-pressed", String(Music.on));
   $("fw-full").textContent = T(fullscreenOn() ? "exitFull" : "full");
   $("fw-help").textContent = T("help");
-  $("fw-keys").textContent = T("keys");
+  $("fw-keys").textContent = T(coarse.matches ? "touchKeys" : "keys");
+  $("fw-rotate").textContent = T("rotate");
   $("fw-foot").textContent = T("foot");
   $("fw-gm").textContent = gm ? "GM \u2713" : T("gmFooter");
   $("fw-gm").classList.toggle("on", gm);
@@ -2673,6 +2708,7 @@ function loop(now) {
   if (state === "play") update(dt);
   else if (state === "menu") player.a += dt * 0.15;   // a slow look around behind the title
   Music.set(state === "play" && Sound.on && Music.on);
+  document.body.classList.toggle("playing", state === "play");
   present();
   requestAnimationFrame(loop);
 }
