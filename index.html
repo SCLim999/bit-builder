@@ -22,6 +22,7 @@
     <a class="btn" href="editor.html" data-i18n="btn.editor">Editor</a>
     <a class="btn" href="https://sclim999.github.io/Packet-Rush/" target="_blank" rel="noopener" data-i18n="btn.packetRush">Packet Rush</a>
     <button id="btn-theme" class="btn">Theme: bright</button>
+    <button id="btn-3d" class="btn" aria-pressed="true">3D: on</button>
     <button id="btn-fullscreen" class="btn" aria-pressed="false">Full screen</button>
     <button id="btn-practice" class="btn" aria-pressed="false">Practice: off</button>
     <button id="btn-sound" class="btn" aria-pressed="true">Sound: on</button>
@@ -33,6 +34,7 @@
 <main class="shell">
   <section class="stage">
     <canvas id="board" width="528" height="528" aria-label="game board"></canvas>
+    <canvas id="board3d" aria-hidden="true"></canvas>
     <div id="overlay" class="overlay hidden">
       <div class="overlay-card">
         <h2 id="ov-title">Ready?</h2>
@@ -144,6 +146,8 @@
 <script src="js/codec.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/sprites.js"></script>
+<script src="js/vendor/three.min.js"></script>
+<script src="js/view3d.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

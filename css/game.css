@@ -121,6 +121,13 @@ body.theme-dark #board { background: #05080d; }
   background: #1a2434;
   touch-action: none;
 }
+#board3d {
+  display: none;
+  position: absolute;
+  border-radius: 6px;
+  pointer-events: none;           /* swipes go through to #board underneath */
+}
+body.view-3d #board3d { display: block; }
 
 .overlay {
   position: absolute;

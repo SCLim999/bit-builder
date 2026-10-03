@@ -44,12 +44,32 @@ function loadTheme() {
 }
 function useTheme(name) {
   applyTheme(name);
+  View3D.reset();
   try { localStorage.setItem(THEME_KEY, currentTheme()); } catch (e) { /* storage disabled */ }
   document.body.classList.toggle("theme-dark", currentTheme() === "dark");
   el("btn-theme").textContent = t("btn.theme", { state: t("theme." + currentTheme()) });
   buildLegend();                 // the small canvases are drawn once, so redraw them
   buildKnowledge();
   if (game) updateHUD();
+}
+
+/* ---------------------------------------------------------------- 3D view */
+/* On by default: a three.js scene with a camera that follows the technician
+   (js/view3d.js). Off, or where WebGL is unavailable, the flat top-down board. */
+const VIEW3D_KEY = "bitbuilder.view3d";
+let view3d = true;
+function loadView3d() {
+  try { return localStorage.getItem(VIEW3D_KEY) !== "off"; } catch (e) { return true; }
+}
+function useView3d(on) {
+  view3d = on && View3D.supported();
+  try { localStorage.setItem(VIEW3D_KEY, on ? "on" : "off"); } catch (e) { /* storage disabled */ }
+  document.body.classList.toggle("view-3d", view3d);
+  const b = el("btn-3d");
+  b.textContent = t("btn.view3d", { state: t(view3d ? "state.on" : "state.off") });
+  b.setAttribute("aria-pressed", String(view3d));
+  b.disabled = !View3D.supported();
+  setupCanvas();
 }
 
 /* --------------------------------------------------------------- language */
@@ -74,6 +94,7 @@ function applyLanguage(lang) {
   el("btn-practice").textContent = t("btn.practice", { state: t(practice ? "state.on" : "state.off") });
   el("btn-fullscreen").textContent = t(fullscreenOn() ? "btn.exitFullscreen" : "btn.fullscreen");
   el("btn-theme").textContent = t("btn.theme", { state: t("theme." + currentTheme()) });
+  el("btn-3d").textContent = t("btn.view3d", { state: t(view3d ? "state.on" : "state.off") });
   buildLevelList();
   buildLegend();
   buildKnowledge();
@@ -150,12 +171,19 @@ const Sound = {
    size it ended up, so the board stays crisp full screen and on retina. */
 function setupCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const css = Math.max(200, Math.round(canvas.getBoundingClientRect().width) || BOARD);
+  // clientWidth ignores the 3D tilt transform; the bounding box would not
+  const css = Math.max(200, Math.round(canvas.clientWidth || canvas.getBoundingClientRect().width) || BOARD);
   BOARD = css;
   TILE = BOARD / VIEW;
   canvas.width = Math.round(css * dpr);
   canvas.height = Math.round(css * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // the 3D canvas sits exactly over the flat one, which still takes the swipes
+  const c3 = document.getElementById("board3d");
+  c3.style.left = canvas.offsetLeft + "px";
+  c3.style.top = canvas.offsetTop + "px";
+  c3.style.width = c3.style.height = css + "px";
+  View3D.resize(css);
 }
 
 function lerp(a, b, t) { return a + (b - a) * t; }
@@ -202,6 +230,7 @@ function drawItem(ch, sx, sy, gx, gy) {
 }
 
 function render(alpha) {
+  if (view3d) return View3D.render(game, alpha, animT, mode === "playing");
   const p = game.player;
   const px = lerp(p.prevX, p.x, alpha);
   const py = lerp(p.prevY, p.y, alpha);
@@ -633,6 +662,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "z" || e.key === "Z") { if (mode === "playing" || mode === "dead") rewind(); return; }
   if (e.key === "f" || e.key === "F") { toggleFullscreen(); return; }
   if (e.key === "p" || e.key === "P") { togglePause(); return; }
+  if (e.key === "v" || e.key === "V") { useView3d(!view3d); return; }
   if (e.key === "Enter" || e.key === " ") {
     if (!el("overlay").classList.contains("hidden")) {
       e.preventDefault();
@@ -896,6 +926,7 @@ el("btn-practice").onclick = e => {
   updateHUD();
 };
 el("btn-theme").onclick = () => useTheme(currentTheme() === "bright" ? "dark" : "bright");
+el("btn-3d").onclick = () => useView3d(!view3d);
 el("btn-knowledge").onclick = () => el("knowledge-dialog").showModal();
 el("btn-lang").onclick = () => applyLanguage(currentLang() === "zh" ? "en" : "zh");
 el("btn-sound").onclick = e => {
@@ -908,6 +939,7 @@ el("btn-sound").onclick = e => {
 setupCanvas();
 window.addEventListener("resize", setupCanvas);
 useTheme(loadTheme());
+useView3d(loadView3d());
 applyLanguage(loadLang());
 startFromHash();
 requestAnimationFrame(frame);
